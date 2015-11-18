@@ -8,16 +8,16 @@ import (
 
 	"io"
 
-	"github.com/bborbe/log"
 	"fmt"
+
+	"github.com/bborbe/log"
 )
 
 var logger = log.DefaultLogger
 
 const (
-	PARAMETER_FILE = "file"
+	PARAMETER_FILE     = "file"
 	PARAMETER_LOGLEVEL = "loglevel"
-
 )
 
 func main() {
