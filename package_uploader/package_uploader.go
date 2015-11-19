@@ -54,7 +54,7 @@ func (p *packageUploader) UploadPackage(api_url string, api_username string, api
 func extractNameOfFile(path string) string {
 	slashPos := strings.LastIndex(path, "/")
 	if slashPos != -1 {
-		return path[slashPos+1:]
+		return path[slashPos + 1:]
 	}
 	return path
 }
@@ -65,32 +65,21 @@ func (p *packageUploader) upload_file(api_url string, api_username string, api_p
 	requestbuilder := p.httpRequestBuilderProvider(fmt.Sprintf("%s/api/files/%s", api_url, name))
 	requestbuilder.AddBasicAuth(api_username, api_password)
 	requestbuilder.SetMethod("POST")
-
 	bodyBuf := &bytes.Buffer{}
 	bodyWriter := multipart.NewWriter(bodyBuf)
-
-	// this step is very important
 	fileWriter, err := bodyWriter.CreateFormFile("file", fmt.Sprintf("%s.deb", name))
 	if err != nil {
-		fmt.Println("error writing to buffer")
 		return err
 	}
-
-	// open file handle
 	fh, err := os.Open(file)
 	if err != nil {
-		fmt.Println("error opening file")
 		return err
 	}
-
-	//iocopy
 	_, err = io.Copy(fileWriter, fh)
 	if err != nil {
 		return err
 	}
-
 	bodyWriter.Close()
-
 	requestbuilder.AddContentType(bodyWriter.FormDataContentType())
 	requestbuilder.SetBody(bodyBuf)
 	return p.buildRequestAndExecute(requestbuilder)
@@ -135,7 +124,7 @@ func (p *packageUploader) buildRequestAndExecute(requestbuilder http_requestbuil
 	if err != nil {
 		return err
 	}
-	if resp.StatusCode/100 != 2 {
+	if resp.StatusCode / 100 != 2 {
 		return fmt.Errorf("upload file failed: %s", string(content))
 	}
 	return nil
