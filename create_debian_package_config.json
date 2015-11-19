@@ -1,0 +1,10 @@
+{
+  "name": "aptly",
+  "version": "1.0.0",
+  "files": [
+    {
+      "source": "bin/aptly_upload",
+      "target": "/opt/aptly/bin/aptly_upload"
+    }
+  ]
+}
