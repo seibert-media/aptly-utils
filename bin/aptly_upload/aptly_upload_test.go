@@ -4,10 +4,12 @@ import (
 	"testing"
 
 	"net/http"
+
+	aptly_package_uploader "github.com/bborbe/aptly/package_uploader"
 	. "github.com/bborbe/assert"
 	"github.com/bborbe/http/client"
+	"github.com/bborbe/http/requestbuilder"
 	io_mock "github.com/bborbe/io/mock"
-	aptly_package_uploader "github.com/bborbe/aptly/package_uploader"
 )
 
 func TestDo(t *testing.T) {
@@ -15,9 +17,9 @@ func TestDo(t *testing.T) {
 	writer := io_mock.NewWriter()
 	package_uploader := aptly_package_uploader.New(func() *http.Client {
 		return client.GetClientWithoutProxy()
-	})
+	}, requestbuilder.NewHttpRequestBuilderProvider().NewHttpRequestBuilder)
 
-	err = do(writer, package_uploader, "", "", "", "")
+	err = do(writer, package_uploader, "", "", "", "", "")
 	err = AssertThat(err, NotNilValue())
 	if err != nil {
 		t.Fatal(err)
