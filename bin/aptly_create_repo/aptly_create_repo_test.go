@@ -3,8 +3,8 @@ package main
 import (
 	"testing"
 
-	aptly_repo_creater "github.com/bborbe/aptly/repo_creater"
-	aptly_requestbuilder_executor "github.com/bborbe/aptly/requestbuilder_executor"
+	aptly_repo_creater "github.com/bborbe/aptly-utils/repo_creater"
+	aptly_requestbuilder_executor "github.com/bborbe/aptly-utils/requestbuilder_executor"
 	. "github.com/bborbe/assert"
 	"github.com/bborbe/http/client"
 	"github.com/bborbe/http/requestbuilder"

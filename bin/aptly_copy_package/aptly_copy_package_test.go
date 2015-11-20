@@ -3,9 +3,9 @@ package main
 import (
 	"testing"
 
-	aptly_package_copier "github.com/bborbe/aptly/package_copier"
-	aptly_package_uploader "github.com/bborbe/aptly/package_uploader"
-	aptly_requestbuilder_executor "github.com/bborbe/aptly/requestbuilder_executor"
+	aptly_package_copier "github.com/bborbe/aptly-utils/package_copier"
+	aptly_package_uploader "github.com/bborbe/aptly-utils/package_uploader"
+	aptly_requestbuilder_executor "github.com/bborbe/aptly-utils/requestbuilder_executor"
 	http_client "github.com/bborbe/http/client"
 	http_requestbuilder "github.com/bborbe/http/requestbuilder"
 

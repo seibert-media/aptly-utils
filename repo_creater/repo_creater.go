@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/bborbe/aptly/defaults"
-	"github.com/bborbe/aptly/requestbuilder_executor"
+	"github.com/bborbe/aptly-utils/defaults"
+	"github.com/bborbe/aptly-utils/requestbuilder_executor"
 	http_requestbuilder "github.com/bborbe/http/requestbuilder"
 	"github.com/bborbe/log"
 )
