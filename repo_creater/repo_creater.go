@@ -31,7 +31,7 @@ func New(buildRequestAndExecute requestbuilder_executor.RequestbuilderExecutor, 
 
 func (c *repoCreater) CreateRepo(apiUrl string, apiUsername string, apiPassword string, repo string) error {
 	if err := c.createRepo(apiUrl, apiUsername, apiPassword, repo); err != nil {
-		return err
+		//return err
 	}
 	if err := c.publishRepo(apiUrl, apiUsername, apiPassword, repo, defaults.DEFAULT_DISTRIBUTION, []string{defaults.DEFAULT_ARCHITECTURE}); err != nil {
 		return err
