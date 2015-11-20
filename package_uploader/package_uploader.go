@@ -63,7 +63,7 @@ func (p *packageUploader) uploadFile(apiUrl string, apiUsername string, apiPassw
 	requestbuilder.SetMethod("POST")
 	bodyBuf := &bytes.Buffer{}
 	bodyWriter := multipart.NewWriter(bodyBuf)
-	fileWriter, err := bodyWriter.CreateFormFile("file", fmt.Sprintf("%s.deb", name))
+	fileWriter, err := bodyWriter.CreateFormFile("file", name)
 	if err != nil {
 		return err
 	}
