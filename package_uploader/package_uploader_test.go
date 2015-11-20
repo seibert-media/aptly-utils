@@ -16,14 +16,14 @@ func TestImplementsPackageUploader(t *testing.T) {
 }
 
 func TestExtractNameOfFileWithoutSlash(t *testing.T) {
-	name := extractNameOfFile("foo.deb")
+	name := extractPkgOfFile("foo.deb")
 	if err := AssertThat(name, Is("foo.deb")); err != nil {
 		t.Fatal(err)
 	}
 }
 
 func TestExtractNameOfFileWithSlash(t *testing.T) {
-	name := extractNameOfFile("asdf/foo.deb")
+	name := extractPkgOfFile("asdf/foo.deb")
 	if err := AssertThat(name, Is("foo.deb")); err != nil {
 		t.Fatal(err)
 	}

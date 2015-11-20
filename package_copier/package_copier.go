@@ -1,30 +1,46 @@
 package package_copier
 
 import (
-	"github.com/bborbe/aptly/requestbuilder_executor"
+	"fmt"
+	"net/http"
+
+	"github.com/bborbe/aptly/package_uploader"
 	http_requestbuilder "github.com/bborbe/http/requestbuilder"
 	"github.com/bborbe/log"
 )
 
 type PackageCopier interface {
-	CopyPackage(apiUrl string, apiUsername string, apiPassword string, sourceRepo string, targetRepo string, pkg string) error
+	CopyPackage(apiUrl string, apiUsername string, apiPassword string, sourceRepo string, targetRepo string, name, version string) error
 }
 
 type packageCopier struct {
-	buildRequestAndExecute     requestbuilder_executor.RequestbuilderExecutor
+	uploader                   package_uploader.PackageUploader
 	httpRequestBuilderProvider http_requestbuilder.HttpRequestBuilderProvider
+	client                     *http.Client
 }
 
 var logger = log.DefaultLogger
 
-func New(buildRequestAndExecute requestbuilder_executor.RequestbuilderExecutor, httpRequestBuilderProvider http_requestbuilder.HttpRequestBuilderProvider) *packageCopier {
+func New(uploader package_uploader.PackageUploader, httpRequestBuilderProvider http_requestbuilder.HttpRequestBuilderProvider, client *http.Client) *packageCopier {
 	p := new(packageCopier)
-	p.buildRequestAndExecute = buildRequestAndExecute
+	p.client = client
+	p.uploader = uploader
 	p.httpRequestBuilderProvider = httpRequestBuilderProvider
 	return p
 }
 
-func (c *packageCopier) CopyPackage(apiUrl string, apiUsername string, apiPassword string, sourceRepo string, targetRepo string, pkg string) error {
-	logger.Debugf("CopyPackage")
-	return nil
+func (c *packageCopier) CopyPackage(apiUrl string, apiUsername string, apiPassword string, sourceRepo string, targetRepo string, name, version string) error {
+	logger.Debugf("CopyPackage - sourceRepo: %s targetRepo: %s, package: %s_%s", sourceRepo, targetRepo, name, version)
+	url := fmt.Sprintf("%s/%s/pool/main/%s/%s/%s_%s.deb", apiUrl, sourceRepo, name[0:1], name, name, version)
+	logger.Debugf("download package url: %s", url)
+	requestbuilder := c.httpRequestBuilderProvider.NewHttpRequestBuilder(url)
+	req, err := requestbuilder.GetRequest()
+	if err != nil {
+		return err
+	}
+	resp, err := c.client.Do(req)
+	if err != nil {
+		return err
+	}
+	return c.uploader.UploadPackageByReader(apiUrl, apiUsername, apiPassword, targetRepo, fmt.Sprintf("%s_%s", name, version), resp.Body)
 }

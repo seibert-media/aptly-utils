@@ -9,9 +9,10 @@ import (
 	"runtime"
 
 	aptly_package_copier "github.com/bborbe/aptly/package_copier"
+	aptly_package_uploader "github.com/bborbe/aptly/package_uploader"
 	aptly_requestbuilder_executor "github.com/bborbe/aptly/requestbuilder_executor"
-	"github.com/bborbe/http/client"
-	"github.com/bborbe/http/requestbuilder"
+	http_client "github.com/bborbe/http/client"
+	http_requestbuilder "github.com/bborbe/http/requestbuilder"
 	"github.com/bborbe/log"
 )
 
@@ -20,7 +21,8 @@ var logger = log.DefaultLogger
 const (
 	PARAMETER_SOURCE            = "source"
 	PARAMETER_TARGET            = "target"
-	PARAMETER_PACKAGE           = "package"
+	PARAMETER_NAME              = "name"
+	PARAMETER_VERSION           = "version"
 	PARAMETER_LOGLEVEL          = "loglevel"
 	PARAMETER_API_URL           = "url"
 	PARAMETER_API_USER          = "username"
@@ -38,18 +40,22 @@ func main() {
 	apiPasswordFilePtr := flag.String(PARAMETER_API_PASSWORD_FILE, "", "passwordfile")
 	sourcePtr := flag.String(PARAMETER_SOURCE, "", "source")
 	targetPtr := flag.String(PARAMETER_TARGET, "", "target")
-	packagePtr := flag.String(PARAMETER_PACKAGE, "", "package")
+	namePtr := flag.String(PARAMETER_NAME, "", "name")
+	versionPtr := flag.String(PARAMETER_VERSION, "", "version")
 	flag.Parse()
 	logger.SetLevelThreshold(log.LogStringToLevel(*logLevelPtr))
 	logger.Debugf("set log level to %s", *logLevelPtr)
 
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
-	requestbuilder_executor := aptly_requestbuilder_executor.New(client.GetClientWithoutProxy())
-	package_copier := aptly_package_copier.New(requestbuilder_executor, requestbuilder.NewHttpRequestBuilderProvider())
+	client := http_client.GetClientWithoutProxy()
+	requestbuilder_executor := aptly_requestbuilder_executor.New(client)
+	requestbuilder := http_requestbuilder.NewHttpRequestBuilderProvider()
+	package_uploader := aptly_package_uploader.New(requestbuilder_executor, requestbuilder)
+	package_copier := aptly_package_copier.New(package_uploader, requestbuilder, client)
 
 	writer := os.Stdout
-	err := do(writer, package_copier, *apiUrlPtr, *apiUserPtr, *apiPasswordPtr, *apiPasswordFilePtr, *sourcePtr, *targetPtr, *packagePtr)
+	err := do(writer, package_copier, *apiUrlPtr, *apiUserPtr, *apiPasswordPtr, *apiPasswordFilePtr, *sourcePtr, *targetPtr, *namePtr, *versionPtr)
 	if err != nil {
 		logger.Fatal(err)
 		logger.Close()
@@ -57,7 +63,7 @@ func main() {
 	}
 }
 
-func do(writer io.Writer, package_copier aptly_package_copier.PackageCopier, url string, user string, password string, passwordfile string, source string, target string, pkg string) error {
+func do(writer io.Writer, package_copier aptly_package_copier.PackageCopier, url string, user string, password string, passwordfile string, source string, target string, name string, version string) error {
 	if len(passwordfile) > 0 {
 		content, err := ioutil.ReadFile(passwordfile)
 		if err != nil {
@@ -71,8 +77,11 @@ func do(writer io.Writer, package_copier aptly_package_copier.PackageCopier, url
 	if len(target) == 0 {
 		return fmt.Errorf("parameter target missing")
 	}
-	if len(pkg) == 0 {
-		return fmt.Errorf("parameter package missing")
+	if len(name) == 0 {
+		return fmt.Errorf("parameter name missing")
 	}
-	return package_copier.CopyPackage(url, user, password, source, target, pkg)
+	if len(version) == 0 {
+		return fmt.Errorf("parameter version missing")
+	}
+	return package_copier.CopyPackage(url, user, password, source, target, name, version)
 }

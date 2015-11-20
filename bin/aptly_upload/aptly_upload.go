@@ -65,5 +65,5 @@ func do(writer io.Writer, package_uploader aptly_package_uploader.PackageUploade
 	if len(file) == 0 {
 		return fmt.Errorf("parameter file missing")
 	}
-	return package_uploader.UploadPackage(url, user, password, file, repo)
+	return package_uploader.UploadPackageByFile(url, user, password, repo, file)
 }
