@@ -1,5 +1,5 @@
 {
-  "name": "aptly",
+  "name": "aptly-utils",
   "section": "utils",
   "priority": "optional",
   "architecture": "amd64",
