@@ -2,12 +2,13 @@ package main
 
 import (
 	"testing"
+
+	aptly_package_uploader "github.com/bborbe/aptly/package_uploader"
+	aptly_requestbuilder_executor "github.com/bborbe/aptly/requestbuilder_executor"
 	. "github.com/bborbe/assert"
 	"github.com/bborbe/http/client"
 	"github.com/bborbe/http/requestbuilder"
 	io_mock "github.com/bborbe/io/mock"
-	aptly_package_uploader "github.com/bborbe/aptly/package_uploader"
-	aptly_requestbuilder_executor "github.com/bborbe/aptly/requestbuilder_executor"
 )
 
 func TestDo(t *testing.T) {

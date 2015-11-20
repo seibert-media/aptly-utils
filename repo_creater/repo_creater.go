@@ -1,12 +1,14 @@
 package repo_creator
+
 import (
-	"github.com/bborbe/log"
-	http_requestbuilder "github.com/bborbe/http/requestbuilder"
-	"encoding/json"
 	"bytes"
+	"encoding/json"
 	"fmt"
-	"github.com/bborbe/aptly/requestbuilder_executor"
+
 	"github.com/bborbe/aptly/defaults"
+	"github.com/bborbe/aptly/requestbuilder_executor"
+	http_requestbuilder "github.com/bborbe/http/requestbuilder"
+	"github.com/bborbe/log"
 )
 
 type RepoCreater interface {
@@ -18,7 +20,6 @@ type repoCreater struct {
 	httpRequestBuilderProvider http_requestbuilder.HttpRequestBuilderProvider
 }
 
-
 var logger = log.DefaultLogger
 
 func New(buildRequestAndExecute requestbuilder_executor.RequestbuilderExecutor, httpRequestBuilderProvider http_requestbuilder.HttpRequestBuilderProvider) *repoCreater {
@@ -28,7 +29,7 @@ func New(buildRequestAndExecute requestbuilder_executor.RequestbuilderExecutor, 
 	return p
 }
 
-func (c *repoCreater ) CreateRepo(apiUrl string, apiUsername string, apiPassword string, repo string) error {
+func (c *repoCreater) CreateRepo(apiUrl string, apiUsername string, apiPassword string, repo string) error {
 	if err := c.createRepo(apiUrl, apiUsername, apiPassword, repo); err != nil {
 		return err
 	}
@@ -38,7 +39,7 @@ func (c *repoCreater ) CreateRepo(apiUrl string, apiUsername string, apiPassword
 	return nil
 }
 
-func (c *repoCreater ) createRepo(apiUrl string, apiUsername string, apiPassword string, repo string) error {
+func (c *repoCreater) createRepo(apiUrl string, apiUsername string, apiPassword string, repo string) error {
 	logger.Debugf("createRepo")
 	requestbuilder := c.httpRequestBuilderProvider.NewHttpRequestBuilder(fmt.Sprintf("%s/api/repos", apiUrl))
 	requestbuilder.AddBasicAuth(apiUsername, apiPassword)
@@ -60,18 +61,18 @@ type publishJson struct {
 	Architectures  []string
 }
 
-func (c *repoCreater ) publishRepo(apiUrl string, apiUsername string, apiPassword string, repo string, distribution string, architectures []string) error {
+func (c *repoCreater) publishRepo(apiUrl string, apiUsername string, apiPassword string, repo string, distribution string, architectures []string) error {
 	logger.Debugf("publishRepo")
 	requestbuilder := c.httpRequestBuilderProvider.NewHttpRequestBuilder(fmt.Sprintf("%s/api/publish/%s", apiUrl, repo))
 	requestbuilder.AddBasicAuth(apiUsername, apiPassword)
 	requestbuilder.SetMethod("POST")
 	requestbuilder.AddContentType("application/json")
 	content, err := json.Marshal(publishJson{
-		ForceOverwrite:true,
-		Distribution: distribution,
-		SourceKind: "local",
-		Sources:   []map[string]string{{"Name":repo}},
-		Architectures: architectures,
+		ForceOverwrite: true,
+		Distribution:   distribution,
+		SourceKind:     "local",
+		Sources:        []map[string]string{{"Name": repo}},
+		Architectures:  architectures,
 	})
 	if err != nil {
 		return err

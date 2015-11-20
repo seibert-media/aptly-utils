@@ -1,8 +1,10 @@
 package requestbuilder_executor
+
 import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+
 	http_requestbuilder "github.com/bborbe/http/requestbuilder"
 )
 
@@ -14,7 +16,7 @@ type requestbuilderExecutor struct {
 	client *http.Client
 }
 
-func New(client  *http.Client) *requestbuilderExecutor {
+func New(client *http.Client) *requestbuilderExecutor {
 	r := new(requestbuilderExecutor)
 	r.client = client
 	return r
@@ -33,7 +35,7 @@ func (r *requestbuilderExecutor) BuildRequestAndExecute(requestbuilder http_requ
 	if err != nil {
 		return err
 	}
-	if resp.StatusCode / 100 != 2 {
+	if resp.StatusCode/100 != 2 {
 		return fmt.Errorf("upload file failed: %s", string(content))
 	}
 	return nil

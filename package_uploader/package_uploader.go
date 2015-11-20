@@ -8,10 +8,11 @@ import (
 	"mime/multipart"
 	"os"
 	"strings"
-	"github.com/bborbe/log"
-	http_requestbuilder "github.com/bborbe/http/requestbuilder"
-	"github.com/bborbe/aptly/requestbuilder_executor"
+
 	"github.com/bborbe/aptly/defaults"
+	"github.com/bborbe/aptly/requestbuilder_executor"
+	http_requestbuilder "github.com/bborbe/http/requestbuilder"
+	"github.com/bborbe/log"
 )
 
 type PackageUploader interface {
@@ -19,7 +20,7 @@ type PackageUploader interface {
 }
 
 type packageUploader struct {
-	buildRequestAndExecute requestbuilder_executor.RequestbuilderExecutor
+	buildRequestAndExecute     requestbuilder_executor.RequestbuilderExecutor
 	httpRequestBuilderProvider http_requestbuilder.HttpRequestBuilderProvider
 }
 
@@ -49,7 +50,7 @@ func (p *packageUploader) UploadPackage(apiUrl string, apiUsername string, apiPa
 func extractNameOfFile(path string) string {
 	slashPos := strings.LastIndex(path, "/")
 	if slashPos != -1 {
-		return path[slashPos + 1:]
+		return path[slashPos+1:]
 	}
 	return path
 }

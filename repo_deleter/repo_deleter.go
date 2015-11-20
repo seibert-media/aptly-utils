@@ -5,13 +5,12 @@ type RepoDeleter interface {
 }
 
 type repoDeleter struct {
-
 }
 
 func New() *repoDeleter {
 	return new(repoDeleter)
 }
 
-func (c *repoDeleter ) DeleteRepo() error {
+func (c *repoDeleter) DeleteRepo() error {
 	return nil
 }

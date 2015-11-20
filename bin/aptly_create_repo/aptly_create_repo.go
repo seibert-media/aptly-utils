@@ -2,27 +2,28 @@ package main
 
 import (
 	"flag"
-	"os"
-	"runtime"
 	"fmt"
 	"io"
 	"io/ioutil"
-	"github.com/bborbe/log"
-	"github.com/bborbe/http/client"
-	"github.com/bborbe/http/requestbuilder"
+	"os"
+	"runtime"
+
 	aptly_repo_creater "github.com/bborbe/aptly/repo_creater"
 	aptly_requestbuilder_executor "github.com/bborbe/aptly/requestbuilder_executor"
+	"github.com/bborbe/http/client"
+	"github.com/bborbe/http/requestbuilder"
+	"github.com/bborbe/log"
 )
 
 var logger = log.DefaultLogger
 
 const (
-	PARAMETER_LOGLEVEL = "loglevel"
-	PARAMETER_API_URL = "url"
-	PARAMETER_API_USER = "username"
-	PARAMETER_API_PASSWORD = "password"
+	PARAMETER_LOGLEVEL          = "loglevel"
+	PARAMETER_API_URL           = "url"
+	PARAMETER_API_USER          = "username"
+	PARAMETER_API_PASSWORD      = "password"
 	PARAMETER_API_PASSWORD_FILE = "passwordfile"
-	PARAMETER_REPO = "repo"
+	PARAMETER_REPO              = "repo"
 )
 
 func main() {

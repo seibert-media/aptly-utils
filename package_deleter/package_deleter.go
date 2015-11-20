@@ -5,13 +5,12 @@ type PackageDeleter interface {
 }
 
 type packageDeleter struct {
-
 }
 
 func New() *packageDeleter {
 	return new(packageDeleter)
 }
 
-func (c *packageDeleter ) DeletePackage() error {
+func (c *packageDeleter) DeletePackage() error {
 	return nil
 }

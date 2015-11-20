@@ -1,6 +1,5 @@
 package package_deleter
 
-
 import (
 	"testing"
 

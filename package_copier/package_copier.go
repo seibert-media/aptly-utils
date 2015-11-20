@@ -1,8 +1,9 @@
 package package_copier
+
 import (
-	"github.com/bborbe/log"
-	http_requestbuilder "github.com/bborbe/http/requestbuilder"
 	"github.com/bborbe/aptly/requestbuilder_executor"
+	http_requestbuilder "github.com/bborbe/http/requestbuilder"
+	"github.com/bborbe/log"
 )
 
 type PackageCopier interface {
@@ -23,8 +24,7 @@ func New(buildRequestAndExecute requestbuilder_executor.RequestbuilderExecutor, 
 	return p
 }
 
-
-func (c *packageCopier ) CopyPackage(apiUrl string, apiUsername string, apiPassword string, sourceRepo string, targetRepo string, pkg string) error {
+func (c *packageCopier) CopyPackage(apiUrl string, apiUsername string, apiPassword string, sourceRepo string, targetRepo string, pkg string) error {
 	logger.Debugf("CopyPackage")
 	return nil
 }
