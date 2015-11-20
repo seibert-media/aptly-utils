@@ -5,47 +5,42 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"mime/multipart"
-	"net/http"
 	"os"
 	"strings"
-
-	http_requestbuilder "github.com/bborbe/http/requestbuilder"
 	"github.com/bborbe/log"
+	http_requestbuilder "github.com/bborbe/http/requestbuilder"
+	"github.com/bborbe/aptly/requestbuilder_executor"
+	"github.com/bborbe/aptly/defaults"
 )
 
 type PackageUploader interface {
-	UploadPackage(api_url string, api_username string, api_password string, file string, repo string) error
+	UploadPackage(apiUrl string, apiUsername string, apiPassword string, file string, repo string) error
 }
 
 type packageUploader struct {
-	httpClientProvider         HttpClientProvider
-	httpRequestBuilderProvider HttpRequestBuilderProvider
+	buildRequestAndExecute requestbuilder_executor.RequestbuilderExecutor
+	httpRequestBuilderProvider http_requestbuilder.HttpRequestBuilderProvider
 }
-
-type HttpClientProvider func() *http.Client
-
-type HttpRequestBuilderProvider func(url string) http_requestbuilder.HttpRequestBuilder
 
 var logger = log.DefaultLogger
 
-func New(httpClientProvider HttpClientProvider, httpRequestBuilderProvider HttpRequestBuilderProvider) *packageUploader {
+func New(buildRequestAndExecute requestbuilder_executor.RequestbuilderExecutor, httpRequestBuilderProvider http_requestbuilder.HttpRequestBuilderProvider) *packageUploader {
 	p := new(packageUploader)
-	p.httpClientProvider = httpClientProvider
+	p.buildRequestAndExecute = buildRequestAndExecute
 	p.httpRequestBuilderProvider = httpRequestBuilderProvider
 	return p
 }
 
-func (p *packageUploader) UploadPackage(api_url string, api_username string, api_password string, file string, repo string) error {
+func (p *packageUploader) UploadPackage(apiUrl string, apiUsername string, apiPassword string, file string, repo string) error {
 	logger.Debugf("UploadPackage")
-	if err := p.upload_file(api_url, api_username, api_password, file); err != nil {
+	if err := p.uploadFile(apiUrl, apiUsername, apiPassword, file); err != nil {
 		return err
 	}
-	if err := p.add_package_to_repo(api_url, api_username, api_password, file, repo); err != nil {
+	if err := p.addPackageToRepo(apiUrl, apiUsername, apiPassword, file, repo); err != nil {
 		return err
 	}
-	if err := p.publish_repo(api_url, api_username, api_password, file, repo, "default"); err != nil {
+	if err := p.publishRepo(apiUrl, apiUsername, apiPassword, file, repo, defaults.DEFAULT_DISTRIBUTION); err != nil {
 		return err
 	}
 	return nil
@@ -59,11 +54,11 @@ func extractNameOfFile(path string) string {
 	return path
 }
 
-func (p *packageUploader) upload_file(api_url string, api_username string, api_password string, file string) error {
-	logger.Debugf("upload_file")
+func (p *packageUploader) uploadFile(apiUrl string, apiUsername string, apiPassword string, file string) error {
+	logger.Debugf("uploadFile")
 	name := extractNameOfFile(file)
-	requestbuilder := p.httpRequestBuilderProvider(fmt.Sprintf("%s/api/files/%s", api_url, name))
-	requestbuilder.AddBasicAuth(api_username, api_password)
+	requestbuilder := p.httpRequestBuilderProvider.NewHttpRequestBuilder(fmt.Sprintf("%s/api/files/%s", apiUrl, name))
+	requestbuilder.AddBasicAuth(apiUsername, apiPassword)
 	requestbuilder.SetMethod("POST")
 	bodyBuf := &bytes.Buffer{}
 	bodyWriter := multipart.NewWriter(bodyBuf)
@@ -82,23 +77,23 @@ func (p *packageUploader) upload_file(api_url string, api_username string, api_p
 	bodyWriter.Close()
 	requestbuilder.AddContentType(bodyWriter.FormDataContentType())
 	requestbuilder.SetBody(bodyBuf)
-	return p.buildRequestAndExecute(requestbuilder)
+	return p.buildRequestAndExecute.BuildRequestAndExecute(requestbuilder)
 }
 
-func (p *packageUploader) add_package_to_repo(api_url string, api_username string, api_password string, file string, repo string) error {
-	logger.Debugf("add_package_to_repo")
+func (p *packageUploader) addPackageToRepo(apiUrl string, apiUsername string, apiPassword string, file string, repo string) error {
+	logger.Debugf("addPackageToRepo")
 	name := extractNameOfFile(file)
-	requestbuilder := p.httpRequestBuilderProvider(fmt.Sprintf("%s/api/repos/%s/file/%s?forceReplace=1", api_url, repo, name))
-	requestbuilder.AddBasicAuth(api_username, api_password)
+	requestbuilder := p.httpRequestBuilderProvider.NewHttpRequestBuilder(fmt.Sprintf("%s/api/repos/%s/file/%s?forceReplace=1", apiUrl, repo, name))
+	requestbuilder.AddBasicAuth(apiUsername, apiPassword)
 	requestbuilder.SetMethod("POST")
 	requestbuilder.AddContentType("application/json")
-	return p.buildRequestAndExecute(requestbuilder)
+	return p.buildRequestAndExecute.BuildRequestAndExecute(requestbuilder)
 }
 
-func (p *packageUploader) publish_repo(api_url string, api_username string, api_password string, file string, repo string, distribution string) error {
-	logger.Debugf("publish_repo")
-	requestbuilder := p.httpRequestBuilderProvider(fmt.Sprintf("%s/api/publish/%s/%s", api_url, repo, distribution))
-	requestbuilder.AddBasicAuth(api_username, api_password)
+func (p *packageUploader) publishRepo(apiUrl string, apiUsername string, apiPassword string, file string, repo string, distribution string) error {
+	logger.Debugf("publishRepo")
+	requestbuilder := p.httpRequestBuilderProvider.NewHttpRequestBuilder(fmt.Sprintf("%s/api/publish/%s/%s", apiUrl, repo, distribution))
+	requestbuilder.AddBasicAuth(apiUsername, apiPassword)
 	requestbuilder.SetMethod("PUT")
 	requestbuilder.AddContentType("application/json")
 
@@ -107,25 +102,5 @@ func (p *packageUploader) publish_repo(api_url string, api_username string, api_
 		return err
 	}
 	requestbuilder.SetBody(bytes.NewBuffer(content))
-	return p.buildRequestAndExecute(requestbuilder)
-}
-
-func (p *packageUploader) buildRequestAndExecute(requestbuilder http_requestbuilder.HttpRequestBuilder) error {
-	req, err := requestbuilder.GetRequest()
-	if err != nil {
-		return err
-	}
-	client := p.httpClientProvider()
-	resp, err := client.Do(req)
-	if err != nil {
-		return err
-	}
-	content, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return err
-	}
-	if resp.StatusCode / 100 != 2 {
-		return fmt.Errorf("upload file failed: %s", string(content))
-	}
-	return nil
+	return p.buildRequestAndExecute.BuildRequestAndExecute(requestbuilder)
 }

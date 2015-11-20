@@ -1,5 +1,4 @@
 package main
-
 import (
 	"flag"
 	"os"
@@ -13,7 +12,6 @@ import (
 	aptly_package_uploader "github.com/bborbe/aptly/package_uploader"
 	aptly_requestbuilder_executor "github.com/bborbe/aptly/requestbuilder_executor"
 )
-
 var logger = log.DefaultLogger
 
 const (

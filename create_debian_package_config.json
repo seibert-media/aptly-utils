@@ -1,10 +1,37 @@
 {
   "name": "aptly",
-  "version": "1.0.0",
+  "section": "utils",
+  "priority": "optional",
+  "architecture": "amd64",
+  "maintainer": "Benjamin Borbe <bborbe@rocketnews.de>",
+  "description": "Aptly Utils",
   "files": [
+    {
+      "source": "bin/aptly_copy_package",
+      "target": "/opt/aptly/bin/aptly_copy_package"
+    },
+    {
+      "source": "bin/aptly_create_repo",
+      "target": "/opt/aptly/bin/aptly_create_repo"
+    },
+    {
+      "source": "bin/aptly_delete_package",
+      "target": "/opt/aptly/bin/aptly_delete_package"
+    },
+    {
+      "source": "bin/aptly_delete_repo",
+      "target": "/opt/aptly/bin/aptly_delete_repo"
+    },
     {
       "source": "bin/aptly_upload",
       "target": "/opt/aptly/bin/aptly_upload"
     }
   ]
 }
+
+
+
+
+
+
+
