@@ -42,5 +42,5 @@ func (c *packageCopier) CopyPackage(apiUrl string, apiUsername string, apiPasswo
 	if err != nil {
 		return err
 	}
-	return c.uploader.UploadPackageByReader(apiUrl, apiUsername, apiPassword, targetRepo, fmt.Sprintf("%s_%s", name, version), resp.Body)
+	return c.uploader.UploadPackageByReader(apiUrl, apiUsername, apiPassword, targetRepo, fmt.Sprintf("%s_%s.deb", name, version), resp.Body)
 }
