@@ -9,11 +9,11 @@ import (
 	"github.com/bborbe/aptly/defaults"
 )
 
-type RepoDeleter interface {
-	DeleteRepo(apiUrl string, apiUsername string, apiPassword string, repo string) error
+type RepoCreater interface {
+	CreateRepo(apiUrl string, apiUsername string, apiPassword string, repo string) error
 }
 
-type repoDeleter struct {
+type repoCreater struct {
 	buildRequestAndExecute     requestbuilder_executor.RequestbuilderExecutor
 	httpRequestBuilderProvider http_requestbuilder.HttpRequestBuilderProvider
 }
@@ -21,14 +21,14 @@ type repoDeleter struct {
 
 var logger = log.DefaultLogger
 
-func New(buildRequestAndExecute requestbuilder_executor.RequestbuilderExecutor, httpRequestBuilderProvider http_requestbuilder.HttpRequestBuilderProvider) *repoDeleter {
-	p := new(repoDeleter)
+func New(buildRequestAndExecute requestbuilder_executor.RequestbuilderExecutor, httpRequestBuilderProvider http_requestbuilder.HttpRequestBuilderProvider) *repoCreater {
+	p := new(repoCreater)
 	p.buildRequestAndExecute = buildRequestAndExecute
 	p.httpRequestBuilderProvider = httpRequestBuilderProvider
 	return p
 }
 
-func (c *repoDeleter ) DeleteRepo(apiUrl string, apiUsername string, apiPassword string, repo string) error {
+func (c *repoCreater ) CreateRepo(apiUrl string, apiUsername string, apiPassword string, repo string) error {
 	if err := c.createRepo(apiUrl, apiUsername, apiPassword, repo); err != nil {
 		return err
 	}
@@ -38,7 +38,7 @@ func (c *repoDeleter ) DeleteRepo(apiUrl string, apiUsername string, apiPassword
 	return nil
 }
 
-func (c *repoDeleter ) createRepo(apiUrl string, apiUsername string, apiPassword string, repo string) error {
+func (c *repoCreater ) createRepo(apiUrl string, apiUsername string, apiPassword string, repo string) error {
 	logger.Debugf("createRepo")
 	requestbuilder := c.httpRequestBuilderProvider.NewHttpRequestBuilder(fmt.Sprintf("%s/api/repos", apiUrl))
 	requestbuilder.AddBasicAuth(apiUsername, apiPassword)
@@ -60,7 +60,7 @@ type publishJson struct {
 	Architectures  []string
 }
 
-func (c *repoDeleter ) publishRepo(apiUrl string, apiUsername string, apiPassword string, repo string, distribution string, architectures []string) error {
+func (c *repoCreater ) publishRepo(apiUrl string, apiUsername string, apiPassword string, repo string, distribution string, architectures []string) error {
 	logger.Debugf("publishRepo")
 	requestbuilder := c.httpRequestBuilderProvider.NewHttpRequestBuilder(fmt.Sprintf("%s/api/publish/%s", apiUrl, repo))
 	requestbuilder.AddBasicAuth(apiUsername, apiPassword)

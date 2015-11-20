@@ -9,7 +9,7 @@ import (
 
 func TestImplementsRepoDeleter(t *testing.T) {
 	b := New(nil, nil)
-	var i *RepoDeleter
+	var i *RepoCreater
 	err := AssertThat(b, Implements(i).Message("check type"))
 	if err != nil {
 		t.Fatal(err)

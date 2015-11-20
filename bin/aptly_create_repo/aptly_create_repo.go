@@ -10,14 +10,13 @@ import (
 	"github.com/bborbe/log"
 	"github.com/bborbe/http/client"
 	"github.com/bborbe/http/requestbuilder"
-	aptly_package_uploader "github.com/bborbe/aptly/package_uploader"
+	aptly_repo_creater "github.com/bborbe/aptly/repo_creater"
 	aptly_requestbuilder_executor "github.com/bborbe/aptly/requestbuilder_executor"
 )
 
 var logger = log.DefaultLogger
 
 const (
-	PARAMETER_FILE = "file"
 	PARAMETER_LOGLEVEL = "loglevel"
 	PARAMETER_API_URL = "url"
 	PARAMETER_API_USER = "username"
@@ -29,7 +28,6 @@ const (
 func main() {
 	defer logger.Close()
 	logLevelPtr := flag.String(PARAMETER_LOGLEVEL, log.INFO_STRING, "one of OFF,TRACE,DEBUG,INFO,WARN,ERROR")
-	filePtr := flag.String(PARAMETER_FILE, "", "file")
 	apiUrlPtr := flag.String(PARAMETER_API_URL, "", "url")
 	apiUserPtr := flag.String(PARAMETER_API_USER, "", "user")
 	apiPasswordPtr := flag.String(PARAMETER_API_PASSWORD, "", "password")
@@ -42,10 +40,10 @@ func main() {
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
 	requestbuilder_executor := aptly_requestbuilder_executor.New(client.GetClientWithoutProxy())
-	package_uploader := aptly_package_uploader.New(requestbuilder_executor, requestbuilder.NewHttpRequestBuilderProvider())
+	repo_creater := aptly_repo_creater.New(requestbuilder_executor, requestbuilder.NewHttpRequestBuilderProvider())
 
 	writer := os.Stdout
-	err := do(writer, package_uploader, *apiUrlPtr, *apiUserPtr, *apiPasswordPtr, *apiPasswordFilePtr, *filePtr, *repoPtr)
+	err := do(writer, repo_creater, *apiUrlPtr, *apiUserPtr, *apiPasswordPtr, *apiPasswordFilePtr, *repoPtr)
 	if err != nil {
 		logger.Fatal(err)
 		logger.Close()
@@ -53,7 +51,7 @@ func main() {
 	}
 }
 
-func do(writer io.Writer, package_uploader aptly_package_uploader.PackageUploader, url string, user string, password string, passwordfile string, file string, repo string) error {
+func do(writer io.Writer, repo_creater aptly_repo_creater.RepoCreater, url string, user string, password string, passwordfile string, repo string) error {
 	if len(passwordfile) > 0 {
 		content, err := ioutil.ReadFile(passwordfile)
 		if err != nil {
@@ -61,8 +59,8 @@ func do(writer io.Writer, package_uploader aptly_package_uploader.PackageUploade
 		}
 		password = string(content)
 	}
-	if len(file) == 0 {
-		return fmt.Errorf("parameter file missing")
+	if len(repo) == 0 {
+		return fmt.Errorf("parameter repo missing")
 	}
-	return package_uploader.UploadPackage(url, user, password, file, repo)
+	return repo_creater.CreateRepo(url, user, password, repo)
 }
