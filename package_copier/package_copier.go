@@ -42,7 +42,7 @@ func (c *packageCopier) CopyPackage(apiUrl string, apiUsername string, apiPasswo
 	if err != nil {
 		return err
 	}
-	if resp.Status / 100 != 2 {
+	if resp.StatusCode / 100 != 2 {
 		return fmt.Errorf("download package %s_%s.deb failed", name, version)
 	}
 	return c.uploader.UploadPackageByReader(apiUrl, apiUsername, apiPassword, targetRepo, fmt.Sprintf("%s_%s.deb", name, version), resp.Body)
