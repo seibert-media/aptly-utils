@@ -47,7 +47,7 @@ echo "Install completed, create debian package"
 /opt/debian/bin/create_debian_package_by_config \
 -loglevel=DEBUG \
 -version=$VERSION \
--config=src/$SOURCEDIRECTORY/create_debian_package_config.json
+-config=src/$SOURCEDIRECTORY/create_debian_package_config.json || exit 1
 
 echo "Create debian package completed, upload"
 
@@ -57,6 +57,6 @@ echo "Create debian package completed, upload"
 -username=api \
 -password=KYkobxZ6uvaGnYBG \
 -file=$DEB \
--repo=unstable
+-repo=unstable || exit 1
 
 echo "Upload completed"
