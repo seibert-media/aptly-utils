@@ -1,17 +1,17 @@
-aptly
-======
+Aptly Utils
+===========
 
 Package provide some aptly utils
 
 Documentation
 -------------
 
-http://godoc.org/github.com/bborbe/aptly
+http://godoc.org/github.com/bborbe/aptly_utils/
 
 Continuous integration
 ----------------------
 
-http://jenkins.benjamin-borbe.de/job/Go-Aptly/
+https://www.benjamin-borbe.de/jenkins/job/Go-Aptly-Utils/
 
 Copyright and license
 ---------------------

@@ -8,8 +8,8 @@ import (
 	"os"
 	"runtime"
 
-	aptly_package_uploader "github.com/bborbe/aptly-utils/package_uploader"
-	aptly_requestbuilder_executor "github.com/bborbe/aptly-utils/requestbuilder_executor"
+	aptly_package_uploader "github.com/bborbe/aptly_utils/package_uploader"
+	aptly_requestbuilder_executor "github.com/bborbe/aptly_utils/requestbuilder_executor"
 	"github.com/bborbe/http/client"
 	"github.com/bborbe/http/requestbuilder"
 	"github.com/bborbe/log"

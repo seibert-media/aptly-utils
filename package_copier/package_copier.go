@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/bborbe/aptly-utils/package_uploader"
+	"github.com/bborbe/aptly_utils/package_uploader"
 	http_requestbuilder "github.com/bborbe/http/requestbuilder"
 	"github.com/bborbe/log"
 )
