@@ -1,7 +1,7 @@
 #!/bin/sh
 
-SOURCEDIRECTORY="github.com/bborbe/aptly-utils"
-INSTALLS="github.com/bborbe/aptly-utils/bin/aptly_copy_package github.com/bborbe/aptly-utils/bin/aptly_create_repo github.com/bborbe/aptly-utils/bin/aptly_delete_package github.com/bborbe/aptly-utils/bin/aptly_delete_repo github.com/bborbe/aptly-utils/bin/aptly_upload"
+SOURCEDIRECTORY="github.com/bborbe/aptly_utils"
+INSTALLS="github.com/bborbe/aptly_utils/bin/aptly_copy_package github.com/bborbe/aptly_utils/bin/aptly_create_repo github.com/bborbe/aptly_utils/bin/aptly_delete_package github.com/bborbe/aptly_utils/bin/aptly_delete_repo github.com/bborbe/aptly_utils/bin/aptly_upload"
 VERSION="1.0.1-b${BUILD_NUMBER}"
 NAME="aptly-utils"
 
@@ -44,7 +44,7 @@ go install $INSTALLS
 
 echo "Install completed, create debian package"
 
-/opt/debian/bin/create_debian_package_by_config \
+/opt/debian/bin/create_debian_package \
 -loglevel=DEBUG \
 -version=$VERSION \
 -config=src/$SOURCEDIRECTORY/create_debian_package_config.json || exit 1
