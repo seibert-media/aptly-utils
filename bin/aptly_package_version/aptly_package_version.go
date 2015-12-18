@@ -8,7 +8,12 @@ import (
 	"os"
 	"runtime"
 
-	aptly_package_version "github.com/bborbe/aptly_utils/package_version"
+	"sort"
+
+	aptly_package_versions "github.com/bborbe/aptly_utils/package_versions"
+	"github.com/bborbe/aptly_utils/version"
+	http_client "github.com/bborbe/http/client"
+	http_requestbuilder "github.com/bborbe/http/requestbuilder"
 	"github.com/bborbe/log"
 )
 
@@ -39,7 +44,9 @@ func main() {
 
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
-	package_version := aptly_package_version.New()
+	client := http_client.GetClientWithoutProxy()
+	httpRequestBuilderProvider := http_requestbuilder.NewHttpRequestBuilderProvider()
+	package_version := aptly_package_versions.New(client.Do, httpRequestBuilderProvider.NewHttpRequestBuilder)
 
 	writer := os.Stdout
 	err := do(writer, package_version, *apiUrlPtr, *apiUserPtr, *apiPasswordPtr, *apiPasswordFilePtr, *repoPtr, *namePtr)
@@ -50,7 +57,7 @@ func main() {
 	}
 }
 
-func do(writer io.Writer, packageVersion aptly_package_version.PackageVersion, url string, user string, password string, passwordfile string, repo string, name string) error {
+func do(writer io.Writer, packageVersions aptly_package_versions.PackageVersions, url string, user string, password string, passwordfile string, repo string, name string) error {
 	if len(passwordfile) > 0 {
 		content, err := ioutil.ReadFile(passwordfile)
 		if err != nil {
@@ -70,10 +77,14 @@ func do(writer io.Writer, packageVersion aptly_package_version.PackageVersion, u
 	}
 
 	var err error
-	var version string
-	if version, err = packageVersion.PackageVersion(url, user, password, repo, name); err != nil {
+	var versions []version.Version
+	if versions, err = packageVersions.PackageVersions(url, user, password, repo, name); err != nil {
 		return err
 	}
-	fmt.Fprintf(writer, "%s\n", version)
+	if len(versions) == 0 {
+		return fmt.Errorf("package %s not found", name)
+	}
+	sort.Sort(version.VersionByName(versions))
+	fmt.Fprintf(writer, "%s\n", versions[len(versions)-1])
 	return nil
 }

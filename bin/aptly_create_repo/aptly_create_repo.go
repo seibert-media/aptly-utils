@@ -10,8 +10,8 @@ import (
 
 	aptly_repo_creater "github.com/bborbe/aptly_utils/repo_creater"
 	aptly_requestbuilder_executor "github.com/bborbe/aptly_utils/requestbuilder_executor"
-	"github.com/bborbe/http/client"
-	"github.com/bborbe/http/requestbuilder"
+	http_client "github.com/bborbe/http/client"
+	http_requestbuilder "github.com/bborbe/http/requestbuilder"
 	"github.com/bborbe/log"
 )
 
@@ -40,8 +40,10 @@ func main() {
 
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
-	requestbuilder_executor := aptly_requestbuilder_executor.New(client.GetClientWithoutProxy())
-	repo_creater := aptly_repo_creater.New(requestbuilder_executor, requestbuilder.NewHttpRequestBuilderProvider())
+	client := http_client.GetClientWithoutProxy()
+	requestbuilder_executor := aptly_requestbuilder_executor.New(client)
+	requestbuilder := http_requestbuilder.NewHttpRequestBuilderProvider()
+	repo_creater := aptly_repo_creater.New(requestbuilder_executor, requestbuilder)
 
 	writer := os.Stdout
 	err := do(writer, repo_creater, *apiUrlPtr, *apiUserPtr, *apiPasswordPtr, *apiPasswordFilePtr, *repoPtr)

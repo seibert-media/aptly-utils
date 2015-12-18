@@ -1,4 +1,4 @@
-package package_deleter
+package package_versions
 
 import (
 	"testing"
@@ -6,9 +6,9 @@ import (
 	. "github.com/bborbe/assert"
 )
 
-func TestImplementsPackageVersion(t *testing.T) {
-	b := New()
-	var i *PackageVersion
+func TestImplementsPackageVersions(t *testing.T) {
+	b := New(nil, nil)
+	var i *PackageVersions
 	err := AssertThat(b, Implements(i).Message("check type"))
 	if err != nil {
 		t.Fatal(err)
