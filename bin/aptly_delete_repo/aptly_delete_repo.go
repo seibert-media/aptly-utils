@@ -8,10 +8,7 @@ import (
 	"os"
 	"runtime"
 
-	aptly_package_uploader "github.com/bborbe/aptly_utils/package_uploader"
-	aptly_requestbuilder_executor "github.com/bborbe/aptly_utils/requestbuilder_executor"
-	"github.com/bborbe/http/client"
-	"github.com/bborbe/http/requestbuilder"
+	aptly_repo_deleter "github.com/bborbe/aptly_utils/repo_deleter"
 	"github.com/bborbe/log"
 )
 
@@ -42,11 +39,10 @@ func main() {
 
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
-	requestbuilder_executor := aptly_requestbuilder_executor.New(client.GetClientWithoutProxy())
-	package_uploader := aptly_package_uploader.New(requestbuilder_executor, requestbuilder.NewHttpRequestBuilderProvider())
+	repo_deleter := aptly_repo_deleter.New()
 
 	writer := os.Stdout
-	err := do(writer, package_uploader, *apiUrlPtr, *apiUserPtr, *apiPasswordPtr, *apiPasswordFilePtr, *filePtr, *repoPtr)
+	err := do(writer, repo_deleter, *apiUrlPtr, *apiUserPtr, *apiPasswordPtr, *apiPasswordFilePtr, *filePtr, *repoPtr)
 	if err != nil {
 		logger.Fatal(err)
 		logger.Close()
@@ -54,7 +50,7 @@ func main() {
 	}
 }
 
-func do(writer io.Writer, package_uploader aptly_package_uploader.PackageUploader, url string, user string, password string, passwordfile string, file string, repo string) error {
+func do(writer io.Writer, repo_deleter aptly_repo_deleter.RepoDeleter, url string, user string, password string, passwordfile string, file string, repo string) error {
 	if len(passwordfile) > 0 {
 		content, err := ioutil.ReadFile(passwordfile)
 		if err != nil {
@@ -65,5 +61,5 @@ func do(writer io.Writer, package_uploader aptly_package_uploader.PackageUploade
 	if len(file) == 0 {
 		return fmt.Errorf("parameter file missing")
 	}
-	return package_uploader.UploadPackageByFile(url, user, password, repo, file)
+	return repo_deleter.DeleteRepo()
 }

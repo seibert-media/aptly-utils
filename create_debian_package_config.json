@@ -25,6 +25,10 @@
     {
       "source": "bin/aptly_upload",
       "target": "/opt/aptly/bin/aptly_upload"
+    },
+    {
+      "source": "bin/aptly_clean_repo",
+      "target": "/opt/aptly/bin/aptly_clean_repo"
     }
   ]
 }

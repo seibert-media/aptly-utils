@@ -1,7 +1,7 @@
 #!/bin/sh
 
 SOURCEDIRECTORY="github.com/bborbe/aptly_utils"
-INSTALLS="github.com/bborbe/aptly_utils/bin/aptly_copy_package github.com/bborbe/aptly_utils/bin/aptly_create_repo github.com/bborbe/aptly_utils/bin/aptly_delete_package github.com/bborbe/aptly_utils/bin/aptly_delete_repo github.com/bborbe/aptly_utils/bin/aptly_upload"
+INSTALLS="github.com/bborbe/aptly_utils/bin/aptly_copy_package github.com/bborbe/aptly_utils/bin/aptly_create_repo github.com/bborbe/aptly_utils/bin/aptly_delete_package github.com/bborbe/aptly_utils/bin/aptly_delete_repo github.com/bborbe/aptly_utils/bin/aptly_upload github.com/bborbe/aptly_utils/bin/aptly_clean_repo"
 VERSION="1.0.1-b${BUILD_NUMBER}"
 NAME="aptly-utils"
 

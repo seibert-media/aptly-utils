@@ -8,7 +8,7 @@ import (
 	"os"
 	"runtime"
 
-	aptly_package_deleter "github.com/bborbe/aptly_utils/package_deleter"
+	aptly_repo_cleaner "github.com/bborbe/aptly_utils/repo_cleaner"
 	"github.com/bborbe/log"
 )
 
@@ -22,8 +22,6 @@ const (
 	PARAMETER_API_PASSWORD      = "password"
 	PARAMETER_API_PASSWORD_FILE = "passwordfile"
 	PARAMETER_REPO              = "repo"
-	PARAMETER_NAME              = "name"
-	PARAMETER_VERSION           = "version"
 )
 
 func main() {
@@ -35,18 +33,16 @@ func main() {
 	apiPasswordPtr := flag.String(PARAMETER_API_PASSWORD, "", "password")
 	apiPasswordFilePtr := flag.String(PARAMETER_API_PASSWORD_FILE, "", "passwordfile")
 	repoPtr := flag.String(PARAMETER_REPO, "", "repo")
-	namePtr := flag.String(PARAMETER_NAME, "", "name")
-	versionPtr := flag.String(PARAMETER_VERSION, "", "version")
 	flag.Parse()
 	logger.SetLevelThreshold(log.LogStringToLevel(*logLevelPtr))
 	logger.Debugf("set log level to %s", *logLevelPtr)
 
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
-	package_deleter := aptly_package_deleter.New()
+	repo_cleaner := aptly_repo_cleaner.New()
 
 	writer := os.Stdout
-	err := do(writer, package_deleter, *apiUrlPtr, *apiUserPtr, *apiPasswordPtr, *apiPasswordFilePtr, *filePtr, *repoPtr, *namePtr, *versionPtr)
+	err := do(writer, repo_cleaner, *apiUrlPtr, *apiUserPtr, *apiPasswordPtr, *apiPasswordFilePtr, *filePtr, *repoPtr)
 	if err != nil {
 		logger.Fatal(err)
 		logger.Close()
@@ -54,7 +50,7 @@ func main() {
 	}
 }
 
-func do(writer io.Writer, package_deleter aptly_package_deleter.PackageDeleter, url string, user string, password string, passwordfile string, file string, repo string, name string, version string) error {
+func do(writer io.Writer, repo_cleaner aptly_repo_cleaner.RepoCleaner, url string, user string, password string, passwordfile string, file string, repo string) error {
 	if len(passwordfile) > 0 {
 		content, err := ioutil.ReadFile(passwordfile)
 		if err != nil {
@@ -65,5 +61,5 @@ func do(writer io.Writer, package_deleter aptly_package_deleter.PackageDeleter, 
 	if len(file) == 0 {
 		return fmt.Errorf("parameter file missing")
 	}
-	return package_deleter.DeletePackage()
+	return repo_cleaner.CleanRepo()
 }
