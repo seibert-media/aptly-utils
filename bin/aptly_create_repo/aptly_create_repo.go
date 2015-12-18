@@ -20,14 +20,14 @@ import (
 var logger = log.DefaultLogger
 
 const (
-	PARAMETER_LOGLEVEL = "loglevel"
-	PARAMETER_API_URL = "url"
-	PARAMETER_API_USER = "username"
-	PARAMETER_API_PASSWORD = "password"
+	PARAMETER_LOGLEVEL          = "loglevel"
+	PARAMETER_API_URL           = "url"
+	PARAMETER_API_USER          = "username"
+	PARAMETER_API_PASSWORD      = "password"
 	PARAMETER_API_PASSWORD_FILE = "passwordfile"
-	PARAMETER_REPO = "repo"
-	PARAMETER_DISTRIBUTION = "distribution"
-	PARAMETER_ARCHITECTURE = "architecture"
+	PARAMETER_REPO              = "repo"
+	PARAMETER_DISTRIBUTION      = "distribution"
+	PARAMETER_ARCHITECTURE      = "architecture"
 )
 
 func main() {
