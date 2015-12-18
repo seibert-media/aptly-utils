@@ -8,6 +8,7 @@ import (
 	"os"
 	"runtime"
 
+	aptly_defaults "github.com/bborbe/aptly_utils/defaults"
 	aptly_repo_creater "github.com/bborbe/aptly_utils/repo_creater"
 	aptly_repo_publisher "github.com/bborbe/aptly_utils/repo_publisher"
 	aptly_requestbuilder_executor "github.com/bborbe/aptly_utils/requestbuilder_executor"
@@ -19,12 +20,14 @@ import (
 var logger = log.DefaultLogger
 
 const (
-	PARAMETER_LOGLEVEL          = "loglevel"
-	PARAMETER_API_URL           = "url"
-	PARAMETER_API_USER          = "username"
-	PARAMETER_API_PASSWORD      = "password"
+	PARAMETER_LOGLEVEL = "loglevel"
+	PARAMETER_API_URL = "url"
+	PARAMETER_API_USER = "username"
+	PARAMETER_API_PASSWORD = "password"
 	PARAMETER_API_PASSWORD_FILE = "passwordfile"
-	PARAMETER_REPO              = "repo"
+	PARAMETER_REPO = "repo"
+	PARAMETER_DISTRIBUTION = "distribution"
+	PARAMETER_ARCHITECTURE = "architecture"
 )
 
 func main() {
@@ -35,6 +38,8 @@ func main() {
 	apiPasswordPtr := flag.String(PARAMETER_API_PASSWORD, "", "password")
 	apiPasswordFilePtr := flag.String(PARAMETER_API_PASSWORD_FILE, "", "passwordfile")
 	repoPtr := flag.String(PARAMETER_REPO, "", "repo")
+	distributionPtr := flag.String(PARAMETER_DISTRIBUTION, aptly_defaults.DEFAULT_DISTRIBUTION, "distribution")
+	architecturePtr := flag.String(PARAMETER_ARCHITECTURE, aptly_defaults.DEFAULT_ARCHITECTURE, "architecture")
 	flag.Parse()
 	logger.SetLevelThreshold(log.LogStringToLevel(*logLevelPtr))
 	logger.Debugf("set log level to %s", *logLevelPtr)
@@ -48,7 +53,7 @@ func main() {
 	repo_creater := aptly_repo_creater.New(requestbuilder_executor, requestbuilder, repo_publisher.PublishNewRepo)
 
 	writer := os.Stdout
-	err := do(writer, repo_creater, *apiUrlPtr, *apiUserPtr, *apiPasswordPtr, *apiPasswordFilePtr, *repoPtr)
+	err := do(writer, repo_creater, *apiUrlPtr, *apiUserPtr, *apiPasswordPtr, *apiPasswordFilePtr, *repoPtr, *distributionPtr, *architecturePtr)
 	if err != nil {
 		logger.Fatal(err)
 		logger.Close()
@@ -56,7 +61,7 @@ func main() {
 	}
 }
 
-func do(writer io.Writer, repo_creater aptly_repo_creater.RepoCreater, url string, user string, password string, passwordfile string, repo string) error {
+func do(writer io.Writer, repo_creater aptly_repo_creater.RepoCreater, url string, user string, password string, passwordfile string, repo string, distribution string, architecture string) error {
 	if len(passwordfile) > 0 {
 		content, err := ioutil.ReadFile(passwordfile)
 		if err != nil {
@@ -70,5 +75,5 @@ func do(writer io.Writer, repo_creater aptly_repo_creater.RepoCreater, url strin
 	if len(repo) == 0 {
 		return fmt.Errorf("parameter %s missing", PARAMETER_REPO)
 	}
-	return repo_creater.CreateRepo(url, user, password, repo)
+	return repo_creater.CreateRepo(url, user, password, repo, distribution, []string{architecture})
 }

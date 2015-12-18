@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 
-	aptly_defaults "github.com/bborbe/aptly_utils/defaults"
 	aptly_requestbuilder_executor "github.com/bborbe/aptly_utils/requestbuilder_executor"
 	http_requestbuilder "github.com/bborbe/http/requestbuilder"
 	"github.com/bborbe/log"
@@ -14,7 +13,7 @@ import (
 type PublishNewRepo func(apiUrl string, apiUsername string, apiPassword string, repo string, distribution string, architectures []string) error
 
 type RepoCreater interface {
-	CreateRepo(apiUrl string, apiUsername string, apiPassword string, repo string) error
+	CreateRepo(apiUrl string, apiUsername string, apiPassword string, repo string, distribution string, architectures []string) error
 }
 
 type repoCreater struct {
@@ -29,14 +28,15 @@ func New(buildRequestAndExecute aptly_requestbuilder_executor.RequestbuilderExec
 	p := new(repoCreater)
 	p.buildRequestAndExecute = buildRequestAndExecute
 	p.httpRequestBuilderProvider = httpRequestBuilderProvider
+	p.publishNewRepo = publishNewRepo
 	return p
 }
 
-func (c *repoCreater) CreateRepo(apiUrl string, apiUsername string, apiPassword string, repo string) error {
+func (c *repoCreater) CreateRepo(apiUrl string, apiUsername string, apiPassword string, repo string, distribution string, architectures []string) error {
 	if err := c.createRepo(apiUrl, apiUsername, apiPassword, repo); err != nil {
 		//return err
 	}
-	if err := c.publishNewRepo(apiUrl, apiUsername, apiPassword, repo, aptly_defaults.DEFAULT_DISTRIBUTION, []string{aptly_defaults.DEFAULT_ARCHITECTURE}); err != nil {
+	if err := c.publishNewRepo(apiUrl, apiUsername, apiPassword, repo, distribution, architectures); err != nil {
 		return err
 	}
 	return nil
