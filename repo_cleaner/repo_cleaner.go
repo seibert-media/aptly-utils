@@ -47,17 +47,26 @@ func (r *repoCleaner) findKeysToDelete(url string, user string, password string,
 func packagesToKeys(packages []map[string]string) []string {
 	latestVersions := make(map[string]map[string]string)
 	var keys []string
-	for _, p := range packages {
-		if val, ok := latestVersions[p["Package"]]; ok {
-			if version.Less(version.Version(p["Version"]), version.Version(val["Version"])) {
-				latestVersions[p["Package"]] = val
-				keys = append(keys, p["Key"])
+	for _, currentPackage := range packages {
+		name := currentPackage["Package"]
+		if latestPackage, ok := latestVersions[name]; ok {
+			var packageToDelete map[string]string
+			logger.Tracef("compare %s < %s", currentPackage["Version"], latestPackage["Version"])
+			if version.Less(version.Version(currentPackage["Version"]), version.Version(latestPackage["Version"])) {
+				packageToDelete = currentPackage
 			} else {
-				keys = append(keys, val["Key"])
+				logger.Tracef("set latest version %s %s", currentPackage["Package"], currentPackage["Version"])
+				latestVersions[name] = currentPackage
+				packageToDelete = latestPackage
 			}
+			keys = append(keys, packageToDelete["Key"])
+			logger.Debugf("mark package %s %s to delete", packageToDelete["Package"], packageToDelete["Version"])
 		} else {
-			latestVersions[p["Package"]] = p
+			latestVersions[name] = currentPackage
 		}
+	}
+	for _, p := range latestVersions {
+		logger.Debugf("keep package %s %s to delete", p["Package"], p["Version"])
 	}
 	return keys
 }
