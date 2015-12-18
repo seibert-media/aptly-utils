@@ -62,8 +62,14 @@ func do(writer io.Writer, package_uploader aptly_package_uploader.PackageUploade
 		}
 		password = string(content)
 	}
+	if len(url) == 0 {
+		return fmt.Errorf("parameter %s missing", PARAMETER_API_URL)
+	}
+	if len(repo) == 0 {
+		return fmt.Errorf("parameter %s missing", PARAMETER_REPO)
+	}
 	if len(file) == 0 {
-		return fmt.Errorf("parameter file missing")
+		return fmt.Errorf("parameter %s missing", PARAMETER_FILE)
 	}
 	return package_uploader.UploadPackageByFile(url, user, password, repo, file)
 }

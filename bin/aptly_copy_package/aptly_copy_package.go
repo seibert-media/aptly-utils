@@ -71,17 +71,20 @@ func do(writer io.Writer, package_copier aptly_package_copier.PackageCopier, url
 		}
 		password = string(content)
 	}
+	if len(url) == 0 {
+		return fmt.Errorf("parameter %s missing", PARAMETER_API_URL)
+	}
 	if len(source) == 0 {
-		return fmt.Errorf("parameter source missing")
+		return fmt.Errorf("parameter %s missing", PARAMETER_SOURCE)
 	}
 	if len(target) == 0 {
-		return fmt.Errorf("parameter target missing")
+		return fmt.Errorf("parameter %s missing", PARAMETER_TARGET)
 	}
 	if len(name) == 0 {
-		return fmt.Errorf("parameter name missing")
+		return fmt.Errorf("parameter %s missing", PARAMETER_NAME)
 	}
 	if len(version) == 0 {
-		return fmt.Errorf("parameter version missing")
+		return fmt.Errorf("parameter %s missing", PARAMETER_VERSION)
 	}
 	return package_copier.CopyPackage(url, user, password, source, target, name, version)
 }

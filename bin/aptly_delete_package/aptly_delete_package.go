@@ -15,7 +15,6 @@ import (
 var logger = log.DefaultLogger
 
 const (
-	PARAMETER_FILE              = "file"
 	PARAMETER_LOGLEVEL          = "loglevel"
 	PARAMETER_API_URL           = "url"
 	PARAMETER_API_USER          = "username"
@@ -29,7 +28,6 @@ const (
 func main() {
 	defer logger.Close()
 	logLevelPtr := flag.String(PARAMETER_LOGLEVEL, log.INFO_STRING, log.FLAG_USAGE)
-	filePtr := flag.String(PARAMETER_FILE, "", "file")
 	apiUrlPtr := flag.String(PARAMETER_API_URL, "", "url")
 	apiUserPtr := flag.String(PARAMETER_API_USER, "", "user")
 	apiPasswordPtr := flag.String(PARAMETER_API_PASSWORD, "", "password")
@@ -46,7 +44,7 @@ func main() {
 	package_deleter := aptly_package_deleter.New()
 
 	writer := os.Stdout
-	err := do(writer, package_deleter, *apiUrlPtr, *apiUserPtr, *apiPasswordPtr, *apiPasswordFilePtr, *filePtr, *repoPtr, *namePtr, *versionPtr)
+	err := do(writer, package_deleter, *apiUrlPtr, *apiUserPtr, *apiPasswordPtr, *apiPasswordFilePtr, *repoPtr, *namePtr, *versionPtr)
 	if err != nil {
 		logger.Fatal(err)
 		logger.Close()
@@ -54,7 +52,7 @@ func main() {
 	}
 }
 
-func do(writer io.Writer, package_deleter aptly_package_deleter.PackageDeleter, url string, user string, password string, passwordfile string, file string, repo string, name string, version string) error {
+func do(writer io.Writer, package_deleter aptly_package_deleter.PackageDeleter, url string, user string, password string, passwordfile string, repo string, name string, version string) error {
 	if len(passwordfile) > 0 {
 		content, err := ioutil.ReadFile(passwordfile)
 		if err != nil {
@@ -62,8 +60,17 @@ func do(writer io.Writer, package_deleter aptly_package_deleter.PackageDeleter, 
 		}
 		password = string(content)
 	}
-	if len(file) == 0 {
-		return fmt.Errorf("parameter file missing")
+	if len(url) == 0 {
+		return fmt.Errorf("parameter %s missing", PARAMETER_API_URL)
+	}
+	if len(repo) == 0 {
+		return fmt.Errorf("parameter %s missing", PARAMETER_REPO)
+	}
+	if len(name) == 0 {
+		return fmt.Errorf("parameter %s missing", PARAMETER_NAME)
+	}
+	if len(version) == 0 {
+		return fmt.Errorf("parameter %s missing", PARAMETER_VERSION)
 	}
 	return package_deleter.DeletePackage()
 }

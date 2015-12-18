@@ -60,8 +60,11 @@ func do(writer io.Writer, repo_creater aptly_repo_creater.RepoCreater, url strin
 		}
 		password = string(content)
 	}
+	if len(url) == 0 {
+		return fmt.Errorf("parameter %s missing", PARAMETER_API_URL)
+	}
 	if len(repo) == 0 {
-		return fmt.Errorf("parameter repo missing")
+		return fmt.Errorf("parameter %s missing", PARAMETER_REPO)
 	}
 	return repo_creater.CreateRepo(url, user, password, repo)
 }

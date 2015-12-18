@@ -58,8 +58,14 @@ func do(writer io.Writer, repo_cleaner aptly_repo_cleaner.RepoCleaner, url strin
 		}
 		password = string(content)
 	}
+	if len(url) == 0 {
+		return fmt.Errorf("parameter %s missing", PARAMETER_API_URL)
+	}
 	if len(file) == 0 {
-		return fmt.Errorf("parameter file missing")
+		return fmt.Errorf("parameter %s missing", PARAMETER_FILE)
+	}
+	if len(repo) == 0 {
+		return fmt.Errorf("parameter %s missing", PARAMETER_REPO)
 	}
 	return repo_cleaner.CleanRepo()
 }

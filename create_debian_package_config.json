@@ -29,6 +29,10 @@
     {
       "source": "bin/aptly_clean_repo",
       "target": "/opt/aptly/bin/aptly_clean_repo"
+    },
+    {
+      "source": "bin/aptly_package_version",
+      "target": "/opt/aptly/bin/aptly_package_version"
     }
   ]
 }
