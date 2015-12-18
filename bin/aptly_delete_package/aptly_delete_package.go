@@ -76,5 +76,5 @@ func do(writer io.Writer, package_deleter aptly_package_deleter.PackageDeleter, 
 	if len(version) == 0 {
 		return fmt.Errorf("parameter %s missing", PARAMETER_VERSION)
 	}
-	return package_deleter.DeletePackage(url, user, password, repo, name, version)
+	return package_deleter.DeletePackageByNameAndVersion(url, user, password, repo, name, version)
 }

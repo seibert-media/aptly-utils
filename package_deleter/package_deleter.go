@@ -18,7 +18,8 @@ type ExecuteRequest func(req *http.Request) (resp *http.Response, err error)
 type NewHttpRequestBuilder func(url string) http_requestbuilder.HttpRequestBuilder
 
 type PackageDeleter interface {
-	DeletePackage(url string, user string, password string, repo string, name string, version string) error
+	DeletePackageByNameAndVersion(url string, user string, password string, repo string, name string, version string) error
+	DeletePackagesByKey(url string, user string, password string, repo string, key []string) error
 }
 
 type packageDeleter struct {
@@ -37,15 +38,18 @@ func New(executeRequest ExecuteRequest, newHttpRequestBuilder NewHttpRequestBuil
 
 type JsonStruct []map[string]string
 
-func (p *packageDeleter) DeletePackage(url string, user string, password string, repo string, name string, version string) error {
-	key, err := p.findKey(url, user, password, repo, name, version)
+func (p *packageDeleter) DeletePackageByNameAndVersion(url string, user string, password string, repo string, name string, version string) error {
+	keys, err := p.findKeys(url, user, password, repo, name, version)
 	if err != nil {
 		return err
 	}
-	return p.deleteByKey(url, user, password, repo, key)
+	if len(keys) == 0 {
+		return fmt.Errorf("no package found")
+	}
+	return p.DeletePackagesByKey(url, user, password, repo, keys)
 }
 
-func (p *packageDeleter) findKey(url string, user string, password string, repo string, name string, version string) (string, error) {
+func (p *packageDeleter) findKeys(url string, user string, password string, repo string, name string, version string) ([]string, error) {
 	logger.Debugf("PackageVersions - repo: %s package: %s", repo, name)
 	requestbuilder := p.newHttpRequestBuilder(fmt.Sprintf("%s/api/repos/%s/packages?format=details", url, repo))
 	requestbuilder.AddBasicAuth(user, password)
@@ -53,47 +57,47 @@ func (p *packageDeleter) findKey(url string, user string, password string, repo 
 	requestbuilder.AddContentType("application/json")
 	req, err := requestbuilder.GetRequest()
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 	resp, err := p.executeRequest(req)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 	content, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 	if resp.StatusCode/100 != 2 {
-		return "", fmt.Errorf("request failed: %s", (content))
+		return nil, fmt.Errorf("request failed: %s", (content))
 	}
 
 	var jsonStruct JsonStruct
 	err = json.Unmarshal(content, &jsonStruct)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
+	var keys []string
 	for _, info := range jsonStruct {
 		if info["Package"] == name && info["Version"] == version {
 			key := info["Key"]
 			logger.Debugf("found key: %s", key)
-			return key, nil
+			keys = append(keys, key)
 		}
 	}
-	return "", fmt.Errorf("package with version not found")
+	return keys, nil
 }
 
-func (p *packageDeleter) deleteByKey(url string, user string, password string, repo string, key string) error {
-	logger.Debugf("delete package with key: %s", key)
+func (p *packageDeleter) DeletePackagesByKey(url string, user string, password string, repo string, keys []string) error {
+	logger.Debugf("delete package with keys: %v", keys)
 	requestbuilder := p.newHttpRequestBuilder(fmt.Sprintf("%s/api/repos/%s/packages?format=details", url, repo))
 	requestbuilder.AddBasicAuth(user, password)
 	requestbuilder.SetMethod("DELETE")
 	requestbuilder.AddContentType("application/json")
-	requestContent, err := json.Marshal(map[string][]string{"PackageRefs": []string{key}})
+	requestContent, err := json.Marshal(map[string][]string{"PackageRefs": keys})
 	if err != nil {
 		return err
 	}
 	requestbuilder.SetBody(bytes.NewBuffer(requestContent))
-
 	req, err := requestbuilder.GetRequest()
 	if err != nil {
 		return err
