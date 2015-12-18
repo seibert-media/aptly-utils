@@ -44,14 +44,14 @@ go install $INSTALLS
 
 echo "Install completed, create debian package"
 
-/opt/debian/bin/create_debian_package \
+/opt/debian_utils/bin/create_debian_package \
 -loglevel=DEBUG \
 -version=$VERSION \
 -config=src/$SOURCEDIRECTORY/create_debian_package_config.json || exit 1
 
 echo "Create debian package completed, upload"
 
-/opt/aptly/bin/aptly_upload \
+/opt/aptly_utils/bin/aptly_upload \
 -loglevel=DEBUG \
 -url=http://aptly.benjamin-borbe.de \
 -username=api \

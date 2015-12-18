@@ -1,0 +1,4 @@
+#!/bin/sh
+
+chown -R root:root /opt/aptly_utils
+find /opt/aptly_utils -type d -exec chmod 755 "{}" \;

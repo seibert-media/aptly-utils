@@ -5,34 +5,35 @@
   "architecture": "amd64",
   "maintainer": "Benjamin Borbe <bborbe@rocketnews.de>",
   "description": "Aptly Utils",
+  "postinst": "src/github.com/bborbe/aptly_utils/postinst",
   "files": [
     {
       "source": "bin/aptly_copy_package",
-      "target": "/opt/aptly/bin/aptly_copy_package"
+      "target": "/opt/aptly_utils/bin/aptly_copy_package"
     },
     {
       "source": "bin/aptly_create_repo",
-      "target": "/opt/aptly/bin/aptly_create_repo"
+      "target": "/opt/aptly_utils/bin/aptly_create_repo"
     },
     {
       "source": "bin/aptly_delete_package",
-      "target": "/opt/aptly/bin/aptly_delete_package"
+      "target": "/opt/aptly_utils/bin/aptly_delete_package"
     },
     {
       "source": "bin/aptly_delete_repo",
-      "target": "/opt/aptly/bin/aptly_delete_repo"
+      "target": "/opt/aptly_utils/bin/aptly_delete_repo"
     },
     {
       "source": "bin/aptly_upload",
-      "target": "/opt/aptly/bin/aptly_upload"
+      "target": "/opt/aptly_utils/bin/aptly_upload"
     },
     {
       "source": "bin/aptly_clean_repo",
-      "target": "/opt/aptly/bin/aptly_clean_repo"
+      "target": "/opt/aptly_utils/bin/aptly_clean_repo"
     },
     {
       "source": "bin/aptly_package_version",
-      "target": "/opt/aptly/bin/aptly_package_version"
+      "target": "/opt/aptly_utils/bin/aptly_package_version"
     }
   ]
 }
