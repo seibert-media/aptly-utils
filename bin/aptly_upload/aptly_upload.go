@@ -9,6 +9,7 @@ import (
 	"runtime"
 
 	aptly_package_uploader "github.com/bborbe/aptly_utils/package_uploader"
+	aptly_repo_publisher "github.com/bborbe/aptly_utils/repo_publisher"
 	aptly_requestbuilder_executor "github.com/bborbe/aptly_utils/requestbuilder_executor"
 	"github.com/bborbe/http/client"
 	"github.com/bborbe/http/requestbuilder"
@@ -43,7 +44,8 @@ func main() {
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
 	requestbuilder_executor := aptly_requestbuilder_executor.New(client.GetClientWithoutProxy())
-	package_uploader := aptly_package_uploader.New(requestbuilder_executor, requestbuilder.NewHttpRequestBuilderProvider())
+	repo_publisher := aptly_repo_publisher.New(requestbuilder_executor, requestbuilder.NewHttpRequestBuilderProvider())
+	package_uploader := aptly_package_uploader.New(requestbuilder_executor, requestbuilder.NewHttpRequestBuilderProvider(), repo_publisher.PublishRepo)
 
 	writer := os.Stdout
 	err := do(writer, package_uploader, *apiUrlPtr, *apiUserPtr, *apiPasswordPtr, *apiPasswordFilePtr, *filePtr, *repoPtr)

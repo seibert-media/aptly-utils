@@ -12,6 +12,7 @@ import (
 
 type RepoPublisher interface {
 	PublishNewRepo(apiUrl string, apiUsername string, apiPassword string, repo string, distribution string, architectures []string) error
+	PublishRepo(apiUrl string, apiUsername string, apiPassword string, repo string, distribution string) error
 }
 
 type repoPublisher struct {
@@ -54,4 +55,18 @@ func (c *repoPublisher) PublishNewRepo(apiUrl string, apiUsername string, apiPas
 	}
 	requestbuilder.SetBody(bytes.NewBuffer(content))
 	return c.buildRequestAndExecute.BuildRequestAndExecute(requestbuilder)
+}
+
+func (p *repoPublisher) PublishRepo(apiUrl string, apiUsername string, apiPassword string, repo string, distribution string) error {
+	logger.Debugf("publishRepo - repo: %s distribution: %s", repo, distribution)
+	requestbuilder := p.httpRequestBuilderProvider.NewHttpRequestBuilder(fmt.Sprintf("%s/api/publish/%s/%s", apiUrl, repo, distribution))
+	requestbuilder.AddBasicAuth(apiUsername, apiPassword)
+	requestbuilder.SetMethod("PUT")
+	requestbuilder.AddContentType("application/json")
+	content, err := json.Marshal(map[string]bool{"ForceOverwrite": true})
+	if err != nil {
+		return err
+	}
+	requestbuilder.SetBody(bytes.NewBuffer(content))
+	return p.buildRequestAndExecute.BuildRequestAndExecute(requestbuilder)
 }

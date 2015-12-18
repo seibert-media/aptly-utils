@@ -2,7 +2,6 @@ package package_uploader
 
 import (
 	"bytes"
-	"encoding/json"
 	"fmt"
 	"io"
 	"mime/multipart"
@@ -15,6 +14,8 @@ import (
 	"github.com/bborbe/log"
 )
 
+type PublishRepo func(apiUrl string, apiUsername string, apiPassword string, repo string, distribution string) error
+
 type PackageUploader interface {
 	UploadPackageByFile(apiUrl string, apiUsername string, apiPassword string, repo string, file string) error
 	UploadPackageByReader(apiUrl string, apiUsername string, apiPassword string, repo string, name string, src io.Reader) error
@@ -23,14 +24,16 @@ type PackageUploader interface {
 type packageUploader struct {
 	buildRequestAndExecute     requestbuilder_executor.RequestbuilderExecutor
 	httpRequestBuilderProvider http_requestbuilder.HttpRequestBuilderProvider
+	publishRepo                PublishRepo
 }
 
 var logger = log.DefaultLogger
 
-func New(buildRequestAndExecute requestbuilder_executor.RequestbuilderExecutor, httpRequestBuilderProvider http_requestbuilder.HttpRequestBuilderProvider) *packageUploader {
+func New(buildRequestAndExecute requestbuilder_executor.RequestbuilderExecutor, httpRequestBuilderProvider http_requestbuilder.HttpRequestBuilderProvider, publishRepo PublishRepo) *packageUploader {
 	p := new(packageUploader)
 	p.buildRequestAndExecute = buildRequestAndExecute
 	p.httpRequestBuilderProvider = httpRequestBuilderProvider
+	p.publishRepo = publishRepo
 	return p
 }
 
@@ -93,19 +96,5 @@ func (p *packageUploader) addPackageToRepo(apiUrl string, apiUsername string, ap
 	requestbuilder.AddBasicAuth(apiUsername, apiPassword)
 	requestbuilder.SetMethod("POST")
 	requestbuilder.AddContentType("application/json")
-	return p.buildRequestAndExecute.BuildRequestAndExecute(requestbuilder)
-}
-
-func (p *packageUploader) publishRepo(apiUrl string, apiUsername string, apiPassword string, repo string, distribution string) error {
-	logger.Debugf("publishRepo - repo: %s distribution: %s", repo, distribution)
-	requestbuilder := p.httpRequestBuilderProvider.NewHttpRequestBuilder(fmt.Sprintf("%s/api/publish/%s/%s", apiUrl, repo, distribution))
-	requestbuilder.AddBasicAuth(apiUsername, apiPassword)
-	requestbuilder.SetMethod("PUT")
-	requestbuilder.AddContentType("application/json")
-	content, err := json.Marshal(map[string]bool{"ForceOverwrite": true})
-	if err != nil {
-		return err
-	}
-	requestbuilder.SetBody(bytes.NewBuffer(content))
 	return p.buildRequestAndExecute.BuildRequestAndExecute(requestbuilder)
 }
