@@ -48,7 +48,6 @@ func main() {
 	client := http_client.GetClientWithoutProxy()
 	httpRequestBuilderProvider := http_requestbuilder.NewHttpRequestBuilderProvider()
 	package_lister := aptly_package_lister.New(client.Do, httpRequestBuilderProvider.NewHttpRequestBuilder)
-
 	package_version := aptly_package_versions.New(package_lister.ListPackages)
 
 	writer := os.Stdout

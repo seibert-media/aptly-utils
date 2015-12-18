@@ -6,7 +6,7 @@ import (
 	"github.com/bborbe/aptly_utils/version"
 )
 
-type ListPackages func(url string, user string, password string, repo string, name string) ([]map[string]string, error)
+type ListPackages func(url string, user string, password string, repo string) ([]map[string]string, error)
 
 type PackageVersions interface {
 	PackageVersions(url string, user string, password string, repo string, name string) ([]version.Version, error)
@@ -28,8 +28,7 @@ type JsonStruct []map[string]string
 
 func (p *packageVersion) PackageVersions(url string, user string, password string, repo string, name string) ([]version.Version, error) {
 	logger.Debugf("PackageVersions - repo: %s package: %s", repo, name)
-
-	jsonStruct, err := p.listPackages(url, user, password, repo, name)
+	jsonStruct, err := p.listPackages(url, user, password, repo)
 	if err != nil {
 		return nil, err
 	}

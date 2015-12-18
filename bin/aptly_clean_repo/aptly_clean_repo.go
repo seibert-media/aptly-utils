@@ -9,6 +9,7 @@ import (
 	"runtime"
 
 	aptly_package_deleter "github.com/bborbe/aptly_utils/package_deleter"
+	aptly_package_lister "github.com/bborbe/aptly_utils/package_lister"
 	aptly_repo_cleaner "github.com/bborbe/aptly_utils/repo_cleaner"
 	http_client "github.com/bborbe/http/client"
 	http_requestbuilder "github.com/bborbe/http/requestbuilder"
@@ -43,7 +44,8 @@ func main() {
 	client := http_client.GetClientWithoutProxy()
 	httpRequestBuilderProvider := http_requestbuilder.NewHttpRequestBuilderProvider()
 	package_deleter := aptly_package_deleter.New(client.Do, httpRequestBuilderProvider.NewHttpRequestBuilder)
-	repo_cleaner := aptly_repo_cleaner.New(package_deleter.DeletePackagesByKey)
+	package_lister := aptly_package_lister.New(client.Do, httpRequestBuilderProvider.NewHttpRequestBuilder)
+	repo_cleaner := aptly_repo_cleaner.New(package_deleter.DeletePackagesByKey, package_lister.ListPackages)
 
 	writer := os.Stdout
 	err := do(writer, repo_cleaner, *apiUrlPtr, *apiUserPtr, *apiPasswordPtr, *apiPasswordFilePtr, *repoPtr)

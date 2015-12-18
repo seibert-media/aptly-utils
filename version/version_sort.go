@@ -12,9 +12,9 @@ type VersionByName []Version
 
 func (v VersionByName) Len() int           { return len(v) }
 func (v VersionByName) Swap(i, j int)      { v[i], v[j] = v[j], v[i] }
-func (v VersionByName) Less(i, j int) bool { return less(v[i], v[j]) }
+func (v VersionByName) Less(i, j int) bool { return Less(v[i], v[j]) }
 
-func less(a Version, b Version) bool {
+func Less(a Version, b Version) bool {
 	result, err := lessArray(a, b)
 	if err != nil {
 		return stringutil.StringLess(string(a), string(b))
