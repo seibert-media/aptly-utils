@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/bborbe/aptly_utils/defaults"
-	"github.com/bborbe/aptly_utils/requestbuilder_executor"
+	aptly_defaults "github.com/bborbe/aptly_utils/defaults"
+	aptly_requestbuilder_executor "github.com/bborbe/aptly_utils/requestbuilder_executor"
 	http_requestbuilder "github.com/bborbe/http/requestbuilder"
 	"github.com/bborbe/log"
 )
@@ -18,14 +18,14 @@ type RepoCreater interface {
 }
 
 type repoCreater struct {
-	buildRequestAndExecute     requestbuilder_executor.RequestbuilderExecutor
+	buildRequestAndExecute     aptly_requestbuilder_executor.RequestbuilderExecutor
 	httpRequestBuilderProvider http_requestbuilder.HttpRequestBuilderProvider
 	publishNewRepo             PublishNewRepo
 }
 
 var logger = log.DefaultLogger
 
-func New(buildRequestAndExecute requestbuilder_executor.RequestbuilderExecutor, httpRequestBuilderProvider http_requestbuilder.HttpRequestBuilderProvider, publishNewRepo PublishNewRepo) *repoCreater {
+func New(buildRequestAndExecute aptly_requestbuilder_executor.RequestbuilderExecutor, httpRequestBuilderProvider http_requestbuilder.HttpRequestBuilderProvider, publishNewRepo PublishNewRepo) *repoCreater {
 	p := new(repoCreater)
 	p.buildRequestAndExecute = buildRequestAndExecute
 	p.httpRequestBuilderProvider = httpRequestBuilderProvider
@@ -36,7 +36,7 @@ func (c *repoCreater) CreateRepo(apiUrl string, apiUsername string, apiPassword 
 	if err := c.createRepo(apiUrl, apiUsername, apiPassword, repo); err != nil {
 		//return err
 	}
-	if err := c.publishNewRepo(apiUrl, apiUsername, apiPassword, repo, defaults.DEFAULT_DISTRIBUTION, []string{defaults.DEFAULT_ARCHITECTURE}); err != nil {
+	if err := c.publishNewRepo(apiUrl, apiUsername, apiPassword, repo, aptly_defaults.DEFAULT_DISTRIBUTION, []string{aptly_defaults.DEFAULT_ARCHITECTURE}); err != nil {
 		return err
 	}
 	return nil

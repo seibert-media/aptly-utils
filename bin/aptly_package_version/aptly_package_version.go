@@ -12,7 +12,7 @@ import (
 
 	aptly_package_lister "github.com/bborbe/aptly_utils/package_lister"
 	aptly_package_versions "github.com/bborbe/aptly_utils/package_versions"
-	"github.com/bborbe/aptly_utils/version"
+	aptly_version "github.com/bborbe/aptly_utils/version"
 	http_client "github.com/bborbe/http/client"
 	http_requestbuilder "github.com/bborbe/http/requestbuilder"
 	"github.com/bborbe/log"
@@ -79,14 +79,14 @@ func do(writer io.Writer, packageVersions aptly_package_versions.PackageVersions
 	}
 
 	var err error
-	var versions []version.Version
+	var versions []aptly_version.Version
 	if versions, err = packageVersions.PackageVersions(url, user, password, repo, name); err != nil {
 		return err
 	}
 	if len(versions) == 0 {
 		return fmt.Errorf("package %s not found", name)
 	}
-	sort.Sort(version.VersionByName(versions))
+	sort.Sort(aptly_version.VersionByName(versions))
 	fmt.Fprintf(writer, "%s\n", versions[len(versions)-1])
 	return nil
 }

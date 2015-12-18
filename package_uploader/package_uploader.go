@@ -8,8 +8,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/bborbe/aptly_utils/defaults"
-	"github.com/bborbe/aptly_utils/requestbuilder_executor"
+	aptly_defaults "github.com/bborbe/aptly_utils/defaults"
+	aptly_requestbuilder_executor "github.com/bborbe/aptly_utils/requestbuilder_executor"
 	http_requestbuilder "github.com/bborbe/http/requestbuilder"
 	"github.com/bborbe/log"
 )
@@ -22,14 +22,14 @@ type PackageUploader interface {
 }
 
 type packageUploader struct {
-	buildRequestAndExecute     requestbuilder_executor.RequestbuilderExecutor
+	buildRequestAndExecute     aptly_requestbuilder_executor.RequestbuilderExecutor
 	httpRequestBuilderProvider http_requestbuilder.HttpRequestBuilderProvider
 	publishRepo                PublishRepo
 }
 
 var logger = log.DefaultLogger
 
-func New(buildRequestAndExecute requestbuilder_executor.RequestbuilderExecutor, httpRequestBuilderProvider http_requestbuilder.HttpRequestBuilderProvider, publishRepo PublishRepo) *packageUploader {
+func New(buildRequestAndExecute aptly_requestbuilder_executor.RequestbuilderExecutor, httpRequestBuilderProvider http_requestbuilder.HttpRequestBuilderProvider, publishRepo PublishRepo) *packageUploader {
 	p := new(packageUploader)
 	p.buildRequestAndExecute = buildRequestAndExecute
 	p.httpRequestBuilderProvider = httpRequestBuilderProvider
@@ -55,7 +55,7 @@ func (p *packageUploader) UploadPackageByReader(apiUrl string, apiUsername strin
 	if err := p.addPackageToRepo(apiUrl, apiUsername, apiPassword, repo, pkg); err != nil {
 		return err
 	}
-	if err := p.publishRepo(apiUrl, apiUsername, apiPassword, repo, defaults.DEFAULT_DISTRIBUTION); err != nil {
+	if err := p.publishRepo(apiUrl, apiUsername, apiPassword, repo, aptly_defaults.DEFAULT_DISTRIBUTION); err != nil {
 		return err
 	}
 	return nil

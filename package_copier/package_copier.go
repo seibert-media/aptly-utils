@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/bborbe/aptly_utils/package_uploader"
+	aptly_package_uploader "github.com/bborbe/aptly_utils/package_uploader"
 	http_requestbuilder "github.com/bborbe/http/requestbuilder"
 	"github.com/bborbe/log"
 )
@@ -14,14 +14,14 @@ type PackageCopier interface {
 }
 
 type packageCopier struct {
-	uploader                   package_uploader.PackageUploader
+	uploader                   aptly_package_uploader.PackageUploader
 	httpRequestBuilderProvider http_requestbuilder.HttpRequestBuilderProvider
 	client                     *http.Client
 }
 
 var logger = log.DefaultLogger
 
-func New(uploader package_uploader.PackageUploader, httpRequestBuilderProvider http_requestbuilder.HttpRequestBuilderProvider, client *http.Client) *packageCopier {
+func New(uploader aptly_package_uploader.PackageUploader, httpRequestBuilderProvider http_requestbuilder.HttpRequestBuilderProvider, client *http.Client) *packageCopier {
 	p := new(packageCopier)
 	p.client = client
 	p.uploader = uploader
