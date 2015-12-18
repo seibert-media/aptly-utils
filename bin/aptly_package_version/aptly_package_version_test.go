@@ -13,7 +13,7 @@ func TestDo(t *testing.T) {
 	var err error
 	writer := io_mock.NewWriter()
 
-	package_versions := aptly_package_versions.New(nil, nil)
+	package_versions := aptly_package_versions.New(nil)
 
 	err = do(writer, package_versions, "", "", "", "", "", "")
 	err = AssertThat(err, NotNilValue())

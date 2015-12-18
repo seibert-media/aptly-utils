@@ -7,7 +7,7 @@ import (
 )
 
 func TestImplementsRepoCleaner(t *testing.T) {
-	b := New()
+	b := New(nil)
 	var i *RepoCleaner
 	err := AssertThat(b, Implements(i).Message("check type"))
 	if err != nil {

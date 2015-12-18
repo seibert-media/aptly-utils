@@ -10,6 +10,7 @@ import (
 
 	"sort"
 
+	aptly_package_lister "github.com/bborbe/aptly_utils/package_lister"
 	aptly_package_versions "github.com/bborbe/aptly_utils/package_versions"
 	"github.com/bborbe/aptly_utils/version"
 	http_client "github.com/bborbe/http/client"
@@ -46,7 +47,9 @@ func main() {
 
 	client := http_client.GetClientWithoutProxy()
 	httpRequestBuilderProvider := http_requestbuilder.NewHttpRequestBuilderProvider()
-	package_version := aptly_package_versions.New(client.Do, httpRequestBuilderProvider.NewHttpRequestBuilder)
+	package_lister := aptly_package_lister.New(client.Do, httpRequestBuilderProvider.NewHttpRequestBuilder)
+
+	package_version := aptly_package_versions.New(package_lister.ListPackages)
 
 	writer := os.Stdout
 	err := do(writer, package_version, *apiUrlPtr, *apiUserPtr, *apiPasswordPtr, *apiPasswordFilePtr, *repoPtr, *namePtr)

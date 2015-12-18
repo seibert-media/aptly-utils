@@ -8,14 +8,16 @@ import (
 	"os"
 	"runtime"
 
+	aptly_package_deleter "github.com/bborbe/aptly_utils/package_deleter"
 	aptly_repo_cleaner "github.com/bborbe/aptly_utils/repo_cleaner"
+	http_client "github.com/bborbe/http/client"
+	http_requestbuilder "github.com/bborbe/http/requestbuilder"
 	"github.com/bborbe/log"
 )
 
 var logger = log.DefaultLogger
 
 const (
-	PARAMETER_FILE              = "file"
 	PARAMETER_LOGLEVEL          = "loglevel"
 	PARAMETER_API_URL           = "url"
 	PARAMETER_API_USER          = "username"
@@ -27,7 +29,6 @@ const (
 func main() {
 	defer logger.Close()
 	logLevelPtr := flag.String(PARAMETER_LOGLEVEL, log.INFO_STRING, log.FLAG_USAGE)
-	filePtr := flag.String(PARAMETER_FILE, "", "file")
 	apiUrlPtr := flag.String(PARAMETER_API_URL, "", "url")
 	apiUserPtr := flag.String(PARAMETER_API_USER, "", "user")
 	apiPasswordPtr := flag.String(PARAMETER_API_PASSWORD, "", "password")
@@ -39,10 +40,13 @@ func main() {
 
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
-	repo_cleaner := aptly_repo_cleaner.New()
+	client := http_client.GetClientWithoutProxy()
+	httpRequestBuilderProvider := http_requestbuilder.NewHttpRequestBuilderProvider()
+	package_deleter := aptly_package_deleter.New(client.Do, httpRequestBuilderProvider.NewHttpRequestBuilder)
+	repo_cleaner := aptly_repo_cleaner.New(package_deleter.DeletePackagesByKey)
 
 	writer := os.Stdout
-	err := do(writer, repo_cleaner, *apiUrlPtr, *apiUserPtr, *apiPasswordPtr, *apiPasswordFilePtr, *filePtr, *repoPtr)
+	err := do(writer, repo_cleaner, *apiUrlPtr, *apiUserPtr, *apiPasswordPtr, *apiPasswordFilePtr, *repoPtr)
 	if err != nil {
 		logger.Fatal(err)
 		logger.Close()
@@ -50,7 +54,7 @@ func main() {
 	}
 }
 
-func do(writer io.Writer, repo_cleaner aptly_repo_cleaner.RepoCleaner, url string, user string, password string, passwordfile string, file string, repo string) error {
+func do(writer io.Writer, repo_cleaner aptly_repo_cleaner.RepoCleaner, url string, user string, password string, passwordfile string, repo string) error {
 	if len(passwordfile) > 0 {
 		content, err := ioutil.ReadFile(passwordfile)
 		if err != nil {
@@ -61,11 +65,8 @@ func do(writer io.Writer, repo_cleaner aptly_repo_cleaner.RepoCleaner, url strin
 	if len(url) == 0 {
 		return fmt.Errorf("parameter %s missing", PARAMETER_API_URL)
 	}
-	if len(file) == 0 {
-		return fmt.Errorf("parameter %s missing", PARAMETER_FILE)
-	}
 	if len(repo) == 0 {
 		return fmt.Errorf("parameter %s missing", PARAMETER_REPO)
 	}
-	return repo_cleaner.CleanRepo()
+	return repo_cleaner.CleanRepo(url, user, password, repo)
 }
