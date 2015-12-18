@@ -11,6 +11,8 @@ import (
 	"github.com/bborbe/log"
 )
 
+type PublishNewRepo func(apiUrl string, apiUsername string, apiPassword string, repo string, distribution string, architectures []string) error
+
 type RepoCreater interface {
 	CreateRepo(apiUrl string, apiUsername string, apiPassword string, repo string) error
 }
@@ -18,11 +20,12 @@ type RepoCreater interface {
 type repoCreater struct {
 	buildRequestAndExecute     requestbuilder_executor.RequestbuilderExecutor
 	httpRequestBuilderProvider http_requestbuilder.HttpRequestBuilderProvider
+	publishNewRepo             PublishNewRepo
 }
 
 var logger = log.DefaultLogger
 
-func New(buildRequestAndExecute requestbuilder_executor.RequestbuilderExecutor, httpRequestBuilderProvider http_requestbuilder.HttpRequestBuilderProvider) *repoCreater {
+func New(buildRequestAndExecute requestbuilder_executor.RequestbuilderExecutor, httpRequestBuilderProvider http_requestbuilder.HttpRequestBuilderProvider, publishNewRepo PublishNewRepo) *repoCreater {
 	p := new(repoCreater)
 	p.buildRequestAndExecute = buildRequestAndExecute
 	p.httpRequestBuilderProvider = httpRequestBuilderProvider
@@ -33,7 +36,7 @@ func (c *repoCreater) CreateRepo(apiUrl string, apiUsername string, apiPassword 
 	if err := c.createRepo(apiUrl, apiUsername, apiPassword, repo); err != nil {
 		//return err
 	}
-	if err := c.publishRepo(apiUrl, apiUsername, apiPassword, repo, defaults.DEFAULT_DISTRIBUTION, []string{defaults.DEFAULT_ARCHITECTURE}); err != nil {
+	if err := c.publishNewRepo(apiUrl, apiUsername, apiPassword, repo, defaults.DEFAULT_DISTRIBUTION, []string{defaults.DEFAULT_ARCHITECTURE}); err != nil {
 		return err
 	}
 	return nil
@@ -46,34 +49,6 @@ func (c *repoCreater) createRepo(apiUrl string, apiUsername string, apiPassword 
 	requestbuilder.SetMethod("POST")
 	requestbuilder.AddContentType("application/json")
 	content, err := json.Marshal(map[string]string{"Name": repo})
-	if err != nil {
-		return err
-	}
-	requestbuilder.SetBody(bytes.NewBuffer(content))
-	return c.buildRequestAndExecute.BuildRequestAndExecute(requestbuilder)
-}
-
-type publishJson struct {
-	ForceOverwrite bool
-	Distribution   string
-	SourceKind     string
-	Sources        []map[string]string
-	Architectures  []string
-}
-
-func (c *repoCreater) publishRepo(apiUrl string, apiUsername string, apiPassword string, repo string, distribution string, architectures []string) error {
-	logger.Debugf("publishRepo")
-	requestbuilder := c.httpRequestBuilderProvider.NewHttpRequestBuilder(fmt.Sprintf("%s/api/publish/%s", apiUrl, repo))
-	requestbuilder.AddBasicAuth(apiUsername, apiPassword)
-	requestbuilder.SetMethod("POST")
-	requestbuilder.AddContentType("application/json")
-	content, err := json.Marshal(publishJson{
-		ForceOverwrite: true,
-		Distribution:   distribution,
-		SourceKind:     "local",
-		Sources:        []map[string]string{{"Name": repo}},
-		Architectures:  architectures,
-	})
 	if err != nil {
 		return err
 	}

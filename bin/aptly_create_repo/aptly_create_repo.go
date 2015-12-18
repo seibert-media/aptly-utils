@@ -9,6 +9,7 @@ import (
 	"runtime"
 
 	aptly_repo_creater "github.com/bborbe/aptly_utils/repo_creater"
+	aptly_repo_publisher "github.com/bborbe/aptly_utils/repo_publisher"
 	aptly_requestbuilder_executor "github.com/bborbe/aptly_utils/requestbuilder_executor"
 	http_client "github.com/bborbe/http/client"
 	http_requestbuilder "github.com/bborbe/http/requestbuilder"
@@ -43,7 +44,8 @@ func main() {
 	client := http_client.GetClientWithoutProxy()
 	requestbuilder_executor := aptly_requestbuilder_executor.New(client)
 	requestbuilder := http_requestbuilder.NewHttpRequestBuilderProvider()
-	repo_creater := aptly_repo_creater.New(requestbuilder_executor, requestbuilder)
+	repo_publisher := aptly_repo_publisher.New(requestbuilder_executor, requestbuilder)
+	repo_creater := aptly_repo_creater.New(requestbuilder_executor, requestbuilder, repo_publisher.PublishNewRepo)
 
 	writer := os.Stdout
 	err := do(writer, repo_creater, *apiUrlPtr, *apiUserPtr, *apiPasswordPtr, *apiPasswordFilePtr, *repoPtr)

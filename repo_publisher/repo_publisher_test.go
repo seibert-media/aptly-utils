@@ -1,4 +1,4 @@
-package repo_creator
+package repo_publisher
 
 import (
 	"testing"
@@ -6,9 +6,9 @@ import (
 	. "github.com/bborbe/assert"
 )
 
-func TestImplementsRepoDeleter(t *testing.T) {
-	b := New(nil, nil, nil)
-	var i *RepoCreater
+func TestImplementsRepoPublisher(t *testing.T) {
+	b := New(nil, nil)
+	var i *RepoPublisher
 	err := AssertThat(b, Implements(i).Message("check type"))
 	if err != nil {
 		t.Fatal(err)
