@@ -13,7 +13,7 @@ func TestDo(t *testing.T) {
 	var err error
 	writer := io_mock.NewWriter()
 
-	package_deleter := aptly_package_deleter.New()
+	package_deleter := aptly_package_deleter.New(nil, nil)
 
 	err = do(writer, package_deleter, "", "", "", "", "", "", "")
 	err = AssertThat(err, NotNilValue())

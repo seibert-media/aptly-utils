@@ -9,6 +9,8 @@ import (
 	"runtime"
 
 	aptly_package_deleter "github.com/bborbe/aptly_utils/package_deleter"
+	http_client "github.com/bborbe/http/client"
+	http_requestbuilder "github.com/bborbe/http/requestbuilder"
 	"github.com/bborbe/log"
 )
 
@@ -41,7 +43,9 @@ func main() {
 
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
-	package_deleter := aptly_package_deleter.New()
+	client := http_client.GetClientWithoutProxy()
+	httpRequestBuilderProvider := http_requestbuilder.NewHttpRequestBuilderProvider()
+	package_deleter := aptly_package_deleter.New(client.Do, httpRequestBuilderProvider.NewHttpRequestBuilder)
 
 	writer := os.Stdout
 	err := do(writer, package_deleter, *apiUrlPtr, *apiUserPtr, *apiPasswordPtr, *apiPasswordFilePtr, *repoPtr, *namePtr, *versionPtr)
@@ -72,5 +76,5 @@ func do(writer io.Writer, package_deleter aptly_package_deleter.PackageDeleter, 
 	if len(version) == 0 {
 		return fmt.Errorf("parameter %s missing", PARAMETER_VERSION)
 	}
-	return package_deleter.DeletePackage()
+	return package_deleter.DeletePackage(url, user, password, repo, name, version)
 }

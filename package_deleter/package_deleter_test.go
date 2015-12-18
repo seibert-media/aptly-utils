@@ -7,7 +7,7 @@ import (
 )
 
 func TestImplementsPackageDeleter(t *testing.T) {
-	b := New()
+	b := New(nil, nil)
 	var i *PackageDeleter
 	err := AssertThat(b, Implements(i).Message("check type"))
 	if err != nil {
