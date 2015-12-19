@@ -1,14 +1,12 @@
 package repo_deleter
 
 import (
-	aptly_defaults "github.com/bborbe/aptly_utils/defaults"
 	aptly_version "github.com/bborbe/aptly_utils/version"
 	"github.com/bborbe/log"
 )
 
 type DeletePackagesByKey func(url string, user string, password string, repo string, keys []string) error
 type ListPackages func(url string, user string, password string, repo string) ([]map[string]string, error)
-type PublishRepo func(apiUrl string, apiUsername string, apiPassword string, repo string, distribution string) error
 
 type RepoCleaner interface {
 	CleanRepo(url string, user string, password string, repo string) error
@@ -17,16 +15,14 @@ type RepoCleaner interface {
 type repoCleaner struct {
 	deletePackagesByKey DeletePackagesByKey
 	listPackages        ListPackages
-	publishRepo         PublishRepo
 }
 
 var logger = log.DefaultLogger
 
-func New(deletePackagesByKey DeletePackagesByKey, listPackages ListPackages, publishRepo PublishRepo) *repoCleaner {
+func New(deletePackagesByKey DeletePackagesByKey, listPackages ListPackages) *repoCleaner {
 	r := new(repoCleaner)
 	r.deletePackagesByKey = deletePackagesByKey
 	r.listPackages = listPackages
-	r.publishRepo = publishRepo
 	return r
 }
 
@@ -40,10 +36,7 @@ func (r *repoCleaner) CleanRepo(url string, user string, password string, repo s
 		logger.Debugf("nothing to delete")
 		return nil
 	}
-	if err = r.deletePackagesByKey(url, user, password, repo, keys); err != nil {
-		return err
-	}
-	return r.publishRepo(url, user, password, repo, aptly_defaults.DEFAULT_DISTRIBUTION)
+	return r.deletePackagesByKey(url, user, password, repo, keys)
 }
 
 func (r *repoCleaner) findKeysToDelete(url string, user string, password string, repo string) ([]string, error) {

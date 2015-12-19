@@ -1,21 +1,20 @@
 package package_deleter
 
 import (
-	"fmt"
-
-	"github.com/bborbe/log"
-
+	"bytes"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 
-	"bytes"
-
+	aptly_defaults "github.com/bborbe/aptly_utils/defaults"
 	http_requestbuilder "github.com/bborbe/http/requestbuilder"
+	"github.com/bborbe/log"
 )
 
 type ExecuteRequest func(req *http.Request) (resp *http.Response, err error)
 type NewHttpRequestBuilder func(url string) http_requestbuilder.HttpRequestBuilder
+type PublishRepo func(apiUrl string, apiUsername string, apiPassword string, repo string, distribution string) error
 
 type PackageDeleter interface {
 	DeletePackageByNameAndVersion(url string, user string, password string, repo string, name string, version string) error
@@ -25,14 +24,16 @@ type PackageDeleter interface {
 type packageDeleter struct {
 	executeRequest        ExecuteRequest
 	newHttpRequestBuilder NewHttpRequestBuilder
+	publishRepo           PublishRepo
 }
 
 var logger = log.DefaultLogger
 
-func New(executeRequest ExecuteRequest, newHttpRequestBuilder NewHttpRequestBuilder) *packageDeleter {
+func New(executeRequest ExecuteRequest, newHttpRequestBuilder NewHttpRequestBuilder, publishRepo PublishRepo) *packageDeleter {
 	p := new(packageDeleter)
 	p.executeRequest = executeRequest
 	p.newHttpRequestBuilder = newHttpRequestBuilder
+	p.publishRepo = publishRepo
 	return p
 }
 
@@ -46,7 +47,10 @@ func (p *packageDeleter) DeletePackageByNameAndVersion(url string, user string, 
 	if len(keys) == 0 {
 		return fmt.Errorf("no package found")
 	}
-	return p.DeletePackagesByKey(url, user, password, repo, keys)
+	if err = p.DeletePackagesByKey(url, user, password, repo, keys); err != nil {
+		return err
+	}
+	return p.publishRepo(url, user, password, repo, aptly_defaults.DEFAULT_DISTRIBUTION)
 }
 
 func (p *packageDeleter) findKeys(url string, user string, password string, repo string, name string, version string) ([]string, error) {

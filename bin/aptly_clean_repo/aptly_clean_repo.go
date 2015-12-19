@@ -45,11 +45,11 @@ func main() {
 
 	client := http_client.GetClientWithoutProxy()
 	httpRequestBuilderProvider := http_requestbuilder.NewHttpRequestBuilderProvider()
-	package_deleter := aptly_package_deleter.New(client.Do, httpRequestBuilderProvider.NewHttpRequestBuilder)
 	package_lister := aptly_package_lister.New(client.Do, httpRequestBuilderProvider.NewHttpRequestBuilder)
 	requestbuilder_executor := aptly_requestbuilder_executor.New(client)
 	repo_publisher := aptly_repo_publisher.New(requestbuilder_executor, httpRequestBuilderProvider)
-	repo_cleaner := aptly_repo_cleaner.New(package_deleter.DeletePackagesByKey, package_lister.ListPackages, repo_publisher.PublishRepo)
+	package_deleter := aptly_package_deleter.New(client.Do, httpRequestBuilderProvider.NewHttpRequestBuilder, repo_publisher.PublishRepo)
+	repo_cleaner := aptly_repo_cleaner.New(package_deleter.DeletePackagesByKey, package_lister.ListPackages)
 
 	writer := os.Stdout
 	err := do(writer, repo_cleaner, *apiUrlPtr, *apiUserPtr, *apiPasswordPtr, *apiPasswordFilePtr, *repoPtr)
