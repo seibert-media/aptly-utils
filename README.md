@@ -1,28 +1,112 @@
-Aptly Utils
-===========
+# Aptly Utils
+
 
 Package provide some aptly utils
 
-Documentation
--------------
 
-http://godoc.org/github.com/bborbe/aptly_utils/
+                
 
-Continuous integration
-----------------------
+## Create Repo
 
-https://www.benjamin-borbe.de/jenkins/job/Go-Aptly-Utils/
+```
+aptly_create_repo \
+-loglevel=DEBUG \
+-url=http://aptly.benjamin-borbe.de \
+-username=api \
+-passwordfile=/etc/aptly_api_password \
+-repo=unstable
+```
 
-Copyright and license
----------------------
+## Delete Repo
 
-    Copyright (c) 2015, Benjamin Borbe <bborbe@rocketnews.de>
+```
+aptly_delete_repo \
+-loglevel=DEBUG \
+-url=http://aptly.benjamin-borbe.de \
+-username=api \
+-passwordfile=/etc/aptly_api_password \
+-repo=unstable
+```
+
+## Clean Repo
+
+```
+aptly_clean_repo \
+-loglevel=DEBUG \
+-url=http://aptly.benjamin-borbe.de \
+-username=api \
+-passwordfile=/etc/aptly_api_password \
+-repo=unstable
+```
+
+## Upload Debian Package
+
+```
+aptly_upload \
+-loglevel=DEBUG \
+-url=http://aptly.benjamin-borbe.de \
+-username=api \
+-passwordfile=/etc/aptly_api_password \
+-file=booking_1.0.1-b47.deb \
+-repo=unstable
+```
+
+## Delete Package
+
+```
+aptly_delete_package \
+-loglevel=DEBUG \
+-url=http://aptly.benjamin-borbe.de \
+-username=api \
+-passwordfile=/etc/aptly_api_password \
+-repo=unstable \
+-name=booking \
+-version=1.0.1-b47
+```
+
+## Copy Package from Repo to Repo
+
+```
+aptly_copy_package \
+-loglevel=DEBUG \
+-url=http://aptly.benjamin-borbe.de \
+-username=api \
+-passwordfile=/etc/aptly_api_password \
+-source=unstable \
+-target=stable \
+-name=booking \
+-version=1.0.1-b47
+```
+
+## Version of Package
+
+```
+aptly_package_version \
+-loglevel=DEBUG \
+-url=http://aptly.benjamin-borbe.de \
+-username=api \
+-passwordfile=/etc/aptly_api_password \
+-repo=unstable \
+-name=booking
+```
+
+## Documentation
+
+[GoDoc](http://godoc.org/github.com/bborbe/aptly_utils/)
+
+## Continuous integration
+
+[Jenkins](https://www.benjamin-borbe.de/jenkins/job/Go-Aptly-Utils/)
+
+## Copyright and license
+
+    Copyright (c) 2016, Benjamin Borbe <bborbe@rocketnews.de>
     All rights reserved.
-
+    
     Redistribution and use in source and binary forms, with or without
     modification, are permitted provided that the following conditions are
     met:
-
+    
        * Redistributions of source code must retain the above copyright
          notice, this list of conditions and the following disclaimer.
        * Redistributions in binary form must reproduce the above
