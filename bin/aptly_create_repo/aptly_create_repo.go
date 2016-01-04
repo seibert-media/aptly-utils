@@ -15,6 +15,7 @@ import (
 	http_client "github.com/bborbe/http/client"
 	http_requestbuilder "github.com/bborbe/http/requestbuilder"
 	"github.com/bborbe/log"
+"strings"
 )
 
 var logger = log.DefaultLogger
@@ -67,7 +68,7 @@ func do(writer io.Writer, repo_creater aptly_repo_creater.RepoCreater, url strin
 		if err != nil {
 			return err
 		}
-		password = string(content)
+		password = strings.TrimSpace(string(content))
 	}
 	if len(url) == 0 {
 		return fmt.Errorf("parameter %s missing", PARAMETER_API_URL)

@@ -10,6 +10,7 @@ import (
 
 	aptly_repo_deleter "github.com/bborbe/aptly_utils/repo_deleter"
 	"github.com/bborbe/log"
+"strings"
 )
 
 var logger = log.DefaultLogger
@@ -54,7 +55,7 @@ func do(writer io.Writer, repo_deleter aptly_repo_deleter.RepoDeleter, url strin
 		if err != nil {
 			return err
 		}
-		password = string(content)
+		password = strings.TrimSpace(string(content))
 	}
 	if len(url) == 0 {
 		return fmt.Errorf("parameter %s missing", PARAMETER_API_URL)
