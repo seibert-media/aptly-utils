@@ -7,7 +7,7 @@ NAME="aptly-utils"
 
 ################################################################################
 
-export GOROOT=/opt/go1.5.1
+export GOROOT=/opt/go
 export PATH=/opt/go2xunit/bin/:/opt/utils/bin/:/opt/aptly_utils/bin/:/opt/aptly/bin/:/opt/debian_utils/bin/:/opt/debian/bin/:$GOROOT/bin:$PATH
 export GOPATH=${WORKSPACE}
 export REPORT_DIR=${WORKSPACE}/test-reports
