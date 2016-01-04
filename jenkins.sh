@@ -57,7 +57,7 @@ aptly_upload \
 -loglevel=DEBUG \
 -url=http://aptly.benjamin-borbe.de \
 -username=api \
--password=KYkobxZ6uvaGnYBG \
+-passwordfile=/etc/aptly_api_password \
 -file=$DEB \
 -repo=unstable || exit 1
 
