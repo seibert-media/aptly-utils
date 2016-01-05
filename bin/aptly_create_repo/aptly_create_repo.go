@@ -8,6 +8,8 @@ import (
 	"os"
 	"runtime"
 
+	"strings"
+
 	aptly_defaults "github.com/bborbe/aptly_utils/defaults"
 	aptly_repo_creater "github.com/bborbe/aptly_utils/repo_creater"
 	aptly_repo_publisher "github.com/bborbe/aptly_utils/repo_publisher"
@@ -15,7 +17,6 @@ import (
 	http_client "github.com/bborbe/http/client"
 	http_requestbuilder "github.com/bborbe/http/requestbuilder"
 	"github.com/bborbe/log"
-"strings"
 )
 
 var logger = log.DefaultLogger

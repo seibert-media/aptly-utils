@@ -10,13 +10,14 @@ import (
 
 	"sort"
 
+	"strings"
+
 	aptly_package_lister "github.com/bborbe/aptly_utils/package_lister"
 	aptly_package_versions "github.com/bborbe/aptly_utils/package_versions"
 	aptly_version "github.com/bborbe/aptly_utils/version"
 	http_client "github.com/bborbe/http/client"
 	http_requestbuilder "github.com/bborbe/http/requestbuilder"
 	"github.com/bborbe/log"
-"strings"
 )
 
 var logger = log.DefaultLogger

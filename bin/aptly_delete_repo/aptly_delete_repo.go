@@ -8,9 +8,10 @@ import (
 	"os"
 	"runtime"
 
+	"strings"
+
 	aptly_repo_deleter "github.com/bborbe/aptly_utils/repo_deleter"
 	"github.com/bborbe/log"
-"strings"
 )
 
 var logger = log.DefaultLogger
