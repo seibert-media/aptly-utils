@@ -70,7 +70,7 @@ func packagesToKeys(packages []map[string]string) []string {
 		}
 	}
 	for _, p := range latestVersions {
-		logger.Debugf("keep package %s %s to delete", p["Package"], p["Version"])
+		logger.Debugf("keep package %s %s", p["Package"], p["Version"])
 	}
 	return keys
 }
