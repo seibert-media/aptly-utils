@@ -7,9 +7,9 @@ import (
 	"io/ioutil"
 	"os"
 	"runtime"
-
 	"strings"
 
+	aptly_defaults "github.com/bborbe/aptly_utils/defaults"
 	aptly_package_deleter "github.com/bborbe/aptly_utils/package_deleter"
 	aptly_repo_publisher "github.com/bborbe/aptly_utils/repo_publisher"
 	aptly_requestbuilder_executor "github.com/bborbe/aptly_utils/requestbuilder_executor"
@@ -29,6 +29,7 @@ const (
 	PARAMETER_REPO              = "repo"
 	PARAMETER_NAME              = "name"
 	PARAMETER_VERSION           = "version"
+	PARAMETER_DISTRIBUTION      = "distribution"
 )
 
 func main() {
@@ -41,6 +42,7 @@ func main() {
 	repoPtr := flag.String(PARAMETER_REPO, "", "repo")
 	namePtr := flag.String(PARAMETER_NAME, "", "name")
 	versionPtr := flag.String(PARAMETER_VERSION, "", "version")
+	distributionPtr := flag.String(PARAMETER_DISTRIBUTION, aptly_defaults.DEFAULT_DISTRIBUTION, "distribution")
 	flag.Parse()
 	logger.SetLevelThreshold(log.LogStringToLevel(*logLevelPtr))
 	logger.Debugf("set log level to %s", *logLevelPtr)
@@ -54,7 +56,7 @@ func main() {
 	package_deleter := aptly_package_deleter.New(client.Do, httpRequestBuilderProvider.NewHttpRequestBuilder, repo_publisher.PublishRepo)
 
 	writer := os.Stdout
-	err := do(writer, package_deleter, *apiUrlPtr, *apiUserPtr, *apiPasswordPtr, *apiPasswordFilePtr, *repoPtr, *namePtr, *versionPtr)
+	err := do(writer, package_deleter, *apiUrlPtr, *apiUserPtr, *apiPasswordPtr, *apiPasswordFilePtr, *repoPtr, *distributionPtr, *namePtr, *versionPtr)
 	if err != nil {
 		logger.Fatal(err)
 		logger.Close()
@@ -62,7 +64,7 @@ func main() {
 	}
 }
 
-func do(writer io.Writer, package_deleter aptly_package_deleter.PackageDeleter, url string, user string, password string, passwordfile string, repo string, name string, version string) error {
+func do(writer io.Writer, package_deleter aptly_package_deleter.PackageDeleter, url string, user string, password string, passwordfile string, repo string, distribution string, name string, version string) error {
 	if len(passwordfile) > 0 {
 		content, err := ioutil.ReadFile(passwordfile)
 		if err != nil {
@@ -82,5 +84,5 @@ func do(writer io.Writer, package_deleter aptly_package_deleter.PackageDeleter, 
 	if len(version) == 0 {
 		return fmt.Errorf("parameter %s missing", PARAMETER_VERSION)
 	}
-	return package_deleter.DeletePackageByNameAndVersion(url, user, password, repo, name, version)
+	return package_deleter.DeletePackageByNameAndVersion(url, user, password, repo, distribution, name, version)
 }

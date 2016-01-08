@@ -7,7 +7,6 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	aptly_defaults "github.com/bborbe/aptly_utils/defaults"
 	http_requestbuilder "github.com/bborbe/http/requestbuilder"
 	"github.com/bborbe/log"
 )
@@ -17,7 +16,7 @@ type NewHttpRequestBuilder func(url string) http_requestbuilder.HttpRequestBuild
 type PublishRepo func(apiUrl string, apiUsername string, apiPassword string, repo string, distribution string) error
 
 type PackageDeleter interface {
-	DeletePackageByNameAndVersion(url string, user string, password string, repo string, name string, version string) error
+	DeletePackageByNameAndVersion(url string, user string, password string, repo string, distribution string, name string, version string) error
 	DeletePackagesByKey(url string, user string, password string, repo string, key []string) error
 }
 
@@ -39,7 +38,7 @@ func New(executeRequest ExecuteRequest, newHttpRequestBuilder NewHttpRequestBuil
 
 type JsonStruct []map[string]string
 
-func (p *packageDeleter) DeletePackageByNameAndVersion(url string, user string, password string, repo string, name string, version string) error {
+func (p *packageDeleter) DeletePackageByNameAndVersion(url string, user string, password string, repo string, distribution string, name string, version string) error {
 	keys, err := p.findKeys(url, user, password, repo, name, version)
 	if err != nil {
 		return err
@@ -50,7 +49,7 @@ func (p *packageDeleter) DeletePackageByNameAndVersion(url string, user string, 
 	if err = p.DeletePackagesByKey(url, user, password, repo, keys); err != nil {
 		return err
 	}
-	return p.publishRepo(url, user, password, repo, aptly_defaults.DEFAULT_DISTRIBUTION)
+	return p.publishRepo(url, user, password, repo, distribution)
 }
 
 func (p *packageDeleter) findKeys(url string, user string, password string, repo string, name string, version string) ([]string, error) {

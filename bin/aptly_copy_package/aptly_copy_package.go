@@ -7,9 +7,9 @@ import (
 	"io/ioutil"
 	"os"
 	"runtime"
-
 	"strings"
 
+	aptly_defaults "github.com/bborbe/aptly_utils/defaults"
 	aptly_package_copier "github.com/bborbe/aptly_utils/package_copier"
 	aptly_package_uploader "github.com/bborbe/aptly_utils/package_uploader"
 	aptly_repo_publisher "github.com/bborbe/aptly_utils/repo_publisher"
@@ -32,6 +32,7 @@ const (
 	PARAMETER_API_PASSWORD      = "password"
 	PARAMETER_API_PASSWORD_FILE = "passwordfile"
 	PARAMETER_REPO              = "repo"
+	PARAMETER_DISTRIBUTION      = "distribution"
 )
 
 func main() {
@@ -45,6 +46,7 @@ func main() {
 	targetPtr := flag.String(PARAMETER_TARGET, "", "target")
 	namePtr := flag.String(PARAMETER_NAME, "", "name")
 	versionPtr := flag.String(PARAMETER_VERSION, "", "version")
+	targetDistributionPtr := flag.String(PARAMETER_DISTRIBUTION, aptly_defaults.DEFAULT_DISTRIBUTION, "distribution")
 	flag.Parse()
 	logger.SetLevelThreshold(log.LogStringToLevel(*logLevelPtr))
 	logger.Debugf("set log level to %s", *logLevelPtr)
@@ -59,7 +61,7 @@ func main() {
 	package_copier := aptly_package_copier.New(package_uploader, requestbuilder, client)
 
 	writer := os.Stdout
-	err := do(writer, package_copier, *apiUrlPtr, *apiUserPtr, *apiPasswordPtr, *apiPasswordFilePtr, *sourcePtr, *targetPtr, *namePtr, *versionPtr)
+	err := do(writer, package_copier, *apiUrlPtr, *apiUserPtr, *apiPasswordPtr, *apiPasswordFilePtr, *sourcePtr, *targetPtr, *targetDistributionPtr, *namePtr, *versionPtr)
 	if err != nil {
 		logger.Fatal(err)
 		logger.Close()
@@ -67,7 +69,7 @@ func main() {
 	}
 }
 
-func do(writer io.Writer, package_copier aptly_package_copier.PackageCopier, url string, user string, password string, passwordfile string, source string, target string, name string, version string) error {
+func do(writer io.Writer, package_copier aptly_package_copier.PackageCopier, url string, user string, password string, passwordfile string, sourceRepo string, targetRepo string, targetDistribution, name string, version string) error {
 	if len(passwordfile) > 0 {
 		content, err := ioutil.ReadFile(passwordfile)
 		if err != nil {
@@ -78,10 +80,10 @@ func do(writer io.Writer, package_copier aptly_package_copier.PackageCopier, url
 	if len(url) == 0 {
 		return fmt.Errorf("parameter %s missing", PARAMETER_API_URL)
 	}
-	if len(source) == 0 {
+	if len(sourceRepo) == 0 {
 		return fmt.Errorf("parameter %s missing", PARAMETER_SOURCE)
 	}
-	if len(target) == 0 {
+	if len(targetRepo) == 0 {
 		return fmt.Errorf("parameter %s missing", PARAMETER_TARGET)
 	}
 	if len(name) == 0 {
@@ -90,5 +92,5 @@ func do(writer io.Writer, package_copier aptly_package_copier.PackageCopier, url
 	if len(version) == 0 {
 		return fmt.Errorf("parameter %s missing", PARAMETER_VERSION)
 	}
-	return package_copier.CopyPackage(url, user, password, source, target, name, version)
+	return package_copier.CopyPackage(url, user, password, sourceRepo, targetRepo, targetDistribution, name, version)
 }
