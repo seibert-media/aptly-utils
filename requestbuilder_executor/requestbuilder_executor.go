@@ -36,7 +36,7 @@ func (r *requestbuilderExecutor) BuildRequestAndExecute(requestbuilder http_requ
 		return err
 	}
 	if resp.StatusCode/100 != 2 {
-		return fmt.Errorf("upload file failed: %s", string(content))
+		return fmt.Errorf("request file failed: %s", string(content))
 	}
 	return nil
 }
