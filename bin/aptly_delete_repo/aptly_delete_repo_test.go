@@ -13,9 +13,9 @@ func TestDo(t *testing.T) {
 	var err error
 	writer := io_mock.NewWriter()
 
-	repo_deleter := aptly_repo_deleter.New()
+	repo_deleter := aptly_repo_deleter.New(nil, nil, nil)
 
-	err = do(writer, repo_deleter, "", "", "", "", "")
+	err = do(writer, repo_deleter, "", "", "", "", "", "")
 	err = AssertThat(err, NotNilValue())
 	if err != nil {
 		t.Fatal(err)

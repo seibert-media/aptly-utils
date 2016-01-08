@@ -8,7 +8,6 @@ import (
 	"os"
 	"strings"
 
-	aptly_defaults "github.com/bborbe/aptly_utils/defaults"
 	aptly_requestbuilder_executor "github.com/bborbe/aptly_utils/requestbuilder_executor"
 	http_requestbuilder "github.com/bborbe/http/requestbuilder"
 	"github.com/bborbe/log"
@@ -17,8 +16,8 @@ import (
 type PublishRepo func(apiUrl string, apiUsername string, apiPassword string, repo string, distribution string) error
 
 type PackageUploader interface {
-	UploadPackageByFile(apiUrl string, apiUsername string, apiPassword string, repo string, file string) error
-	UploadPackageByReader(apiUrl string, apiUsername string, apiPassword string, repo string, name string, src io.Reader) error
+	UploadPackageByFile(apiUrl string, apiUsername string, apiPassword string, repo string, distribution string, file string) error
+	UploadPackageByReader(apiUrl string, apiUsername string, apiPassword string, repo string, distribution string, name string, src io.Reader) error
 }
 
 type packageUploader struct {
@@ -37,17 +36,17 @@ func New(buildRequestAndExecute aptly_requestbuilder_executor.RequestbuilderExec
 	return p
 }
 
-func (p *packageUploader) UploadPackageByFile(apiUrl string, apiUsername string, apiPassword string, repo string, file string) error {
+func (p *packageUploader) UploadPackageByFile(apiUrl string, apiUsername string, apiPassword string, repo string, distribution string, file string) error {
 	logger.Debugf("UploadPackageByFile - repo: %s file: %s", repo, file)
 	name := extractPkgOfFile(file)
 	fh, err := os.Open(file)
 	if err != nil {
 		return err
 	}
-	return p.UploadPackageByReader(apiUrl, apiUsername, apiPassword, repo, name, fh)
+	return p.UploadPackageByReader(apiUrl, apiUsername, apiPassword, repo, distribution, name, fh)
 }
 
-func (p *packageUploader) UploadPackageByReader(apiUrl string, apiUsername string, apiPassword string, repo string, pkg string, src io.Reader) error {
+func (p *packageUploader) UploadPackageByReader(apiUrl string, apiUsername string, apiPassword string, repo string, distribution string, pkg string, src io.Reader) error {
 	logger.Debugf("UploadPackageByReader - repo: %s package: %s", repo, pkg)
 	if err := p.uploadFile(apiUrl, apiUsername, apiPassword, pkg, src); err != nil {
 		return err
@@ -55,7 +54,7 @@ func (p *packageUploader) UploadPackageByReader(apiUrl string, apiUsername strin
 	if err := p.addPackageToRepo(apiUrl, apiUsername, apiPassword, repo, pkg); err != nil {
 		return err
 	}
-	if err := p.publishRepo(apiUrl, apiUsername, apiPassword, repo, aptly_defaults.DEFAULT_DISTRIBUTION); err != nil {
+	if err := p.publishRepo(apiUrl, apiUsername, apiPassword, repo, distribution); err != nil {
 		return err
 	}
 	return nil

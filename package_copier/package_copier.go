@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/bborbe/aptly_utils/defaults"
 	aptly_package_uploader "github.com/bborbe/aptly_utils/package_uploader"
 	http_requestbuilder "github.com/bborbe/http/requestbuilder"
 	"github.com/bborbe/log"
@@ -45,5 +46,5 @@ func (c *packageCopier) CopyPackage(apiUrl string, apiUsername string, apiPasswo
 	if resp.StatusCode/100 != 2 {
 		return fmt.Errorf("download package %s_%s.deb failed", name, version)
 	}
-	return c.uploader.UploadPackageByReader(apiUrl, apiUsername, apiPassword, targetRepo, fmt.Sprintf("%s_%s.deb", name, version), resp.Body)
+	return c.uploader.UploadPackageByReader(apiUrl, apiUsername, apiPassword, targetRepo, fmt.Sprintf("%s_%s.deb", name, version), defaults.DEFAULT_DISTRIBUTION, resp.Body)
 }

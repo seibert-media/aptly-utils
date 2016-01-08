@@ -15,6 +15,7 @@ import (
 type RepoPublisher interface {
 	PublishNewRepo(apiUrl string, apiUsername string, apiPassword string, repo string, distribution string, architectures []string) error
 	PublishRepo(apiUrl string, apiUsername string, apiPassword string, repo string, distribution string) error
+	UnPublishRepo(apiUrl string, apiUsername string, apiPassword string, repo string, distribution string) error
 }
 
 type repoPublisher struct {
@@ -70,5 +71,13 @@ func (p *repoPublisher) PublishRepo(apiUrl string, apiUsername string, apiPasswo
 		return err
 	}
 	requestbuilder.SetBody(bytes.NewBuffer(content))
+	return p.buildRequestAndExecute.BuildRequestAndExecute(requestbuilder)
+}
+
+func (p *repoPublisher) UnPublishRepo(apiUrl string, apiUsername string, apiPassword string, repo string, distribution string) error {
+	logger.Debugf("unPublishRepo - repo: %s distribution: %s", repo, distribution)
+	requestbuilder := p.httpRequestBuilderProvider.NewHttpRequestBuilder(fmt.Sprintf("%s/api/publish/%s/%s", apiUrl, repo, distribution))
+	requestbuilder.AddBasicAuth(apiUsername, apiPassword)
+	requestbuilder.SetMethod("DELETE")
 	return p.buildRequestAndExecute.BuildRequestAndExecute(requestbuilder)
 }
