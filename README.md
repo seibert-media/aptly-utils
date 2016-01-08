@@ -14,7 +14,8 @@ aptly_create_repo \
 -url=http://aptly.benjamin-borbe.de \
 -username=api \
 -passwordfile=/etc/aptly_api_password \
--repo=unstable
+-repo=unstable \          
+-architecture=amd64,all
 ```
 
 ## Delete Repo
