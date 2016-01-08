@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"strings"
+
 	aptly_requestbuilder_executor "github.com/bborbe/aptly_utils/requestbuilder_executor"
 	http_requestbuilder "github.com/bborbe/http/requestbuilder"
 	"github.com/bborbe/log"
@@ -38,7 +40,7 @@ func New(buildRequestAndExecute aptly_requestbuilder_executor.RequestbuilderExec
 }
 
 func (c *repoPublisher) PublishNewRepo(apiUrl string, apiUsername string, apiPassword string, repo string, distribution string, architectures []string) error {
-	logger.Debugf("publishRepo")
+	logger.Debugf("publishRepo - repo: %s arch: %s", repo, strings.Join(architectures, ","))
 	requestbuilder := c.httpRequestBuilderProvider.NewHttpRequestBuilder(fmt.Sprintf("%s/api/publish/%s", apiUrl, repo))
 	requestbuilder.AddBasicAuth(apiUsername, apiPassword)
 	requestbuilder.SetMethod("POST")
