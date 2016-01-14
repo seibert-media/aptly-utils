@@ -21,22 +21,11 @@ type ExecuteRequest func(req *http.Request) (resp *http.Response, err error)
 
 type NewHttpRequestBuilder func(url string) http_requestbuilder.HttpRequestBuilder
 
-type PublishRepo func(
-	api aptly_api.Api,
-	repository aptly_repository.Repository,
-	distribution aptly_distribution.Distribution) error
+type PublishRepo func(api aptly_api.Api, repository aptly_repository.Repository, distribution aptly_distribution.Distribution) error
 
 type PackageDeleter interface {
-	DeletePackageByNameAndVersion(
-		api aptly_api.Api,
-		repository aptly_repository.Repository,
-		distribution aptly_distribution.Distribution,
-		name aptly_package_name.PackageName,
-		version aptly_version.Version) error
-	DeletePackagesByKey(
-		api aptly_api.Api,
-		repository aptly_repository.Repository,
-		keys []aptly_key.Key) error
+	DeletePackageByNameAndVersion(api aptly_api.Api, repository aptly_repository.Repository, distribution aptly_distribution.Distribution, name aptly_package_name.PackageName, version aptly_version.Version) error
+	DeletePackagesByKey(api aptly_api.Api, repository aptly_repository.Repository, keys []aptly_key.Key) error
 }
 
 type packageDeleter struct {
@@ -57,12 +46,7 @@ func New(executeRequest ExecuteRequest, newHttpRequestBuilder NewHttpRequestBuil
 
 type JsonStruct []map[string]string
 
-func (p *packageDeleter) DeletePackageByNameAndVersion(
-	api aptly_api.Api,
-	repository aptly_repository.Repository,
-	distribution aptly_distribution.Distribution,
-	name aptly_package_name.PackageName,
-	version aptly_version.Version) error {
+func (p *packageDeleter) DeletePackageByNameAndVersion(api aptly_api.Api, repository aptly_repository.Repository, distribution aptly_distribution.Distribution, name aptly_package_name.PackageName, version aptly_version.Version) error {
 	keys, err := p.findKeys(api, repository, name, version)
 	if err != nil {
 		return err
@@ -76,11 +60,7 @@ func (p *packageDeleter) DeletePackageByNameAndVersion(
 	return p.publishRepo(api, repository, distribution)
 }
 
-func (p *packageDeleter) findKeys(
-	api aptly_api.Api,
-	repository aptly_repository.Repository,
-	packageName aptly_package_name.PackageName,
-	version aptly_version.Version) ([]aptly_key.Key, error) {
+func (p *packageDeleter) findKeys(api aptly_api.Api, repository aptly_repository.Repository, packageName aptly_package_name.PackageName, version aptly_version.Version) ([]aptly_key.Key, error) {
 	logger.Debugf("PackageVersions - repo: %s package: %s", repository, packageName)
 	requestbuilder := p.newHttpRequestBuilder(fmt.Sprintf("%s/api/repos/%s/packages?format=details", api.Url, repository))
 	requestbuilder.AddBasicAuth(string(api.User), string(api.Password))
@@ -118,10 +98,7 @@ func (p *packageDeleter) findKeys(
 	return keys, nil
 }
 
-func (p *packageDeleter) DeletePackagesByKey(
-	api aptly_api.Api,
-	repository aptly_repository.Repository,
-	keys []aptly_key.Key) error {
+func (p *packageDeleter) DeletePackagesByKey(api aptly_api.Api, repository aptly_repository.Repository, keys []aptly_key.Key) error {
 	logger.Debugf("delete package with keys: %v", keys)
 	requestbuilder := p.newHttpRequestBuilder(fmt.Sprintf("%s/api/repos/%s/packages?format=details", api.Url, repository))
 	requestbuilder.AddBasicAuth(string(api.User), string(api.Password))

@@ -8,15 +8,10 @@ import (
 	"github.com/bborbe/log"
 )
 
-type ListPackages func(
-	api aptly_api.Api,
-	repository aptly_repository.Repository) ([]map[string]string, error)
+type ListPackages func(api aptly_api.Api, repository aptly_repository.Repository) ([]map[string]string, error)
 
 type PackageVersions interface {
-	PackageVersions(
-		api aptly_api.Api,
-		repository aptly_repository.Repository,
-		packageName package_name.PackageName) ([]aptly_version.Version, error)
+	PackageVersions(api aptly_api.Api, repository aptly_repository.Repository, packageName package_name.PackageName) ([]aptly_version.Version, error)
 }
 
 type packageVersion struct {
@@ -33,10 +28,7 @@ func New(listPackages ListPackages) *packageVersion {
 
 type JsonStruct []map[string]string
 
-func (p *packageVersion) PackageVersions(
-	api aptly_api.Api,
-	repository aptly_repository.Repository,
-	packageName package_name.PackageName) ([]aptly_version.Version, error) {
+func (p *packageVersion) PackageVersions(api aptly_api.Api, repository aptly_repository.Repository, packageName package_name.PackageName) ([]aptly_version.Version, error) {
 	logger.Debugf("PackageVersions - repo: %s package: %s", repository, packageName)
 	jsonStruct, err := p.listPackages(api, repository)
 	if err != nil {

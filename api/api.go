@@ -14,8 +14,5 @@ type Api struct {
 
 func New(url string, user string, password string) Api {
 	return Api{
-		Url:      aptly_url.Url(url),
-		User:     aptly_user.User(user),
-		Password: aptly_password.Password(password),
-	}
+		Url: aptly_url.Url(url), User: aptly_user.User(user), Password: aptly_password.Password(password)}
 }

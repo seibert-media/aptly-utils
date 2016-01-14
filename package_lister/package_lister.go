@@ -16,9 +16,7 @@ type ExecuteRequest func(req *http.Request) (resp *http.Response, err error)
 type NewHttpRequestBuilder func(url string) http_requestbuilder.HttpRequestBuilder
 
 type PackageLister interface {
-	ListPackages(
-		api aptly_api.Api,
-		repository aptly_repository.Repository) ([]map[string]string, error)
+	ListPackages(api aptly_api.Api, repository aptly_repository.Repository) ([]map[string]string, error)
 }
 
 type packageVersion struct {
@@ -35,9 +33,7 @@ func New(executeRequest ExecuteRequest, newHttpRequestBuilder NewHttpRequestBuil
 	return p
 }
 
-func (p *packageVersion) ListPackages(
-	api aptly_api.Api,
-	repository aptly_repository.Repository) ([]map[string]string, error) {
+func (p *packageVersion) ListPackages(api aptly_api.Api, repository aptly_repository.Repository) ([]map[string]string, error) {
 	logger.Debugf("PackageVersions - repo: %s", repository)
 	requestbuilder := p.newHttpRequestBuilder(fmt.Sprintf("%s/api/repos/%s/packages?format=details", api.Url, repository))
 	requestbuilder.AddBasicAuth(string(api.User), string(api.Password))

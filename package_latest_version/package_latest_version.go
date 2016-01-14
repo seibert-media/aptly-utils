@@ -13,16 +13,10 @@ import (
 
 var logger = log.DefaultLogger
 
-type PackageVersions func(
-	api aptly_api.Api,
-	repository aptly_repository.Repository,
-	packageName package_name.PackageName) ([]aptly_version.Version, error)
+type PackageVersions func(api aptly_api.Api, repository aptly_repository.Repository, packageName package_name.PackageName) ([]aptly_version.Version, error)
 
 type PackageLatestVersion interface {
-	PackageLatestVersion(
-		api aptly_api.Api,
-		repository aptly_repository.Repository,
-		packageName package_name.PackageName) (*aptly_version.Version, error)
+	PackageLatestVersion(api aptly_api.Api, repository aptly_repository.Repository, packageName package_name.PackageName) (*aptly_version.Version, error)
 }
 
 type packageLatestVersion struct {
@@ -35,10 +29,7 @@ func New(packageVersions PackageVersions) *packageLatestVersion {
 	return p
 }
 
-func (p *packageLatestVersion) PackageLatestVersion(
-	api aptly_api.Api,
-	repository aptly_repository.Repository,
-	packageName package_name.PackageName) (*aptly_version.Version, error) {
+func (p *packageLatestVersion) PackageLatestVersion(api aptly_api.Api, repository aptly_repository.Repository, packageName package_name.PackageName) (*aptly_version.Version, error) {
 	logger.Debugf("PackageLatestVersion")
 	var err error
 	var versions []aptly_version.Version

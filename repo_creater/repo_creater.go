@@ -14,18 +14,10 @@ import (
 	"github.com/bborbe/log"
 )
 
-type PublishNewRepo func(
-	api aptly_api.Api,
-	repository aptly_repository.Repository,
-	distribution aptly_distribution.Distribution,
-	architectures []aptly_architecture.Architecture) error
+type PublishNewRepo func(api aptly_api.Api, repository aptly_repository.Repository, distribution aptly_distribution.Distribution, architectures []aptly_architecture.Architecture) error
 
 type RepoCreater interface {
-	CreateRepo(
-		api aptly_api.Api,
-		repository aptly_repository.Repository,
-		distribution aptly_distribution.Distribution,
-		architectures []aptly_architecture.Architecture) error
+	CreateRepo(api aptly_api.Api, repository aptly_repository.Repository, distribution aptly_distribution.Distribution, architectures []aptly_architecture.Architecture) error
 }
 
 type repoCreater struct {
@@ -44,11 +36,7 @@ func New(buildRequestAndExecute aptly_requestbuilder_executor.RequestbuilderExec
 	return p
 }
 
-func (c *repoCreater) CreateRepo(
-	api aptly_api.Api,
-	repository aptly_repository.Repository,
-	distribution aptly_distribution.Distribution,
-	architectures []aptly_architecture.Architecture) error {
+func (c *repoCreater) CreateRepo(api aptly_api.Api, repository aptly_repository.Repository, distribution aptly_distribution.Distribution, architectures []aptly_architecture.Architecture) error {
 	if err := c.createRepo(api, repository); err != nil {
 		//return err
 	}
@@ -58,9 +46,7 @@ func (c *repoCreater) CreateRepo(
 	return nil
 }
 
-func (c *repoCreater) createRepo(
-	api aptly_api.Api,
-	repository aptly_repository.Repository) error {
+func (c *repoCreater) createRepo(api aptly_api.Api, repository aptly_repository.Repository) error {
 	logger.Debugf("createRepo")
 	requestbuilder := c.httpRequestBuilderProvider.NewHttpRequestBuilder(fmt.Sprintf("%s/api/repos", api.Url))
 	requestbuilder.AddBasicAuth(string(api.User), string(api.Password))
