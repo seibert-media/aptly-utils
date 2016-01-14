@@ -11,8 +11,9 @@ import (
 	"strings"
 
 	aptly_api "github.com/bborbe/aptly_utils/api"
+	aptly_package_detail_lister "github.com/bborbe/aptly_utils/package_detail_lister"
 	aptly_package_lister "github.com/bborbe/aptly_utils/package_lister"
-	"github.com/bborbe/aptly_utils/package_name"
+	aptly_package_name "github.com/bborbe/aptly_utils/package_name"
 	aptly_package_versions "github.com/bborbe/aptly_utils/package_versions"
 	aptly_repository "github.com/bborbe/aptly_utils/repository"
 	aptly_version "github.com/bborbe/aptly_utils/version"
@@ -50,11 +51,12 @@ func main() {
 
 	client := http_client.GetClientWithoutProxy()
 	httpRequestBuilderProvider := http_requestbuilder.NewHttpRequestBuilderProvider()
-	package_lister := aptly_package_lister.New(client.Do, httpRequestBuilderProvider.NewHttpRequestBuilder)
-	package_version := aptly_package_versions.New(package_lister.ListPackages)
+	packageLister := aptly_package_lister.New(client.Do, httpRequestBuilderProvider.NewHttpRequestBuilder)
+	packageDetailLister := aptly_package_detail_lister.New(packageLister.ListPackages)
+	packageVersion := aptly_package_versions.New(packageDetailLister.ListPackageDetails)
 
 	writer := os.Stdout
-	err := do(writer, package_version, *urlPtr, *apiUserPtr, *passwordPtr, *passwordFilePtr, *repoPtr, *namePtr)
+	err := do(writer, packageVersion, *urlPtr, *apiUserPtr, *passwordPtr, *passwordFilePtr, *repoPtr, *namePtr)
 	if err != nil {
 		logger.Fatal(err)
 		logger.Close()
@@ -83,7 +85,7 @@ func do(writer io.Writer, packageVersions aptly_package_versions.PackageVersions
 
 	var err error
 	var versions []aptly_version.Version
-	if versions, err = packageVersions.PackageVersions(aptly_api.New(url, user, password), aptly_repository.Repository(repo), package_name.PackageName(name)); err != nil {
+	if versions, err = packageVersions.PackageVersions(aptly_api.New(url, user, password), aptly_repository.Repository(repo), aptly_package_name.PackageName(name)); err != nil {
 		return err
 	}
 	if len(versions) == 0 {

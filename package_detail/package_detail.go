@@ -22,3 +22,11 @@ func NewByString(packageName string, version string) PackageDetail {
 func FromInfo(info map[string]string) PackageDetail {
 	return NewByString(info["Package"], info["Version"])
 }
+
+func FromInfos(infos []map[string]string) []PackageDetail {
+	var result []PackageDetail
+	for _, info := range infos {
+		result = append(result, FromInfo(info))
+	}
+	return result
+}

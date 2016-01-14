@@ -13,6 +13,7 @@ import (
 )
 
 type ExecuteRequest func(req *http.Request) (resp *http.Response, err error)
+
 type NewHttpRequestBuilder func(url string) http_requestbuilder.HttpRequestBuilder
 
 type PackageLister interface {
@@ -54,7 +55,6 @@ func (p *packageVersion) ListPackages(api aptly_api.Api, repository aptly_reposi
 	if resp.StatusCode/100 != 2 {
 		return nil, fmt.Errorf("request failed: %s", (content))
 	}
-
 	var packages []map[string]string
 	err = json.Unmarshal(content, &packages)
 	if err != nil {
