@@ -2,7 +2,7 @@
 
 Package provide some aptly utils
 
-## Create Repo
+## Create repository
 
 ```
 aptly_create_repo \
@@ -14,7 +14,7 @@ aptly_create_repo \
 -architecture=amd64,all
 ```
 
-## Delete Repo
+## Delete repository
 
 ```
 aptly_delete_repo \
@@ -25,7 +25,7 @@ aptly_delete_repo \
 -repo=unstable
 ```
 
-## Clean Repo
+## Clean repository
 
 ```
 aptly_clean_repo \
@@ -36,7 +36,7 @@ aptly_clean_repo \
 -repo=unstable
 ```
 
-## Upload Debian Package
+## Upload Debian package
 
 ```
 aptly_upload \
@@ -48,7 +48,7 @@ aptly_upload \
 -repo=unstable
 ```
 
-## List Packages
+## List packages
 
 ```
 aptly_package_lister \
@@ -59,7 +59,7 @@ aptly_package_lister \
 -repo=unstable
 ```
 
-## Delete Package
+## Delete package
 
 ```
 aptly_delete_package \
@@ -72,7 +72,9 @@ aptly_delete_package \
 -version=1.0.1-b47
 ```
 
-## Copy Package from Repo to Repo
+## Copy package from source to target repo
+
+### Coy package with version
 
 ```
 aptly_copy_package \
@@ -86,6 +88,8 @@ aptly_copy_package \
 -version=1.0.1-b47
 ```
 
+### Copy latest version
+
 ```
 aptly_copy_package \
 -loglevel=DEBUG \
@@ -95,6 +99,20 @@ aptly_copy_package \
 -source=unstable \
 -target=stable \
 -name=booking \
+-version=latest
+```
+
+### Copy latest version of each package
+
+```
+aptly_copy_package \
+-loglevel=DEBUG \
+-url=http://aptly.benjamin-borbe.de \
+-username=api \
+-passwordfile=/etc/aptly_api_password \
+-source=unstable \
+-target=stable \
+-name=all \
 -version=latest
 ```
 
