@@ -1,4 +1,4 @@
-package package_versions
+package package_lister
 
 import (
 	"testing"

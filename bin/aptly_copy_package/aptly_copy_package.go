@@ -11,6 +11,7 @@ import (
 
 	aptly_distribution "github.com/bborbe/aptly_utils/distribution"
 	aptly_package_copier "github.com/bborbe/aptly_utils/package_copier"
+	aptly_package_detail "github.com/bborbe/aptly_utils/package_detail"
 	aptly_package_latest_version "github.com/bborbe/aptly_utils/package_latest_version"
 	aptly_package_lister "github.com/bborbe/aptly_utils/package_lister"
 	"github.com/bborbe/aptly_utils/package_name"
@@ -75,7 +76,7 @@ func main() {
 	packageLastestVersion := aptly_package_latest_version.New(packageVersion.PackageVersions)
 
 	writer := os.Stdout
-	err := do(writer, packageCopier, packageLastestVersion, *urlPtr, *apiUserPtr, *passwordPtr, *passwordFilePtr, *sourcePtr, *targetPtr, *targetDistributionPtr, *namePtr, *versionPtr)
+	err := do(writer, packageCopier, packageLastestVersion, packageLister, *urlPtr, *apiUserPtr, *passwordPtr, *passwordFilePtr, *sourcePtr, *targetPtr, *targetDistributionPtr, *namePtr, *versionPtr)
 	if err != nil {
 		logger.Fatal(err)
 		logger.Close()
@@ -83,7 +84,7 @@ func main() {
 	}
 }
 
-func do(writer io.Writer, packageCopier aptly_package_copier.PackageCopier, packageLatestVersion aptly_package_latest_version.PackageLatestVersion, url string, user string, password string, passwordfile string, sourceRepo string, targetRepo string, targetDistribution, name string, version string) error {
+func do(writer io.Writer, packageCopier aptly_package_copier.PackageCopier, packageLatestVersion aptly_package_latest_version.PackageLatestVersion, packageLister aptly_package_lister.PackageLister, url string, user string, password string, passwordfile string, sourceRepo string, targetRepo string, targetDistribution, name string, version string) error {
 	if len(passwordfile) > 0 {
 		content, err := ioutil.ReadFile(passwordfile)
 		if err != nil {
@@ -109,6 +110,7 @@ func do(writer io.Writer, packageCopier aptly_package_copier.PackageCopier, pack
 	return copy(
 		packageCopier,
 		packageLatestVersion,
+		packageLister,
 		aptly_url.Url(url),
 		aptly_user.User(user),
 		aptly_password.Password(password),
@@ -122,6 +124,7 @@ func do(writer io.Writer, packageCopier aptly_package_copier.PackageCopier, pack
 func copy(
 	packageCopier aptly_package_copier.PackageCopier,
 	packageLatestVersion aptly_package_latest_version.PackageLatestVersion,
+	packageLister aptly_package_lister.PackageLister,
 	url aptly_url.Url,
 	user aptly_user.User,
 	password aptly_password.Password,
@@ -133,11 +136,15 @@ func copy(
 	if packageName == aptly_package_name.ALL && version != aptly_version.LATEST {
 		return fmt.Errorf("can't copy with package all and version != latest")
 	}
-	var list []Detail
+	var list []aptly_package_detail.PackageDetail
+	var err error
 	if packageName == aptly_package_name.ALL {
-		list = []Detail{}
+		list, err = listPackageDetails(packageLister, url, user, password, sourceRepo)
+		if err != nil {
+			return err
+		}
 	} else {
-		list = []Detail{Detail{packageName: packageName, version: version}}
+		list = []aptly_package_detail.PackageDetail{aptly_package_detail.PackageDetail{PackageName: packageName, Version: version}}
 	}
 	return copyList(
 		packageCopier,
@@ -151,9 +158,21 @@ func copy(
 		list)
 }
 
-type Detail struct {
-	packageName package_name.PackageName
-	version     aptly_version.Version
+func listPackageDetails(
+	packageLister aptly_package_lister.PackageLister,
+	url aptly_url.Url,
+	user aptly_user.User,
+	password aptly_password.Password,
+	repository aptly_repository.Repository) ([]aptly_package_detail.PackageDetail, error) {
+	list, err := packageLister.ListPackages(url, user, password, repository)
+	if err != nil {
+		return nil, err
+	}
+	var result []aptly_package_detail.PackageDetail
+	for _, info := range list {
+		result = append(result, aptly_package_detail.FromInfo(info))
+	}
+	return result, nil
 }
 
 func copyList(
@@ -165,10 +184,10 @@ func copyList(
 	sourceRepo aptly_repository.Repository,
 	targetRepo aptly_repository.Repository,
 	targetDistribution aptly_distribution.Distribution,
-	list []Detail) error {
+	list []aptly_package_detail.PackageDetail) error {
 	for _, e := range list {
-		version := e.version
-		packageName := e.packageName
+		version := e.Version
+		packageName := e.PackageName
 		if version == aptly_version.LATEST {
 			latestVersion, err := packageLatestVersion.PackageLatestVersion(url, user, password, sourceRepo, packageName)
 			if err != nil {
