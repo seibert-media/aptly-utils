@@ -39,10 +39,10 @@ func main() {
 	defer logger.Close()
 	logLevelPtr := flag.String(PARAMETER_LOGLEVEL, log.INFO_STRING, log.FLAG_USAGE)
 	filePtr := flag.String(PARAMETER_FILE, "", "file")
-	apiUrlPtr := flag.String(PARAMETER_API_URL, "", "url")
+	urlPtr := flag.String(PARAMETER_API_URL, "", "url")
 	apiUserPtr := flag.String(PARAMETER_API_USER, "", "user")
-	apiPasswordPtr := flag.String(PARAMETER_API_PASSWORD, "", "password")
-	apiPasswordFilePtr := flag.String(PARAMETER_API_PASSWORD_FILE, "", "passwordfile")
+	passwordPtr := flag.String(PARAMETER_API_PASSWORD, "", "password")
+	passwordFilePtr := flag.String(PARAMETER_API_PASSWORD_FILE, "", "passwordfile")
 	repoPtr := flag.String(PARAMETER_REPO, "", "repo")
 	distributionPtr := flag.String(PARAMETER_DISTRIBUTION, string(aptly_distribution.DEFAULT), "distribution")
 	flag.Parse()
@@ -56,7 +56,7 @@ func main() {
 	package_uploader := aptly_package_uploader.New(requestbuilder_executor, http_requestbuilder.NewHttpRequestBuilderProvider(), repo_publisher.PublishRepo)
 
 	writer := os.Stdout
-	err := do(writer, package_uploader, *apiUrlPtr, *apiUserPtr, *apiPasswordPtr, *apiPasswordFilePtr, *filePtr, *repoPtr, *distributionPtr)
+	err := do(writer, package_uploader, *urlPtr, *apiUserPtr, *passwordPtr, *passwordFilePtr, *filePtr, *repoPtr, *distributionPtr)
 	if err != nil {
 		logger.Fatal(err)
 		logger.Close()

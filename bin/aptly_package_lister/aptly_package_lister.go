@@ -34,10 +34,10 @@ const (
 func main() {
 	defer logger.Close()
 	logLevelPtr := flag.String(PARAMETER_LOGLEVEL, log.INFO_STRING, log.FLAG_USAGE)
-	apiUrlPtr := flag.String(PARAMETER_API_URL, "", "url")
+	urlPtr := flag.String(PARAMETER_API_URL, "", "url")
 	apiUserPtr := flag.String(PARAMETER_API_USER, "", "user")
-	apiPasswordPtr := flag.String(PARAMETER_API_PASSWORD, "", "password")
-	apiPasswordFilePtr := flag.String(PARAMETER_API_PASSWORD_FILE, "", "passwordfile")
+	passwordPtr := flag.String(PARAMETER_API_PASSWORD, "", "password")
+	passwordFilePtr := flag.String(PARAMETER_API_PASSWORD_FILE, "", "passwordfile")
 	repoPtr := flag.String(PARAMETER_REPO, "", "repo")
 	flag.Parse()
 	logger.SetLevelThreshold(log.LogStringToLevel(*logLevelPtr))
@@ -50,7 +50,7 @@ func main() {
 	package_lister := aptly_package_lister.New(client.Do, httpRequestBuilderProvider.NewHttpRequestBuilder)
 
 	writer := os.Stdout
-	err := do(writer, package_lister, *apiUrlPtr, *apiUserPtr, *apiPasswordPtr, *apiPasswordFilePtr, *repoPtr)
+	err := do(writer, package_lister, *urlPtr, *apiUserPtr, *passwordPtr, *passwordFilePtr, *repoPtr)
 	if err != nil {
 		logger.Fatal(err)
 		logger.Close()

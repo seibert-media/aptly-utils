@@ -11,23 +11,23 @@ import (
 )
 
 type DeletePackagesByKey func(
-	apiUrl aptly_url.Url,
-	apiUsername aptly_user.User,
-	apiPassword aptly_password.Password,
+	url aptly_url.Url,
+	user aptly_user.User,
+	password aptly_password.Password,
 	repository aptly_repository.Repository,
 	keys []aptly_key.Key) error
 
 type ListPackages func(
-	apiUrl aptly_url.Url,
-	apiUsername aptly_user.User,
-	apiPassword aptly_password.Password,
+	url aptly_url.Url,
+	user aptly_user.User,
+	password aptly_password.Password,
 	repository aptly_repository.Repository) ([]map[string]string, error)
 
 type RepoCleaner interface {
 	CleanRepo(
-		apiUrl aptly_url.Url,
-		apiUsername aptly_user.User,
-		apiPassword aptly_password.Password,
+		url aptly_url.Url,
+		user aptly_user.User,
+		password aptly_password.Password,
 		repository aptly_repository.Repository) error
 }
 
@@ -46,12 +46,12 @@ func New(deletePackagesByKey DeletePackagesByKey, listPackages ListPackages) *re
 }
 
 func (r *repoCleaner) CleanRepo(
-	apiUrl aptly_url.Url,
-	apiUsername aptly_user.User,
-	apiPassword aptly_password.Password,
+	url aptly_url.Url,
+	user aptly_user.User,
+	password aptly_password.Password,
 	repository aptly_repository.Repository) error {
 	logger.Debugf("clean repo: %s", repository)
-	keys, err := r.findKeysToDelete(apiUrl, apiUsername, apiPassword, repository)
+	keys, err := r.findKeysToDelete(url, user, password, repository)
 	if err != nil {
 		return err
 	}
@@ -59,16 +59,16 @@ func (r *repoCleaner) CleanRepo(
 		logger.Debugf("nothing to delete")
 		return nil
 	}
-	return r.deletePackagesByKey(apiUrl, apiUsername, apiPassword, repository, keys)
+	return r.deletePackagesByKey(url, user, password, repository, keys)
 }
 
 func (r *repoCleaner) findKeysToDelete(
-	apiUrl aptly_url.Url,
-	apiUsername aptly_user.User,
-	apiPassword aptly_password.Password,
+	url aptly_url.Url,
+	user aptly_user.User,
+	password aptly_password.Password,
 	repository aptly_repository.Repository) ([]aptly_key.Key, error) {
 	logger.Debugf("find keys to delete repo: %s", repository)
-	packages, err := r.listPackages(apiUrl, apiUsername, apiPassword, repository)
+	packages, err := r.listPackages(url, user, password, repository)
 	if err != nil {
 		return nil, err
 	}

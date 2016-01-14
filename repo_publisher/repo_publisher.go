@@ -18,22 +18,22 @@ import (
 
 type RepoPublisher interface {
 	PublishNewRepo(
-		apiUrl aptly_url.Url,
-		apiUsername aptly_user.User,
-		apiPassword aptly_password.Password,
+		url aptly_url.Url,
+		user aptly_user.User,
+		password aptly_password.Password,
 		repository aptly_repository.Repository,
 		distribution aptly_distribution.Distribution,
 		architectures []aptly_architecture.Architecture) error
 	PublishRepo(
-		apiUrl aptly_url.Url,
-		apiUsername aptly_user.User,
-		apiPassword aptly_password.Password,
+		url aptly_url.Url,
+		user aptly_user.User,
+		password aptly_password.Password,
 		repository aptly_repository.Repository,
 		distribution aptly_distribution.Distribution) error
 	UnPublishRepo(
-		apiUrl aptly_url.Url,
-		apiUsername aptly_user.User,
-		apiPassword aptly_password.Password,
+		url aptly_url.Url,
+		user aptly_user.User,
+		password aptly_password.Password,
 		repository aptly_repository.Repository,
 		distribution aptly_distribution.Distribution) error
 }
@@ -61,15 +61,15 @@ func New(buildRequestAndExecute aptly_requestbuilder_executor.RequestbuilderExec
 }
 
 func (c *repoPublisher) PublishNewRepo(
-	apiUrl aptly_url.Url,
-	apiUsername aptly_user.User,
-	apiPassword aptly_password.Password,
+	url aptly_url.Url,
+	user aptly_user.User,
+	password aptly_password.Password,
 	repository aptly_repository.Repository,
 	distribution aptly_distribution.Distribution,
 	architectures []aptly_architecture.Architecture) error {
 	logger.Debugf("publishRepo - repo: %s arch: %s", repository, aptly_architecture.Join(architectures, ","))
-	requestbuilder := c.httpRequestBuilderProvider.NewHttpRequestBuilder(fmt.Sprintf("%s/api/publish/%s", apiUrl, repository))
-	requestbuilder.AddBasicAuth(string(apiUsername), string(apiPassword))
+	requestbuilder := c.httpRequestBuilderProvider.NewHttpRequestBuilder(fmt.Sprintf("%s/api/publish/%s", url, repository))
+	requestbuilder.AddBasicAuth(string(user), string(password))
 	requestbuilder.SetMethod("POST")
 	requestbuilder.AddContentType("application/json")
 	content, err := json.Marshal(publishJson{
@@ -87,14 +87,14 @@ func (c *repoPublisher) PublishNewRepo(
 }
 
 func (p *repoPublisher) PublishRepo(
-	apiUrl aptly_url.Url,
-	apiUsername aptly_user.User,
-	apiPassword aptly_password.Password,
+	url aptly_url.Url,
+	user aptly_user.User,
+	password aptly_password.Password,
 	repository aptly_repository.Repository,
 	distribution aptly_distribution.Distribution) error {
 	logger.Debugf("publishRepo - repo: %s distribution: %s", repository, distribution)
-	requestbuilder := p.httpRequestBuilderProvider.NewHttpRequestBuilder(fmt.Sprintf("%s/api/publish/%s/%s", apiUrl, repository, distribution))
-	requestbuilder.AddBasicAuth(string(apiUsername), string(apiPassword))
+	requestbuilder := p.httpRequestBuilderProvider.NewHttpRequestBuilder(fmt.Sprintf("%s/api/publish/%s/%s", url, repository, distribution))
+	requestbuilder.AddBasicAuth(string(user), string(password))
 	requestbuilder.SetMethod("PUT")
 	requestbuilder.AddContentType("application/json")
 	content, err := json.Marshal(map[string]bool{"ForceOverwrite": true})
@@ -106,14 +106,14 @@ func (p *repoPublisher) PublishRepo(
 }
 
 func (p *repoPublisher) UnPublishRepo(
-	apiUrl aptly_url.Url,
-	apiUsername aptly_user.User,
-	apiPassword aptly_password.Password,
+	url aptly_url.Url,
+	user aptly_user.User,
+	password aptly_password.Password,
 	repository aptly_repository.Repository,
 	distribution aptly_distribution.Distribution) error {
 	logger.Debugf("unPublishRepo - repo: %s distribution: %s", repository, distribution)
-	requestbuilder := p.httpRequestBuilderProvider.NewHttpRequestBuilder(fmt.Sprintf("%s/api/publish/%s/%s", apiUrl, repository, distribution))
-	requestbuilder.AddBasicAuth(string(apiUsername), string(apiPassword))
+	requestbuilder := p.httpRequestBuilderProvider.NewHttpRequestBuilder(fmt.Sprintf("%s/api/publish/%s/%s", url, repository, distribution))
+	requestbuilder.AddBasicAuth(string(user), string(password))
 	requestbuilder.SetMethod("DELETE")
 	return p.buildRequestAndExecute.BuildRequestAndExecute(requestbuilder)
 }

@@ -48,10 +48,10 @@ const (
 func main() {
 	defer logger.Close()
 	logLevelPtr := flag.String(PARAMETER_LOGLEVEL, log.INFO_STRING, log.FLAG_USAGE)
-	apiUrlPtr := flag.String(PARAMETER_API_URL, "", "url")
+	urlPtr := flag.String(PARAMETER_API_URL, "", "url")
 	apiUserPtr := flag.String(PARAMETER_API_USER, "", "user")
-	apiPasswordPtr := flag.String(PARAMETER_API_PASSWORD, "", "password")
-	apiPasswordFilePtr := flag.String(PARAMETER_API_PASSWORD_FILE, "", "passwordfile")
+	passwordPtr := flag.String(PARAMETER_API_PASSWORD, "", "password")
+	passwordFilePtr := flag.String(PARAMETER_API_PASSWORD_FILE, "", "passwordfile")
 	sourcePtr := flag.String(PARAMETER_SOURCE, "", "source")
 	targetPtr := flag.String(PARAMETER_TARGET, "", "target")
 	namePtr := flag.String(PARAMETER_NAME, "", "name")
@@ -75,7 +75,7 @@ func main() {
 	packageLastestVersion := aptly_package_latest_version.New(packageVersion.PackageVersions)
 
 	writer := os.Stdout
-	err := do(writer, packageCopier, packageLastestVersion, *apiUrlPtr, *apiUserPtr, *apiPasswordPtr, *apiPasswordFilePtr, *sourcePtr, *targetPtr, *targetDistributionPtr, *namePtr, *versionPtr)
+	err := do(writer, packageCopier, packageLastestVersion, *urlPtr, *apiUserPtr, *passwordPtr, *passwordFilePtr, *sourcePtr, *targetPtr, *targetDistributionPtr, *namePtr, *versionPtr)
 	if err != nil {
 		logger.Fatal(err)
 		logger.Close()
@@ -122,9 +122,9 @@ func do(writer io.Writer, packageCopier aptly_package_copier.PackageCopier, pack
 func copy(
 	packageCopier aptly_package_copier.PackageCopier,
 	packageLatestVersion aptly_package_latest_version.PackageLatestVersion,
-	apiUrl aptly_url.Url,
-	apiUsername aptly_user.User,
-	apiPassword aptly_password.Password,
+	url aptly_url.Url,
+	user aptly_user.User,
+	password aptly_password.Password,
 	sourceRepo aptly_repository.Repository,
 	targetRepo aptly_repository.Repository,
 	targetDistribution aptly_distribution.Distribution,
@@ -142,9 +142,9 @@ func copy(
 	return copyList(
 		packageCopier,
 		packageLatestVersion,
-		apiUrl,
-		apiUsername,
-		apiPassword,
+		url,
+		user,
+		password,
 		sourceRepo,
 		targetRepo,
 		targetDistribution,
@@ -159,9 +159,9 @@ type Detail struct {
 func copyList(
 	packageCopier aptly_package_copier.PackageCopier,
 	packageLatestVersion aptly_package_latest_version.PackageLatestVersion,
-	apiUrl aptly_url.Url,
-	apiUsername aptly_user.User,
-	apiPassword aptly_password.Password,
+	url aptly_url.Url,
+	user aptly_user.User,
+	password aptly_password.Password,
 	sourceRepo aptly_repository.Repository,
 	targetRepo aptly_repository.Repository,
 	targetDistribution aptly_distribution.Distribution,
@@ -170,13 +170,13 @@ func copyList(
 		version := e.version
 		packageName := e.packageName
 		if version == aptly_version.LATEST {
-			latestVersion, err := packageLatestVersion.PackageLatestVersion(apiUrl, apiUsername, apiPassword, sourceRepo, packageName)
+			latestVersion, err := packageLatestVersion.PackageLatestVersion(url, user, password, sourceRepo, packageName)
 			if err != nil {
 				return err
 			}
 			version = *latestVersion
 		}
-		err := packageCopier.CopyPackage(apiUrl, apiUsername, apiPassword, sourceRepo, targetRepo, targetDistribution, packageName, version)
+		err := packageCopier.CopyPackage(url, user, password, sourceRepo, targetRepo, targetDistribution, packageName, version)
 		if err != nil {
 			return err
 		}

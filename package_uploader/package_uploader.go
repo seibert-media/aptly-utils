@@ -19,24 +19,24 @@ import (
 )
 
 type PublishRepo func(
-	apiUrl aptly_url.Url,
-	apiUsername aptly_user.User,
-	apiPassword aptly_password.Password,
+	url aptly_url.Url,
+	user aptly_user.User,
+	password aptly_password.Password,
 	repository aptly_repository.Repository,
 	distribution aptly_distribution.Distribution) error
 
 type PackageUploader interface {
 	UploadPackageByFile(
-		apiUrl aptly_url.Url,
-		apiUsername aptly_user.User,
-		apiPassword aptly_password.Password,
+		url aptly_url.Url,
+		user aptly_user.User,
+		password aptly_password.Password,
 		repository aptly_repository.Repository,
 		distribution aptly_distribution.Distribution,
 		file string) error
 	UploadPackageByReader(
-		apiUrl aptly_url.Url,
-		apiUsername aptly_user.User,
-		apiPassword aptly_password.Password,
+		url aptly_url.Url,
+		user aptly_user.User,
+		password aptly_password.Password,
 		repository aptly_repository.Repository,
 		distribution aptly_distribution.Distribution,
 		packageName package_name.PackageName,
@@ -60,9 +60,9 @@ func New(buildRequestAndExecute aptly_requestbuilder_executor.RequestbuilderExec
 }
 
 func (p *packageUploader) UploadPackageByFile(
-	apiUrl aptly_url.Url,
-	apiUsername aptly_user.User,
-	apiPassword aptly_password.Password,
+	url aptly_url.Url,
+	user aptly_user.User,
+	password aptly_password.Password,
 	repository aptly_repository.Repository,
 	distribution aptly_distribution.Distribution,
 	file string) error {
@@ -72,39 +72,39 @@ func (p *packageUploader) UploadPackageByFile(
 	if err != nil {
 		return err
 	}
-	return p.UploadPackageByReader(apiUrl, apiUsername, apiPassword, repository, distribution, name, fh)
+	return p.UploadPackageByReader(url, user, password, repository, distribution, name, fh)
 }
 
 func (p *packageUploader) UploadPackageByReader(
-	apiUrl aptly_url.Url,
-	apiUsername aptly_user.User,
-	apiPassword aptly_password.Password,
+	url aptly_url.Url,
+	user aptly_user.User,
+	password aptly_password.Password,
 	repository aptly_repository.Repository,
 	distribution aptly_distribution.Distribution,
 	packageName package_name.PackageName,
 	src io.Reader) error {
 	logger.Debugf("UploadPackageByReader - repo: %s package: %s", repository, packageName)
-	if err := p.uploadFile(apiUrl, apiUsername, apiPassword, packageName, src); err != nil {
+	if err := p.uploadFile(url, user, password, packageName, src); err != nil {
 		return err
 	}
-	if err := p.addPackageToRepo(apiUrl, apiUsername, apiPassword, repository, packageName); err != nil {
+	if err := p.addPackageToRepo(url, user, password, repository, packageName); err != nil {
 		return err
 	}
-	if err := p.publishRepo(apiUrl, apiUsername, apiPassword, repository, distribution); err != nil {
+	if err := p.publishRepo(url, user, password, repository, distribution); err != nil {
 		return err
 	}
 	return nil
 }
 
 func (p *packageUploader) uploadFile(
-	apiUrl aptly_url.Url,
-	apiUsername aptly_user.User,
-	apiPassword aptly_password.Password,
+	url aptly_url.Url,
+	user aptly_user.User,
+	password aptly_password.Password,
 	packageName package_name.PackageName,
 	src io.Reader) error {
 	logger.Debugf("uploadFile - package: %s", packageName)
-	requestbuilder := p.httpRequestBuilderProvider.NewHttpRequestBuilder(fmt.Sprintf("%s/api/files/%s", apiUrl, packageName))
-	requestbuilder.AddBasicAuth(string(apiUsername), string(apiPassword))
+	requestbuilder := p.httpRequestBuilderProvider.NewHttpRequestBuilder(fmt.Sprintf("%s/api/files/%s", url, packageName))
+	requestbuilder.AddBasicAuth(string(user), string(password))
 	requestbuilder.SetMethod("POST")
 	bodyBuf := &bytes.Buffer{}
 	bodyWriter := multipart.NewWriter(bodyBuf)
@@ -123,14 +123,14 @@ func (p *packageUploader) uploadFile(
 }
 
 func (p *packageUploader) addPackageToRepo(
-	apiUrl aptly_url.Url,
-	apiUsername aptly_user.User,
-	apiPassword aptly_password.Password,
+	url aptly_url.Url,
+	user aptly_user.User,
+	password aptly_password.Password,
 	repository aptly_repository.Repository,
 	packageName package_name.PackageName) error {
 	logger.Debugf("addPackageToRepo - repo: %s package: %s", repository, packageName)
-	requestbuilder := p.httpRequestBuilderProvider.NewHttpRequestBuilder(fmt.Sprintf("%s/api/repos/%s/file/%s?forceReplace=1", apiUrl, repository, packageName))
-	requestbuilder.AddBasicAuth(string(apiUsername), string(apiPassword))
+	requestbuilder := p.httpRequestBuilderProvider.NewHttpRequestBuilder(fmt.Sprintf("%s/api/repos/%s/file/%s?forceReplace=1", url, repository, packageName))
+	requestbuilder.AddBasicAuth(string(user), string(password))
 	requestbuilder.SetMethod("POST")
 	requestbuilder.AddContentType("application/json")
 	return p.buildRequestAndExecute.BuildRequestAndExecute(requestbuilder)

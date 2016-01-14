@@ -16,17 +16,17 @@ import (
 var logger = log.DefaultLogger
 
 type PackageVersions func(
-	apiUrl aptly_url.Url,
-	apiUsername aptly_user.User,
-	apiPassword aptly_password.Password,
+	url aptly_url.Url,
+	user aptly_user.User,
+	password aptly_password.Password,
 	repository aptly_repository.Repository,
 	packageName package_name.PackageName) ([]aptly_version.Version, error)
 
 type PackageLatestVersion interface {
 	PackageLatestVersion(
-		apiUrl aptly_url.Url,
-		apiUsername aptly_user.User,
-		apiPassword aptly_password.Password,
+		url aptly_url.Url,
+		user aptly_user.User,
+		password aptly_password.Password,
 		repository aptly_repository.Repository,
 		packageName package_name.PackageName) (*aptly_version.Version, error)
 }
@@ -42,15 +42,15 @@ func New(packageVersions PackageVersions) *packageLatestVersion {
 }
 
 func (p *packageLatestVersion) PackageLatestVersion(
-	apiUrl aptly_url.Url,
-	apiUsername aptly_user.User,
-	apiPassword aptly_password.Password,
+	url aptly_url.Url,
+	user aptly_user.User,
+	password aptly_password.Password,
 	repository aptly_repository.Repository,
 	packageName package_name.PackageName) (*aptly_version.Version, error) {
 	logger.Debugf("PackageLatestVersion")
 	var err error
 	var versions []aptly_version.Version
-	if versions, err = p.packageVersions(apiUrl, apiUsername, apiPassword, repository, packageName); err != nil {
+	if versions, err = p.packageVersions(url, user, password, repository, packageName); err != nil {
 		return nil, err
 	}
 	if len(versions) == 0 {

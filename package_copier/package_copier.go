@@ -18,9 +18,9 @@ import (
 
 type PackageCopier interface {
 	CopyPackage(
-		apiUrl aptly_url.Url,
-		apiUsername aptly_user.User,
-		apiPassword aptly_password.Password,
+		url aptly_url.Url,
+		user aptly_user.User,
+		password aptly_password.Password,
 		sourceRepo aptly_repository.Repository,
 		targetRepo aptly_repository.Repository,
 		targetDistribution aptly_distribution.Distribution,
@@ -45,18 +45,18 @@ func New(uploader aptly_package_uploader.PackageUploader, httpRequestBuilderProv
 }
 
 func (c *packageCopier) CopyPackage(
-	apiUrl aptly_url.Url,
-	apiUsername aptly_user.User,
-	apiPassword aptly_password.Password,
+	url aptly_url.Url,
+	user aptly_user.User,
+	password aptly_password.Password,
 	sourceRepo aptly_repository.Repository,
 	targetRepo aptly_repository.Repository,
 	targetDistribution aptly_distribution.Distribution,
 	packageName package_name.PackageName,
 	version aptly_version.Version) error {
 	logger.Debugf("CopyPackage - sourceRepo: %s targetRepo: %s, package: %s_%s", sourceRepo, targetRepo, packageName, version)
-	url := fmt.Sprintf("%s/%s/pool/main/%s/%s/%s_%s.deb", apiUrl, sourceRepo, packageName[0:1], packageName, packageName, version)
-	logger.Debugf("download package url: %s", url)
-	requestbuilder := c.httpRequestBuilderProvider.NewHttpRequestBuilder(url)
+	requestUrl := fmt.Sprintf("%s/%s/pool/main/%s/%s/%s_%s.deb", url, sourceRepo, packageName[0:1], packageName, packageName, version)
+	logger.Debugf("download package url: %s", requestUrl)
+	requestbuilder := c.httpRequestBuilderProvider.NewHttpRequestBuilder(requestUrl)
 	req, err := requestbuilder.GetRequest()
 	if err != nil {
 		return err
@@ -65,8 +65,9 @@ func (c *packageCopier) CopyPackage(
 	if err != nil {
 		return err
 	}
+	defer resp.Body.Close()
 	if resp.StatusCode/100 != 2 {
 		return fmt.Errorf("download package %s %s failed", packageName, version)
 	}
-	return c.uploader.UploadPackageByReader(apiUrl, apiUsername, apiPassword, targetRepo, targetDistribution, packageName, resp.Body)
+	return c.uploader.UploadPackageByReader(url, user, password, targetRepo, targetDistribution, packageName, resp.Body)
 }

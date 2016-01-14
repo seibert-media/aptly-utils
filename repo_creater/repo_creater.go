@@ -17,18 +17,18 @@ import (
 )
 
 type PublishNewRepo func(
-	apiUrl aptly_url.Url,
-	apiUsername aptly_user.User,
-	apiPassword aptly_password.Password,
+	url aptly_url.Url,
+	user aptly_user.User,
+	password aptly_password.Password,
 	repository aptly_repository.Repository,
 	distribution aptly_distribution.Distribution,
 	architectures []aptly_architecture.Architecture) error
 
 type RepoCreater interface {
 	CreateRepo(
-		apiUrl aptly_url.Url,
-		apiUsername aptly_user.User,
-		apiPassword aptly_password.Password,
+		url aptly_url.Url,
+		user aptly_user.User,
+		password aptly_password.Password,
 		repository aptly_repository.Repository,
 		distribution aptly_distribution.Distribution,
 		architectures []aptly_architecture.Architecture) error
@@ -51,29 +51,29 @@ func New(buildRequestAndExecute aptly_requestbuilder_executor.RequestbuilderExec
 }
 
 func (c *repoCreater) CreateRepo(
-	apiUrl aptly_url.Url,
-	apiUsername aptly_user.User,
-	apiPassword aptly_password.Password,
+	url aptly_url.Url,
+	user aptly_user.User,
+	password aptly_password.Password,
 	repository aptly_repository.Repository,
 	distribution aptly_distribution.Distribution,
 	architectures []aptly_architecture.Architecture) error {
-	if err := c.createRepo(apiUrl, apiUsername, apiPassword, repository); err != nil {
+	if err := c.createRepo(url, user, password, repository); err != nil {
 		//return err
 	}
-	if err := c.publishNewRepo(apiUrl, apiUsername, apiPassword, repository, distribution, architectures); err != nil {
+	if err := c.publishNewRepo(url, user, password, repository, distribution, architectures); err != nil {
 		return err
 	}
 	return nil
 }
 
 func (c *repoCreater) createRepo(
-	apiUrl aptly_url.Url,
-	apiUsername aptly_user.User,
-	apiPassword aptly_password.Password,
+	url aptly_url.Url,
+	user aptly_user.User,
+	password aptly_password.Password,
 	repository aptly_repository.Repository) error {
 	logger.Debugf("createRepo")
-	requestbuilder := c.httpRequestBuilderProvider.NewHttpRequestBuilder(fmt.Sprintf("%s/api/repos", apiUrl))
-	requestbuilder.AddBasicAuth(string(apiUsername), string(apiPassword))
+	requestbuilder := c.httpRequestBuilderProvider.NewHttpRequestBuilder(fmt.Sprintf("%s/api/repos", url))
+	requestbuilder.AddBasicAuth(string(user), string(password))
 	requestbuilder.SetMethod("POST")
 	requestbuilder.AddContentType("application/json")
 	content, err := json.Marshal(map[string]aptly_repository.Repository{"Name": repository})

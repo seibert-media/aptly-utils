@@ -40,10 +40,10 @@ const (
 func main() {
 	defer logger.Close()
 	logLevelPtr := flag.String(PARAMETER_LOGLEVEL, log.INFO_STRING, log.FLAG_USAGE)
-	apiUrlPtr := flag.String(PARAMETER_API_URL, "", "url")
+	urlPtr := flag.String(PARAMETER_API_URL, "", "url")
 	apiUserPtr := flag.String(PARAMETER_API_USER, "", "user")
-	apiPasswordPtr := flag.String(PARAMETER_API_PASSWORD, "", "password")
-	apiPasswordFilePtr := flag.String(PARAMETER_API_PASSWORD_FILE, "", "passwordfile")
+	passwordPtr := flag.String(PARAMETER_API_PASSWORD, "", "password")
+	passwordFilePtr := flag.String(PARAMETER_API_PASSWORD_FILE, "", "passwordfile")
 	repoPtr := flag.String(PARAMETER_REPO, "", "repo")
 	namePtr := flag.String(PARAMETER_NAME, "", "name")
 	flag.Parse()
@@ -58,7 +58,7 @@ func main() {
 	package_version := aptly_package_versions.New(package_lister.ListPackages)
 
 	writer := os.Stdout
-	err := do(writer, package_version, *apiUrlPtr, *apiUserPtr, *apiPasswordPtr, *apiPasswordFilePtr, *repoPtr, *namePtr)
+	err := do(writer, package_version, *urlPtr, *apiUserPtr, *passwordPtr, *passwordFilePtr, *repoPtr, *namePtr)
 	if err != nil {
 		logger.Fatal(err)
 		logger.Close()

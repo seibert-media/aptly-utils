@@ -11,16 +11,16 @@ import (
 )
 
 type ListPackages func(
-	apiUrl aptly_url.Url,
-	apiUsername aptly_user.User,
-	apiPassword aptly_password.Password,
+	url aptly_url.Url,
+	user aptly_user.User,
+	password aptly_password.Password,
 	repository aptly_repository.Repository) ([]map[string]string, error)
 
 type PackageVersions interface {
 	PackageVersions(
-		apiUrl aptly_url.Url,
-		apiUsername aptly_user.User,
-		apiPassword aptly_password.Password,
+		url aptly_url.Url,
+		user aptly_user.User,
+		password aptly_password.Password,
 		repository aptly_repository.Repository,
 		packageName package_name.PackageName) ([]aptly_version.Version, error)
 }
@@ -40,13 +40,13 @@ func New(listPackages ListPackages) *packageVersion {
 type JsonStruct []map[string]string
 
 func (p *packageVersion) PackageVersions(
-	apiUrl aptly_url.Url,
-	apiUsername aptly_user.User,
-	apiPassword aptly_password.Password,
+	url aptly_url.Url,
+	user aptly_user.User,
+	password aptly_password.Password,
 	repository aptly_repository.Repository,
 	packageName package_name.PackageName) ([]aptly_version.Version, error) {
 	logger.Debugf("PackageVersions - repo: %s package: %s", repository, packageName)
-	jsonStruct, err := p.listPackages(apiUrl, apiUsername, apiPassword, repository)
+	jsonStruct, err := p.listPackages(url, user, password, repository)
 	if err != nil {
 		return nil, err
 	}
