@@ -5,30 +5,24 @@ import (
 	"encoding/json"
 	"fmt"
 
+	aptly_api "github.com/bborbe/aptly_utils/api"
 	aptly_architecture "github.com/bborbe/aptly_utils/architecture"
 	aptly_distribution "github.com/bborbe/aptly_utils/distribution"
-	aptly_password "github.com/bborbe/aptly_utils/password"
 	aptly_repository "github.com/bborbe/aptly_utils/repository"
 	aptly_requestbuilder_executor "github.com/bborbe/aptly_utils/requestbuilder_executor"
-	aptly_url "github.com/bborbe/aptly_utils/url"
-	aptly_user "github.com/bborbe/aptly_utils/user"
 	http_requestbuilder "github.com/bborbe/http/requestbuilder"
 	"github.com/bborbe/log"
 )
 
 type PublishNewRepo func(
-	url aptly_url.Url,
-	user aptly_user.User,
-	password aptly_password.Password,
+	api aptly_api.Api,
 	repository aptly_repository.Repository,
 	distribution aptly_distribution.Distribution,
 	architectures []aptly_architecture.Architecture) error
 
 type RepoCreater interface {
 	CreateRepo(
-		url aptly_url.Url,
-		user aptly_user.User,
-		password aptly_password.Password,
+		api aptly_api.Api,
 		repository aptly_repository.Repository,
 		distribution aptly_distribution.Distribution,
 		architectures []aptly_architecture.Architecture) error
@@ -51,29 +45,25 @@ func New(buildRequestAndExecute aptly_requestbuilder_executor.RequestbuilderExec
 }
 
 func (c *repoCreater) CreateRepo(
-	url aptly_url.Url,
-	user aptly_user.User,
-	password aptly_password.Password,
+	api aptly_api.Api,
 	repository aptly_repository.Repository,
 	distribution aptly_distribution.Distribution,
 	architectures []aptly_architecture.Architecture) error {
-	if err := c.createRepo(url, user, password, repository); err != nil {
+	if err := c.createRepo(api, repository); err != nil {
 		//return err
 	}
-	if err := c.publishNewRepo(url, user, password, repository, distribution, architectures); err != nil {
+	if err := c.publishNewRepo(api, repository, distribution, architectures); err != nil {
 		return err
 	}
 	return nil
 }
 
 func (c *repoCreater) createRepo(
-	url aptly_url.Url,
-	user aptly_user.User,
-	password aptly_password.Password,
+	api aptly_api.Api,
 	repository aptly_repository.Repository) error {
 	logger.Debugf("createRepo")
-	requestbuilder := c.httpRequestBuilderProvider.NewHttpRequestBuilder(fmt.Sprintf("%s/api/repos", url))
-	requestbuilder.AddBasicAuth(string(user), string(password))
+	requestbuilder := c.httpRequestBuilderProvider.NewHttpRequestBuilder(fmt.Sprintf("%s/api/repos", api.Url))
+	requestbuilder.AddBasicAuth(string(api.User), string(api.Password))
 	requestbuilder.SetMethod("POST")
 	requestbuilder.AddContentType("application/json")
 	content, err := json.Marshal(map[string]aptly_repository.Repository{"Name": repository})

@@ -4,11 +4,9 @@ import (
 	"fmt"
 	"sort"
 
+	aptly_api "github.com/bborbe/aptly_utils/api"
 	"github.com/bborbe/aptly_utils/package_name"
-	aptly_password "github.com/bborbe/aptly_utils/password"
 	aptly_repository "github.com/bborbe/aptly_utils/repository"
-	aptly_url "github.com/bborbe/aptly_utils/url"
-	aptly_user "github.com/bborbe/aptly_utils/user"
 	aptly_version "github.com/bborbe/aptly_utils/version"
 	"github.com/bborbe/log"
 )
@@ -16,17 +14,13 @@ import (
 var logger = log.DefaultLogger
 
 type PackageVersions func(
-	url aptly_url.Url,
-	user aptly_user.User,
-	password aptly_password.Password,
+	api aptly_api.Api,
 	repository aptly_repository.Repository,
 	packageName package_name.PackageName) ([]aptly_version.Version, error)
 
 type PackageLatestVersion interface {
 	PackageLatestVersion(
-		url aptly_url.Url,
-		user aptly_user.User,
-		password aptly_password.Password,
+		api aptly_api.Api,
 		repository aptly_repository.Repository,
 		packageName package_name.PackageName) (*aptly_version.Version, error)
 }
@@ -42,15 +36,13 @@ func New(packageVersions PackageVersions) *packageLatestVersion {
 }
 
 func (p *packageLatestVersion) PackageLatestVersion(
-	url aptly_url.Url,
-	user aptly_user.User,
-	password aptly_password.Password,
+	api aptly_api.Api,
 	repository aptly_repository.Repository,
 	packageName package_name.PackageName) (*aptly_version.Version, error) {
 	logger.Debugf("PackageLatestVersion")
 	var err error
 	var versions []aptly_version.Version
-	if versions, err = p.packageVersions(url, user, password, repository, packageName); err != nil {
+	if versions, err = p.packageVersions(api, repository, packageName); err != nil {
 		return nil, err
 	}
 	if len(versions) == 0 {

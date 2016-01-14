@@ -9,6 +9,7 @@ import (
 	"runtime"
 	"strings"
 
+	aptly_api "github.com/bborbe/aptly_utils/api"
 	aptly_distribution "github.com/bborbe/aptly_utils/distribution"
 	aptly_package_copier "github.com/bborbe/aptly_utils/package_copier"
 	aptly_package_detail "github.com/bborbe/aptly_utils/package_detail"
@@ -18,12 +19,9 @@ import (
 	aptly_package_name "github.com/bborbe/aptly_utils/package_name"
 	aptly_package_uploader "github.com/bborbe/aptly_utils/package_uploader"
 	aptly_package_versions "github.com/bborbe/aptly_utils/package_versions"
-	aptly_password "github.com/bborbe/aptly_utils/password"
 	aptly_repo_publisher "github.com/bborbe/aptly_utils/repo_publisher"
 	aptly_repository "github.com/bborbe/aptly_utils/repository"
 	aptly_requestbuilder_executor "github.com/bborbe/aptly_utils/requestbuilder_executor"
-	aptly_url "github.com/bborbe/aptly_utils/url"
-	aptly_user "github.com/bborbe/aptly_utils/user"
 	aptly_version "github.com/bborbe/aptly_utils/version"
 	http_client "github.com/bborbe/http/client"
 	http_requestbuilder "github.com/bborbe/http/requestbuilder"
@@ -111,9 +109,7 @@ func do(writer io.Writer, packageCopier aptly_package_copier.PackageCopier, pack
 		packageCopier,
 		packageLatestVersion,
 		packageLister,
-		aptly_url.Url(url),
-		aptly_user.User(user),
-		aptly_password.Password(password),
+		aptly_api.New(url, user, password),
 		aptly_repository.Repository(sourceRepo),
 		aptly_repository.Repository(targetRepo),
 		aptly_distribution.Distribution(targetDistribution),
@@ -125,9 +121,7 @@ func copy(
 	packageCopier aptly_package_copier.PackageCopier,
 	packageLatestVersion aptly_package_latest_version.PackageLatestVersion,
 	packageLister aptly_package_lister.PackageLister,
-	url aptly_url.Url,
-	user aptly_user.User,
-	password aptly_password.Password,
+	api aptly_api.Api,
 	sourceRepo aptly_repository.Repository,
 	targetRepo aptly_repository.Repository,
 	targetDistribution aptly_distribution.Distribution,
@@ -139,7 +133,7 @@ func copy(
 	var list []aptly_package_detail.PackageDetail
 	var err error
 	if packageName == aptly_package_name.ALL {
-		list, err = listPackageDetails(packageLister, url, user, password, sourceRepo)
+		list, err = listPackageDetails(packageLister, api, sourceRepo)
 		if err != nil {
 			return err
 		}
@@ -149,9 +143,7 @@ func copy(
 	return copyList(
 		packageCopier,
 		packageLatestVersion,
-		url,
-		user,
-		password,
+		api,
 		sourceRepo,
 		targetRepo,
 		targetDistribution,
@@ -160,11 +152,8 @@ func copy(
 
 func listPackageDetails(
 	packageLister aptly_package_lister.PackageLister,
-	url aptly_url.Url,
-	user aptly_user.User,
-	password aptly_password.Password,
-	repository aptly_repository.Repository) ([]aptly_package_detail.PackageDetail, error) {
-	list, err := packageLister.ListPackages(url, user, password, repository)
+	api aptly_api.Api, repository aptly_repository.Repository) ([]aptly_package_detail.PackageDetail, error) {
+	list, err := packageLister.ListPackages(api, repository)
 	if err != nil {
 		return nil, err
 	}
@@ -178,9 +167,7 @@ func listPackageDetails(
 func copyList(
 	packageCopier aptly_package_copier.PackageCopier,
 	packageLatestVersion aptly_package_latest_version.PackageLatestVersion,
-	url aptly_url.Url,
-	user aptly_user.User,
-	password aptly_password.Password,
+	api aptly_api.Api,
 	sourceRepo aptly_repository.Repository,
 	targetRepo aptly_repository.Repository,
 	targetDistribution aptly_distribution.Distribution,
@@ -189,13 +176,13 @@ func copyList(
 		version := e.Version
 		packageName := e.PackageName
 		if version == aptly_version.LATEST {
-			latestVersion, err := packageLatestVersion.PackageLatestVersion(url, user, password, sourceRepo, packageName)
+			latestVersion, err := packageLatestVersion.PackageLatestVersion(api, sourceRepo, packageName)
 			if err != nil {
 				return err
 			}
 			version = *latestVersion
 		}
-		err := packageCopier.CopyPackage(url, user, password, sourceRepo, targetRepo, targetDistribution, packageName, version)
+		err := packageCopier.CopyPackage(api, sourceRepo, targetRepo, targetDistribution, packageName, version)
 		if err != nil {
 			return err
 		}

@@ -5,35 +5,27 @@ import (
 	"encoding/json"
 	"fmt"
 
+	aptly_api "github.com/bborbe/aptly_utils/api"
 	aptly_architecture "github.com/bborbe/aptly_utils/architecture"
 	aptly_distribution "github.com/bborbe/aptly_utils/distribution"
-	aptly_password "github.com/bborbe/aptly_utils/password"
 	aptly_repository "github.com/bborbe/aptly_utils/repository"
 	aptly_requestbuilder_executor "github.com/bborbe/aptly_utils/requestbuilder_executor"
-	aptly_url "github.com/bborbe/aptly_utils/url"
-	aptly_user "github.com/bborbe/aptly_utils/user"
 	http_requestbuilder "github.com/bborbe/http/requestbuilder"
 	"github.com/bborbe/log"
 )
 
 type RepoPublisher interface {
 	PublishNewRepo(
-		url aptly_url.Url,
-		user aptly_user.User,
-		password aptly_password.Password,
+		api aptly_api.Api,
 		repository aptly_repository.Repository,
 		distribution aptly_distribution.Distribution,
 		architectures []aptly_architecture.Architecture) error
 	PublishRepo(
-		url aptly_url.Url,
-		user aptly_user.User,
-		password aptly_password.Password,
+		api aptly_api.Api,
 		repository aptly_repository.Repository,
 		distribution aptly_distribution.Distribution) error
 	UnPublishRepo(
-		url aptly_url.Url,
-		user aptly_user.User,
-		password aptly_password.Password,
+		api aptly_api.Api,
 		repository aptly_repository.Repository,
 		distribution aptly_distribution.Distribution) error
 }
@@ -61,15 +53,13 @@ func New(buildRequestAndExecute aptly_requestbuilder_executor.RequestbuilderExec
 }
 
 func (c *repoPublisher) PublishNewRepo(
-	url aptly_url.Url,
-	user aptly_user.User,
-	password aptly_password.Password,
+	api aptly_api.Api,
 	repository aptly_repository.Repository,
 	distribution aptly_distribution.Distribution,
 	architectures []aptly_architecture.Architecture) error {
 	logger.Debugf("publishRepo - repo: %s arch: %s", repository, aptly_architecture.Join(architectures, ","))
-	requestbuilder := c.httpRequestBuilderProvider.NewHttpRequestBuilder(fmt.Sprintf("%s/api/publish/%s", url, repository))
-	requestbuilder.AddBasicAuth(string(user), string(password))
+	requestbuilder := c.httpRequestBuilderProvider.NewHttpRequestBuilder(fmt.Sprintf("%s/api/publish/%s", api.Url, repository))
+	requestbuilder.AddBasicAuth(string(api.User), string(api.Password))
 	requestbuilder.SetMethod("POST")
 	requestbuilder.AddContentType("application/json")
 	content, err := json.Marshal(publishJson{
@@ -87,14 +77,12 @@ func (c *repoPublisher) PublishNewRepo(
 }
 
 func (p *repoPublisher) PublishRepo(
-	url aptly_url.Url,
-	user aptly_user.User,
-	password aptly_password.Password,
+	api aptly_api.Api,
 	repository aptly_repository.Repository,
 	distribution aptly_distribution.Distribution) error {
 	logger.Debugf("publishRepo - repo: %s distribution: %s", repository, distribution)
-	requestbuilder := p.httpRequestBuilderProvider.NewHttpRequestBuilder(fmt.Sprintf("%s/api/publish/%s/%s", url, repository, distribution))
-	requestbuilder.AddBasicAuth(string(user), string(password))
+	requestbuilder := p.httpRequestBuilderProvider.NewHttpRequestBuilder(fmt.Sprintf("%s/api/publish/%s/%s", api.Url, repository, distribution))
+	requestbuilder.AddBasicAuth(string(api.User), string(api.Password))
 	requestbuilder.SetMethod("PUT")
 	requestbuilder.AddContentType("application/json")
 	content, err := json.Marshal(map[string]bool{"ForceOverwrite": true})
@@ -106,14 +94,12 @@ func (p *repoPublisher) PublishRepo(
 }
 
 func (p *repoPublisher) UnPublishRepo(
-	url aptly_url.Url,
-	user aptly_user.User,
-	password aptly_password.Password,
+	api aptly_api.Api,
 	repository aptly_repository.Repository,
 	distribution aptly_distribution.Distribution) error {
 	logger.Debugf("unPublishRepo - repo: %s distribution: %s", repository, distribution)
-	requestbuilder := p.httpRequestBuilderProvider.NewHttpRequestBuilder(fmt.Sprintf("%s/api/publish/%s/%s", url, repository, distribution))
-	requestbuilder.AddBasicAuth(string(user), string(password))
+	requestbuilder := p.httpRequestBuilderProvider.NewHttpRequestBuilder(fmt.Sprintf("%s/api/publish/%s/%s", api.Url, repository, distribution))
+	requestbuilder.AddBasicAuth(string(api.User), string(api.Password))
 	requestbuilder.SetMethod("DELETE")
 	return p.buildRequestAndExecute.BuildRequestAndExecute(requestbuilder)
 }

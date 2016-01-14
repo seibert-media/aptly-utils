@@ -6,10 +6,8 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	aptly_password "github.com/bborbe/aptly_utils/password"
+	aptly_api "github.com/bborbe/aptly_utils/api"
 	aptly_repository "github.com/bborbe/aptly_utils/repository"
-	aptly_url "github.com/bborbe/aptly_utils/url"
-	aptly_user "github.com/bborbe/aptly_utils/user"
 	http_requestbuilder "github.com/bborbe/http/requestbuilder"
 	"github.com/bborbe/log"
 )
@@ -19,9 +17,7 @@ type NewHttpRequestBuilder func(url string) http_requestbuilder.HttpRequestBuild
 
 type PackageLister interface {
 	ListPackages(
-		url aptly_url.Url,
-		user aptly_user.User,
-		password aptly_password.Password,
+		api aptly_api.Api,
 		repository aptly_repository.Repository) ([]map[string]string, error)
 }
 
@@ -40,13 +36,11 @@ func New(executeRequest ExecuteRequest, newHttpRequestBuilder NewHttpRequestBuil
 }
 
 func (p *packageVersion) ListPackages(
-	url aptly_url.Url,
-	user aptly_user.User,
-	password aptly_password.Password,
+	api aptly_api.Api,
 	repository aptly_repository.Repository) ([]map[string]string, error) {
 	logger.Debugf("PackageVersions - repo: %s", repository)
-	requestbuilder := p.newHttpRequestBuilder(fmt.Sprintf("%s/api/repos/%s/packages?format=details", url, repository))
-	requestbuilder.AddBasicAuth(string(user), string(password))
+	requestbuilder := p.newHttpRequestBuilder(fmt.Sprintf("%s/api/repos/%s/packages?format=details", api.Url, repository))
+	requestbuilder.AddBasicAuth(string(api.User), string(api.Password))
 	requestbuilder.SetMethod("GET")
 	requestbuilder.AddContentType("application/json")
 	req, err := requestbuilder.GetRequest()

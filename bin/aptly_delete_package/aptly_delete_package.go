@@ -9,15 +9,13 @@ import (
 	"runtime"
 	"strings"
 
+	aptly_api "github.com/bborbe/aptly_utils/api"
 	aptly_distribution "github.com/bborbe/aptly_utils/distribution"
 	aptly_package_deleter "github.com/bborbe/aptly_utils/package_deleter"
 	"github.com/bborbe/aptly_utils/package_name"
-	aptly_password "github.com/bborbe/aptly_utils/password"
 	aptly_repo_publisher "github.com/bborbe/aptly_utils/repo_publisher"
 	aptly_repository "github.com/bborbe/aptly_utils/repository"
 	aptly_requestbuilder_executor "github.com/bborbe/aptly_utils/requestbuilder_executor"
-	aptly_url "github.com/bborbe/aptly_utils/url"
-	aptly_user "github.com/bborbe/aptly_utils/user"
 	aptly_version "github.com/bborbe/aptly_utils/version"
 	http_client "github.com/bborbe/http/client"
 	http_requestbuilder "github.com/bborbe/http/requestbuilder"
@@ -90,5 +88,5 @@ func do(writer io.Writer, package_deleter aptly_package_deleter.PackageDeleter, 
 	if len(version) == 0 {
 		return fmt.Errorf("parameter %s missing", PARAMETER_VERSION)
 	}
-	return package_deleter.DeletePackageByNameAndVersion(aptly_url.Url(url), aptly_user.User(user), aptly_password.Password(password), aptly_repository.Repository(repo), aptly_distribution.Distribution(distribution), package_name.PackageName(name), aptly_version.Version(version))
+	return package_deleter.DeletePackageByNameAndVersion(aptly_api.New(url, user, password), aptly_repository.Repository(repo), aptly_distribution.Distribution(distribution), package_name.PackageName(name), aptly_version.Version(version))
 }

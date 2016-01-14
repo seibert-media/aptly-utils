@@ -1,26 +1,20 @@
 package package_versions
 
 import (
+	aptly_api "github.com/bborbe/aptly_utils/api"
 	"github.com/bborbe/aptly_utils/package_name"
-	aptly_password "github.com/bborbe/aptly_utils/password"
 	aptly_repository "github.com/bborbe/aptly_utils/repository"
-	aptly_url "github.com/bborbe/aptly_utils/url"
-	aptly_user "github.com/bborbe/aptly_utils/user"
 	aptly_version "github.com/bborbe/aptly_utils/version"
 	"github.com/bborbe/log"
 )
 
 type ListPackages func(
-	url aptly_url.Url,
-	user aptly_user.User,
-	password aptly_password.Password,
+	api aptly_api.Api,
 	repository aptly_repository.Repository) ([]map[string]string, error)
 
 type PackageVersions interface {
 	PackageVersions(
-		url aptly_url.Url,
-		user aptly_user.User,
-		password aptly_password.Password,
+		api aptly_api.Api,
 		repository aptly_repository.Repository,
 		packageName package_name.PackageName) ([]aptly_version.Version, error)
 }
@@ -40,13 +34,11 @@ func New(listPackages ListPackages) *packageVersion {
 type JsonStruct []map[string]string
 
 func (p *packageVersion) PackageVersions(
-	url aptly_url.Url,
-	user aptly_user.User,
-	password aptly_password.Password,
+	api aptly_api.Api,
 	repository aptly_repository.Repository,
 	packageName package_name.PackageName) ([]aptly_version.Version, error) {
 	logger.Debugf("PackageVersions - repo: %s package: %s", repository, packageName)
-	jsonStruct, err := p.listPackages(url, user, password, repository)
+	jsonStruct, err := p.listPackages(api, repository)
 	if err != nil {
 		return nil, err
 	}

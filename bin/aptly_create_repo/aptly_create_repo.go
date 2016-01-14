@@ -9,15 +9,13 @@ import (
 	"runtime"
 	"strings"
 
+	aptly_api "github.com/bborbe/aptly_utils/api"
 	aptly_architecture "github.com/bborbe/aptly_utils/architecture"
 	aptly_distribution "github.com/bborbe/aptly_utils/distribution"
-	aptly_password "github.com/bborbe/aptly_utils/password"
 	aptly_repo_creater "github.com/bborbe/aptly_utils/repo_creater"
 	aptly_repo_publisher "github.com/bborbe/aptly_utils/repo_publisher"
 	aptly_repository "github.com/bborbe/aptly_utils/repository"
 	aptly_requestbuilder_executor "github.com/bborbe/aptly_utils/requestbuilder_executor"
-	aptly_url "github.com/bborbe/aptly_utils/url"
-	aptly_user "github.com/bborbe/aptly_utils/user"
 	http_client "github.com/bborbe/http/client"
 	http_requestbuilder "github.com/bborbe/http/requestbuilder"
 	"github.com/bborbe/log"
@@ -81,5 +79,5 @@ func do(writer io.Writer, repo_creater aptly_repo_creater.RepoCreater, url strin
 	if len(repo) == 0 {
 		return fmt.Errorf("parameter %s missing", PARAMETER_REPO)
 	}
-	return repo_creater.CreateRepo(aptly_url.Url(url), aptly_user.User(user), aptly_password.Password(password), aptly_repository.Repository(repo), aptly_distribution.Distribution(distribution), aptly_architecture.Parse(architectures))
+	return repo_creater.CreateRepo(aptly_api.New(url, user, password), aptly_repository.Repository(repo), aptly_distribution.Distribution(distribution), aptly_architecture.Parse(architectures))
 }
