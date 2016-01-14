@@ -8,6 +8,10 @@
   "postinst": "src/github.com/bborbe/aptly_utils/postinst",
   "files": [
     {
+      "source": "bin/aptly_package_lister",
+      "target": "/opt/aptly_utils/bin/aptly_package_lister"
+    },
+    {
       "source": "bin/aptly_copy_package",
       "target": "/opt/aptly_utils/bin/aptly_copy_package"
     },

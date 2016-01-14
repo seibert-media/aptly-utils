@@ -13,7 +13,12 @@ import (
 	"strings"
 
 	aptly_package_lister "github.com/bborbe/aptly_utils/package_lister"
+	"github.com/bborbe/aptly_utils/package_name"
 	aptly_package_versions "github.com/bborbe/aptly_utils/package_versions"
+	aptly_password "github.com/bborbe/aptly_utils/password"
+	aptly_repository "github.com/bborbe/aptly_utils/repository"
+	aptly_url "github.com/bborbe/aptly_utils/url"
+	aptly_user "github.com/bborbe/aptly_utils/user"
 	aptly_version "github.com/bborbe/aptly_utils/version"
 	http_client "github.com/bborbe/http/client"
 	http_requestbuilder "github.com/bborbe/http/requestbuilder"
@@ -82,7 +87,7 @@ func do(writer io.Writer, packageVersions aptly_package_versions.PackageVersions
 
 	var err error
 	var versions []aptly_version.Version
-	if versions, err = packageVersions.PackageVersions(url, user, password, repo, name); err != nil {
+	if versions, err = packageVersions.PackageVersions(aptly_url.Url(url), aptly_user.User(user), aptly_password.Password(password), aptly_repository.Repository(repo), package_name.PackageName(name)); err != nil {
 		return err
 	}
 	if len(versions) == 0 {

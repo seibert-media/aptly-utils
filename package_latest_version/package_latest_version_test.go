@@ -1,4 +1,4 @@
-package package_uploader
+package package_latest_version
 
 import (
 	"testing"
@@ -6,9 +6,9 @@ import (
 	. "github.com/bborbe/assert"
 )
 
-func TestImplementsPackageUploader(t *testing.T) {
-	b := New(nil, nil, nil)
-	var i *PackageUploader
+func TestImplementsPackageLatestVersion(t *testing.T) {
+	b := New(nil)
+	var i *PackageLatestVersion
 	err := AssertThat(b, Implements(i).Message("check type"))
 	if err != nil {
 		t.Fatal(err)

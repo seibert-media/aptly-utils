@@ -1,10 +1,10 @@
 package repo_deleter
 
 import (
+	"sort"
 	"testing"
 
-	"sort"
-
+	aptly_key "github.com/bborbe/aptly_utils/key"
 	. "github.com/bborbe/assert"
 )
 
@@ -43,7 +43,7 @@ func TestPackagesToKeysTwoDifferentVersions(t *testing.T) {
 	if err := AssertThat(len(keys), Is(1)); err != nil {
 		t.Fatal(err)
 	}
-	if err := AssertThat(keys[0], Is("keyB")); err != nil {
+	if err := AssertThat(string(keys[0]), Is("keyB")); err != nil {
 		t.Fatal(err)
 	}
 }
@@ -53,11 +53,11 @@ func TestPackagesToKeysThreeDifferentVersions(t *testing.T) {
 	if err := AssertThat(len(keys), Is(2)); err != nil {
 		t.Fatal(err)
 	}
-	sort.Strings(keys)
-	if err := AssertThat(keys[0], Is("keyA")); err != nil {
+	sort.Sort(aptly_key.KeySlice(keys))
+	if err := AssertThat(string(keys[0]), Is("keyA")); err != nil {
 		t.Fatal(err)
 	}
-	if err := AssertThat(keys[1], Is("keyB")); err != nil {
+	if err := AssertThat(string(keys[1]), Is("keyB")); err != nil {
 		t.Fatal(err)
 	}
 }

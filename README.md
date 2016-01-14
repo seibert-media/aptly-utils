@@ -1,10 +1,6 @@
 # Aptly Utils
 
-
 Package provide some aptly utils
-
-
-                
 
 ## Create Repo
 
@@ -52,6 +48,17 @@ aptly_upload \
 -repo=unstable
 ```
 
+## List Packages
+
+```
+aptly_package_lister \
+-loglevel=DEBUG \
+-url=http://aptly.benjamin-borbe.de \
+-username=api \
+-passwordfile=/etc/aptly_api_password \
+-repo=unstable
+```
+
 ## Delete Package
 
 ```
@@ -77,6 +84,18 @@ aptly_copy_package \
 -target=stable \
 -name=booking \
 -version=1.0.1-b47
+```
+
+```
+aptly_copy_package \
+-loglevel=DEBUG \
+-url=http://aptly.benjamin-borbe.de \
+-username=api \
+-passwordfile=/etc/aptly_api_password \
+-source=unstable \
+-target=stable \
+-name=booking \
+-version=latest
 ```
 
 ## Version of Package

@@ -9,10 +9,14 @@ import (
 	"runtime"
 	"strings"
 
-	aptly_defaults "github.com/bborbe/aptly_utils/defaults"
+	aptly_distribution "github.com/bborbe/aptly_utils/distribution"
+	aptly_password "github.com/bborbe/aptly_utils/password"
 	aptly_repo_deleter "github.com/bborbe/aptly_utils/repo_deleter"
 	aptly_repo_publisher "github.com/bborbe/aptly_utils/repo_publisher"
+	aptly_repository "github.com/bborbe/aptly_utils/repository"
 	aptly_requestbuilder_executor "github.com/bborbe/aptly_utils/requestbuilder_executor"
+	aptly_url "github.com/bborbe/aptly_utils/url"
+	aptly_user "github.com/bborbe/aptly_utils/user"
 	http_client "github.com/bborbe/http/client"
 	http_requestbuilder "github.com/bborbe/http/requestbuilder"
 	"github.com/bborbe/log"
@@ -38,7 +42,7 @@ func main() {
 	apiPasswordPtr := flag.String(PARAMETER_API_PASSWORD, "", "password")
 	apiPasswordFilePtr := flag.String(PARAMETER_API_PASSWORD_FILE, "", "passwordfile")
 	repoPtr := flag.String(PARAMETER_REPO, "", "repo")
-	distributionPtr := flag.String(PARAMETER_DISTRIBUTION, aptly_defaults.DEFAULT_DISTRIBUTION, "distribution")
+	distributionPtr := flag.String(PARAMETER_DISTRIBUTION, string(aptly_distribution.DEFAULT), "distribution")
 	flag.Parse()
 	logger.SetLevelThreshold(log.LogStringToLevel(*logLevelPtr))
 	logger.Debugf("set log level to %s", *logLevelPtr)
@@ -71,5 +75,5 @@ func do(writer io.Writer, repo_deleter aptly_repo_deleter.RepoDeleter, url strin
 	if len(repo) == 0 {
 		return fmt.Errorf("parameter %s missing", PARAMETER_REPO)
 	}
-	return repo_deleter.DeleteRepo(url, user, password, repo, distribution)
+	return repo_deleter.DeleteRepo(aptly_url.Url(url), aptly_user.User(user), aptly_password.Password(password), aptly_repository.Repository(repo), aptly_distribution.Distribution(distribution))
 }

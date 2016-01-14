@@ -4,13 +4,28 @@ import (
 	"fmt"
 	"net/http"
 
+	aptly_distribution "github.com/bborbe/aptly_utils/distribution"
+	"github.com/bborbe/aptly_utils/package_name"
 	aptly_package_uploader "github.com/bborbe/aptly_utils/package_uploader"
+	aptly_password "github.com/bborbe/aptly_utils/password"
+	aptly_repository "github.com/bborbe/aptly_utils/repository"
+	aptly_url "github.com/bborbe/aptly_utils/url"
+	aptly_user "github.com/bborbe/aptly_utils/user"
+	aptly_version "github.com/bborbe/aptly_utils/version"
 	http_requestbuilder "github.com/bborbe/http/requestbuilder"
 	"github.com/bborbe/log"
 )
 
 type PackageCopier interface {
-	CopyPackage(apiUrl string, apiUsername string, apiPassword string, sourceRepo string, targetRepo string, targetDistribution, name, version string) error
+	CopyPackage(
+		apiUrl aptly_url.Url,
+		apiUsername aptly_user.User,
+		apiPassword aptly_password.Password,
+		sourceRepo aptly_repository.Repository,
+		targetRepo aptly_repository.Repository,
+		targetDistribution aptly_distribution.Distribution,
+		name package_name.PackageName,
+		version aptly_version.Version) error
 }
 
 type packageCopier struct {
@@ -29,7 +44,15 @@ func New(uploader aptly_package_uploader.PackageUploader, httpRequestBuilderProv
 	return p
 }
 
-func (c *packageCopier) CopyPackage(apiUrl string, apiUsername string, apiPassword string, sourceRepo string, targetRepo string, targetDistribution, name, version string) error {
+func (c *packageCopier) CopyPackage(
+	apiUrl aptly_url.Url,
+	apiUsername aptly_user.User,
+	apiPassword aptly_password.Password,
+	sourceRepo aptly_repository.Repository,
+	targetRepo aptly_repository.Repository,
+	targetDistribution aptly_distribution.Distribution,
+	name package_name.PackageName,
+	version aptly_version.Version) error {
 	logger.Debugf("CopyPackage - sourceRepo: %s targetRepo: %s, package: %s_%s", sourceRepo, targetRepo, name, version)
 	url := fmt.Sprintf("%s/%s/pool/main/%s/%s/%s_%s.deb", apiUrl, sourceRepo, name[0:1], name, name, version)
 	logger.Debugf("download package url: %s", url)
@@ -43,7 +66,7 @@ func (c *packageCopier) CopyPackage(apiUrl string, apiUsername string, apiPasswo
 		return err
 	}
 	if resp.StatusCode/100 != 2 {
-		return fmt.Errorf("download package %s_%s.deb failed", name, version)
+		return fmt.Errorf("download package %s %s failed", name, version)
 	}
-	return c.uploader.UploadPackageByReader(apiUrl, apiUsername, apiPassword, targetRepo, fmt.Sprintf("%s_%s.deb", name, version), targetDistribution, resp.Body)
+	return c.uploader.UploadPackageByReader(apiUrl, apiUsername, apiPassword, targetRepo, targetDistribution, name, resp.Body)
 }
