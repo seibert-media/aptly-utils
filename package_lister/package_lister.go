@@ -22,7 +22,7 @@ type PackageLister interface {
 		apiUrl aptly_url.Url,
 		apiUsername aptly_user.User,
 		apiPassword aptly_password.Password,
-		repo aptly_repository.Repository) ([]map[string]string, error)
+		repository aptly_repository.Repository) ([]map[string]string, error)
 }
 
 type packageVersion struct {
@@ -43,9 +43,9 @@ func (p *packageVersion) ListPackages(
 	apiUrl aptly_url.Url,
 	apiUsername aptly_user.User,
 	apiPassword aptly_password.Password,
-	repo aptly_repository.Repository) ([]map[string]string, error) {
-	logger.Debugf("PackageVersions - repo: %s", repo)
-	requestbuilder := p.newHttpRequestBuilder(fmt.Sprintf("%s/api/repos/%s/packages?format=details", apiUrl, repo))
+	repository aptly_repository.Repository) ([]map[string]string, error) {
+	logger.Debugf("PackageVersions - repo: %s", repository)
+	requestbuilder := p.newHttpRequestBuilder(fmt.Sprintf("%s/api/repos/%s/packages?format=details", apiUrl, repository))
 	requestbuilder.AddBasicAuth(string(apiUsername), string(apiPassword))
 	requestbuilder.SetMethod("GET")
 	requestbuilder.AddContentType("application/json")

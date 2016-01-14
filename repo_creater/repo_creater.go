@@ -20,7 +20,7 @@ type PublishNewRepo func(
 	apiUrl aptly_url.Url,
 	apiUsername aptly_user.User,
 	apiPassword aptly_password.Password,
-	repo aptly_repository.Repository,
+	repository aptly_repository.Repository,
 	distribution aptly_distribution.Distribution,
 	architectures []aptly_architecture.Architecture) error
 
@@ -29,7 +29,7 @@ type RepoCreater interface {
 		apiUrl aptly_url.Url,
 		apiUsername aptly_user.User,
 		apiPassword aptly_password.Password,
-		repo aptly_repository.Repository,
+		repository aptly_repository.Repository,
 		distribution aptly_distribution.Distribution,
 		architectures []aptly_architecture.Architecture) error
 }
@@ -54,13 +54,13 @@ func (c *repoCreater) CreateRepo(
 	apiUrl aptly_url.Url,
 	apiUsername aptly_user.User,
 	apiPassword aptly_password.Password,
-	repo aptly_repository.Repository,
+	repository aptly_repository.Repository,
 	distribution aptly_distribution.Distribution,
 	architectures []aptly_architecture.Architecture) error {
-	if err := c.createRepo(apiUrl, apiUsername, apiPassword, repo); err != nil {
+	if err := c.createRepo(apiUrl, apiUsername, apiPassword, repository); err != nil {
 		//return err
 	}
-	if err := c.publishNewRepo(apiUrl, apiUsername, apiPassword, repo, distribution, architectures); err != nil {
+	if err := c.publishNewRepo(apiUrl, apiUsername, apiPassword, repository, distribution, architectures); err != nil {
 		return err
 	}
 	return nil
@@ -70,13 +70,13 @@ func (c *repoCreater) createRepo(
 	apiUrl aptly_url.Url,
 	apiUsername aptly_user.User,
 	apiPassword aptly_password.Password,
-	repo aptly_repository.Repository) error {
+	repository aptly_repository.Repository) error {
 	logger.Debugf("createRepo")
 	requestbuilder := c.httpRequestBuilderProvider.NewHttpRequestBuilder(fmt.Sprintf("%s/api/repos", apiUrl))
 	requestbuilder.AddBasicAuth(string(apiUsername), string(apiPassword))
 	requestbuilder.SetMethod("POST")
 	requestbuilder.AddContentType("application/json")
-	content, err := json.Marshal(map[string]aptly_repository.Repository{"Name": repo})
+	content, err := json.Marshal(map[string]aptly_repository.Repository{"Name": repository})
 	if err != nil {
 		return err
 	}

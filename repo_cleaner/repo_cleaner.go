@@ -14,21 +14,21 @@ type DeletePackagesByKey func(
 	apiUrl aptly_url.Url,
 	apiUsername aptly_user.User,
 	apiPassword aptly_password.Password,
-	repo aptly_repository.Repository,
+	repository aptly_repository.Repository,
 	keys []aptly_key.Key) error
 
 type ListPackages func(
 	apiUrl aptly_url.Url,
 	apiUsername aptly_user.User,
 	apiPassword aptly_password.Password,
-	repo aptly_repository.Repository) ([]map[string]string, error)
+	repository aptly_repository.Repository) ([]map[string]string, error)
 
 type RepoCleaner interface {
 	CleanRepo(
 		apiUrl aptly_url.Url,
 		apiUsername aptly_user.User,
 		apiPassword aptly_password.Password,
-		repo aptly_repository.Repository) error
+		repository aptly_repository.Repository) error
 }
 
 type repoCleaner struct {
@@ -49,9 +49,9 @@ func (r *repoCleaner) CleanRepo(
 	apiUrl aptly_url.Url,
 	apiUsername aptly_user.User,
 	apiPassword aptly_password.Password,
-	repo aptly_repository.Repository) error {
-	logger.Debugf("clean repo: %s", repo)
-	keys, err := r.findKeysToDelete(apiUrl, apiUsername, apiPassword, repo)
+	repository aptly_repository.Repository) error {
+	logger.Debugf("clean repo: %s", repository)
+	keys, err := r.findKeysToDelete(apiUrl, apiUsername, apiPassword, repository)
 	if err != nil {
 		return err
 	}
@@ -59,16 +59,16 @@ func (r *repoCleaner) CleanRepo(
 		logger.Debugf("nothing to delete")
 		return nil
 	}
-	return r.deletePackagesByKey(apiUrl, apiUsername, apiPassword, repo, keys)
+	return r.deletePackagesByKey(apiUrl, apiUsername, apiPassword, repository, keys)
 }
 
 func (r *repoCleaner) findKeysToDelete(
 	apiUrl aptly_url.Url,
 	apiUsername aptly_user.User,
 	apiPassword aptly_password.Password,
-	repo aptly_repository.Repository) ([]aptly_key.Key, error) {
-	logger.Debugf("find keys to delete repo: %s", repo)
-	packages, err := r.listPackages(apiUrl, apiUsername, apiPassword, repo)
+	repository aptly_repository.Repository) ([]aptly_key.Key, error) {
+	logger.Debugf("find keys to delete repo: %s", repository)
+	packages, err := r.listPackages(apiUrl, apiUsername, apiPassword, repository)
 	if err != nil {
 		return nil, err
 	}

@@ -21,20 +21,20 @@ type RepoPublisher interface {
 		apiUrl aptly_url.Url,
 		apiUsername aptly_user.User,
 		apiPassword aptly_password.Password,
-		repo aptly_repository.Repository,
+		repository aptly_repository.Repository,
 		distribution aptly_distribution.Distribution,
 		architectures []aptly_architecture.Architecture) error
 	PublishRepo(
 		apiUrl aptly_url.Url,
 		apiUsername aptly_user.User,
 		apiPassword aptly_password.Password,
-		repo aptly_repository.Repository,
+		repository aptly_repository.Repository,
 		distribution aptly_distribution.Distribution) error
 	UnPublishRepo(
 		apiUrl aptly_url.Url,
 		apiUsername aptly_user.User,
 		apiPassword aptly_password.Password,
-		repo aptly_repository.Repository,
+		repository aptly_repository.Repository,
 		distribution aptly_distribution.Distribution) error
 }
 
@@ -64,11 +64,11 @@ func (c *repoPublisher) PublishNewRepo(
 	apiUrl aptly_url.Url,
 	apiUsername aptly_user.User,
 	apiPassword aptly_password.Password,
-	repo aptly_repository.Repository,
+	repository aptly_repository.Repository,
 	distribution aptly_distribution.Distribution,
 	architectures []aptly_architecture.Architecture) error {
-	logger.Debugf("publishRepo - repo: %s arch: %s", repo, aptly_architecture.Join(architectures, ","))
-	requestbuilder := c.httpRequestBuilderProvider.NewHttpRequestBuilder(fmt.Sprintf("%s/api/publish/%s", apiUrl, repo))
+	logger.Debugf("publishRepo - repo: %s arch: %s", repository, aptly_architecture.Join(architectures, ","))
+	requestbuilder := c.httpRequestBuilderProvider.NewHttpRequestBuilder(fmt.Sprintf("%s/api/publish/%s", apiUrl, repository))
 	requestbuilder.AddBasicAuth(string(apiUsername), string(apiPassword))
 	requestbuilder.SetMethod("POST")
 	requestbuilder.AddContentType("application/json")
@@ -76,7 +76,7 @@ func (c *repoPublisher) PublishNewRepo(
 		ForceOverwrite: true,
 		Distribution:   distribution,
 		SourceKind:     "local",
-		Sources:        []map[string]aptly_repository.Repository{{"Name": repo}},
+		Sources:        []map[string]aptly_repository.Repository{{"Name": repository}},
 		Architectures:  architectures,
 	})
 	if err != nil {
@@ -90,10 +90,10 @@ func (p *repoPublisher) PublishRepo(
 	apiUrl aptly_url.Url,
 	apiUsername aptly_user.User,
 	apiPassword aptly_password.Password,
-	repo aptly_repository.Repository,
+	repository aptly_repository.Repository,
 	distribution aptly_distribution.Distribution) error {
-	logger.Debugf("publishRepo - repo: %s distribution: %s", repo, distribution)
-	requestbuilder := p.httpRequestBuilderProvider.NewHttpRequestBuilder(fmt.Sprintf("%s/api/publish/%s/%s", apiUrl, repo, distribution))
+	logger.Debugf("publishRepo - repo: %s distribution: %s", repository, distribution)
+	requestbuilder := p.httpRequestBuilderProvider.NewHttpRequestBuilder(fmt.Sprintf("%s/api/publish/%s/%s", apiUrl, repository, distribution))
 	requestbuilder.AddBasicAuth(string(apiUsername), string(apiPassword))
 	requestbuilder.SetMethod("PUT")
 	requestbuilder.AddContentType("application/json")
@@ -109,10 +109,10 @@ func (p *repoPublisher) UnPublishRepo(
 	apiUrl aptly_url.Url,
 	apiUsername aptly_user.User,
 	apiPassword aptly_password.Password,
-	repo aptly_repository.Repository,
+	repository aptly_repository.Repository,
 	distribution aptly_distribution.Distribution) error {
-	logger.Debugf("unPublishRepo - repo: %s distribution: %s", repo, distribution)
-	requestbuilder := p.httpRequestBuilderProvider.NewHttpRequestBuilder(fmt.Sprintf("%s/api/publish/%s/%s", apiUrl, repo, distribution))
+	logger.Debugf("unPublishRepo - repo: %s distribution: %s", repository, distribution)
+	requestbuilder := p.httpRequestBuilderProvider.NewHttpRequestBuilder(fmt.Sprintf("%s/api/publish/%s/%s", apiUrl, repository, distribution))
 	requestbuilder.AddBasicAuth(string(apiUsername), string(apiPassword))
 	requestbuilder.SetMethod("DELETE")
 	return p.buildRequestAndExecute.BuildRequestAndExecute(requestbuilder)

@@ -4,6 +4,10 @@ import "strings"
 
 type PackageName string
 
+const (
+	ALL = PackageName("all")
+)
+
 func FromFileName(path string) PackageName {
 	slashPos := strings.LastIndex(path, "/")
 	if slashPos != -1 {

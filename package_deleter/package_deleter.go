@@ -27,7 +27,7 @@ type PublishRepo func(
 	apiUrl aptly_url.Url,
 	apiUsername aptly_user.User,
 	apiPassword aptly_password.Password,
-	repo aptly_repository.Repository,
+	repository aptly_repository.Repository,
 	distribution aptly_distribution.Distribution) error
 
 type PackageDeleter interface {
@@ -35,7 +35,7 @@ type PackageDeleter interface {
 		apiUrl aptly_url.Url,
 		apiUsername aptly_user.User,
 		apiPassword aptly_password.Password,
-		repo aptly_repository.Repository,
+		repository aptly_repository.Repository,
 		distribution aptly_distribution.Distribution,
 		name aptly_package_name.PackageName,
 		version aptly_version.Version) error
@@ -43,7 +43,7 @@ type PackageDeleter interface {
 		apiUrl aptly_url.Url,
 		apiUsername aptly_user.User,
 		apiPassword aptly_password.Password,
-		repo aptly_repository.Repository,
+		repository aptly_repository.Repository,
 		keys []aptly_key.Key) error
 }
 
@@ -69,32 +69,32 @@ func (p *packageDeleter) DeletePackageByNameAndVersion(
 	apiUrl aptly_url.Url,
 	apiUsername aptly_user.User,
 	apiPassword aptly_password.Password,
-	repo aptly_repository.Repository,
+	repository aptly_repository.Repository,
 	distribution aptly_distribution.Distribution,
 	name aptly_package_name.PackageName,
 	version aptly_version.Version) error {
-	keys, err := p.findKeys(apiUrl, apiUsername, apiPassword, repo, name, version)
+	keys, err := p.findKeys(apiUrl, apiUsername, apiPassword, repository, name, version)
 	if err != nil {
 		return err
 	}
 	if len(keys) == 0 {
 		return fmt.Errorf("no package found")
 	}
-	if err = p.DeletePackagesByKey(apiUrl, apiUsername, apiPassword, repo, keys); err != nil {
+	if err = p.DeletePackagesByKey(apiUrl, apiUsername, apiPassword, repository, keys); err != nil {
 		return err
 	}
-	return p.publishRepo(apiUrl, apiUsername, apiPassword, repo, distribution)
+	return p.publishRepo(apiUrl, apiUsername, apiPassword, repository, distribution)
 }
 
 func (p *packageDeleter) findKeys(
 	apiUrl aptly_url.Url,
 	apiUsername aptly_user.User,
 	apiPassword aptly_password.Password,
-	repo aptly_repository.Repository,
-	name aptly_package_name.PackageName,
+	repository aptly_repository.Repository,
+	packageName aptly_package_name.PackageName,
 	version aptly_version.Version) ([]aptly_key.Key, error) {
-	logger.Debugf("PackageVersions - repo: %s package: %s", repo, name)
-	requestbuilder := p.newHttpRequestBuilder(fmt.Sprintf("%s/api/repos/%s/packages?format=details", apiUrl, repo))
+	logger.Debugf("PackageVersions - repo: %s package: %s", repository, packageName)
+	requestbuilder := p.newHttpRequestBuilder(fmt.Sprintf("%s/api/repos/%s/packages?format=details", apiUrl, repository))
 	requestbuilder.AddBasicAuth(string(apiUsername), string(apiPassword))
 	requestbuilder.SetMethod("GET")
 	requestbuilder.AddContentType("application/json")
@@ -121,7 +121,7 @@ func (p *packageDeleter) findKeys(
 	}
 	var keys []aptly_key.Key
 	for _, info := range jsonStruct {
-		if info["Package"] == string(name) && info["Version"] == string(version) {
+		if info["Package"] == string(packageName) && info["Version"] == string(version) {
 			key := info["Key"]
 			logger.Debugf("found key: %s", key)
 			keys = append(keys, aptly_key.Key(key))
@@ -134,10 +134,10 @@ func (p *packageDeleter) DeletePackagesByKey(
 	apiUrl aptly_url.Url,
 	apiUsername aptly_user.User,
 	apiPassword aptly_password.Password,
-	repo aptly_repository.Repository,
+	repository aptly_repository.Repository,
 	keys []aptly_key.Key) error {
 	logger.Debugf("delete package with keys: %v", keys)
-	requestbuilder := p.newHttpRequestBuilder(fmt.Sprintf("%s/api/repos/%s/packages?format=details", apiUrl, repo))
+	requestbuilder := p.newHttpRequestBuilder(fmt.Sprintf("%s/api/repos/%s/packages?format=details", apiUrl, repository))
 	requestbuilder.AddBasicAuth(string(apiUsername), string(apiPassword))
 	requestbuilder.SetMethod("DELETE")
 	requestbuilder.AddContentType("application/json")

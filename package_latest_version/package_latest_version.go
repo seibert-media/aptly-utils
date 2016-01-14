@@ -19,16 +19,16 @@ type PackageVersions func(
 	apiUrl aptly_url.Url,
 	apiUsername aptly_user.User,
 	apiPassword aptly_password.Password,
-	repo aptly_repository.Repository,
-	name package_name.PackageName) ([]aptly_version.Version, error)
+	repository aptly_repository.Repository,
+	packageName package_name.PackageName) ([]aptly_version.Version, error)
 
 type PackageLatestVersion interface {
 	PackageLatestVersion(
 		apiUrl aptly_url.Url,
 		apiUsername aptly_user.User,
 		apiPassword aptly_password.Password,
-		repo aptly_repository.Repository,
-		name package_name.PackageName) (*aptly_version.Version, error)
+		repository aptly_repository.Repository,
+		packageName package_name.PackageName) (*aptly_version.Version, error)
 }
 
 type packageLatestVersion struct {
@@ -45,19 +45,19 @@ func (p *packageLatestVersion) PackageLatestVersion(
 	apiUrl aptly_url.Url,
 	apiUsername aptly_user.User,
 	apiPassword aptly_password.Password,
-	repo aptly_repository.Repository,
-	name package_name.PackageName) (*aptly_version.Version, error) {
+	repository aptly_repository.Repository,
+	packageName package_name.PackageName) (*aptly_version.Version, error) {
 	logger.Debugf("PackageLatestVersion")
 	var err error
 	var versions []aptly_version.Version
-	if versions, err = p.packageVersions(apiUrl, apiUsername, apiPassword, repo, name); err != nil {
+	if versions, err = p.packageVersions(apiUrl, apiUsername, apiPassword, repository, packageName); err != nil {
 		return nil, err
 	}
 	if len(versions) == 0 {
-		return nil, fmt.Errorf("package %s not found", name)
+		return nil, fmt.Errorf("package %s not found", packageName)
 	}
 	sort.Sort(aptly_version.VersionByName(versions))
 	latestVersion := versions[len(versions)-1]
-	logger.Debugf("found latest version %v for package %s", latestVersion, name)
+	logger.Debugf("found latest version %v for package %s", latestVersion, packageName)
 	return &latestVersion, nil
 }

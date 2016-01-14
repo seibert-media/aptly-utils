@@ -19,7 +19,7 @@ type UnPublishRepo func(
 	apiUrl aptly_url.Url,
 	apiUsername aptly_user.User,
 	apiPassword aptly_password.Password,
-	repo aptly_repository.Repository,
+	repository aptly_repository.Repository,
 	distribution aptly_distribution.Distribution) error
 
 type RepoDeleter interface {
@@ -27,7 +27,7 @@ type RepoDeleter interface {
 		apiUrl aptly_url.Url,
 		apiUsername aptly_user.User,
 		apiPassword aptly_password.Password,
-		repo aptly_repository.Repository,
+		repository aptly_repository.Repository,
 		distribution aptly_distribution.Distribution) error
 }
 
@@ -49,23 +49,23 @@ func (c *repoDeleter) DeleteRepo(
 	apiUrl aptly_url.Url,
 	apiUsername aptly_user.User,
 	apiPassword aptly_password.Password,
-	repo aptly_repository.Repository,
+	repository aptly_repository.Repository,
 	distribution aptly_distribution.Distribution) error {
-	logger.Debugf("DeleteRepo - repo: %s distribution: %s", repo, distribution)
-	err := c.unPublishRepo(apiUrl, apiUsername, apiPassword, repo, distribution)
+	logger.Debugf("DeleteRepo - repo: %s distribution: %s", repository, distribution)
+	err := c.unPublishRepo(apiUrl, apiUsername, apiPassword, repository, distribution)
 	if err != nil {
 		return err
 	}
-	return c.deleteRepo(apiUrl, apiUsername, apiPassword, repo)
+	return c.deleteRepo(apiUrl, apiUsername, apiPassword, repository)
 }
 
 func (p *repoDeleter) deleteRepo(
 	apiUrl aptly_url.Url,
 	apiUsername aptly_user.User,
 	apiPassword aptly_password.Password,
-	repo aptly_repository.Repository) error {
-	logger.Debugf("deleteRepo - repo: %s", repo)
-	requestbuilder := p.httpRequestBuilderProvider.NewHttpRequestBuilder(fmt.Sprintf("%s/api/repos/%s", apiUrl, repo))
+	repository aptly_repository.Repository) error {
+	logger.Debugf("deleteRepo - repo: %s", repository)
+	requestbuilder := p.httpRequestBuilderProvider.NewHttpRequestBuilder(fmt.Sprintf("%s/api/repos/%s", apiUrl, repository))
 	requestbuilder.AddBasicAuth(string(apiUsername), string(apiPassword))
 	requestbuilder.SetMethod("DELETE")
 	return p.buildRequestAndExecute.BuildRequestAndExecute(requestbuilder)

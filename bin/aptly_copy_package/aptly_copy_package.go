@@ -14,6 +14,7 @@ import (
 	aptly_package_latest_version "github.com/bborbe/aptly_utils/package_latest_version"
 	aptly_package_lister "github.com/bborbe/aptly_utils/package_lister"
 	"github.com/bborbe/aptly_utils/package_name"
+	aptly_package_name "github.com/bborbe/aptly_utils/package_name"
 	aptly_package_uploader "github.com/bborbe/aptly_utils/package_uploader"
 	aptly_package_versions "github.com/bborbe/aptly_utils/package_versions"
 	aptly_password "github.com/bborbe/aptly_utils/password"
@@ -105,15 +106,80 @@ func do(writer io.Writer, packageCopier aptly_package_copier.PackageCopier, pack
 	if len(version) == 0 {
 		return fmt.Errorf("parameter %s missing", PARAMETER_VERSION)
 	}
-	if version == "latest" {
-		latestVersion, err := packageLatestVersion.PackageLatestVersion(aptly_url.Url(url), aptly_user.User(user), aptly_password.Password(password), aptly_repository.Repository(sourceRepo), package_name.PackageName(name))
+	return copy(
+		packageCopier,
+		packageLatestVersion,
+		aptly_url.Url(url),
+		aptly_user.User(user),
+		aptly_password.Password(password),
+		aptly_repository.Repository(sourceRepo),
+		aptly_repository.Repository(targetRepo),
+		aptly_distribution.Distribution(targetDistribution),
+		aptly_package_name.PackageName(name),
+		aptly_version.Version(version))
+}
+
+func copy(
+	packageCopier aptly_package_copier.PackageCopier,
+	packageLatestVersion aptly_package_latest_version.PackageLatestVersion,
+	apiUrl aptly_url.Url,
+	apiUsername aptly_user.User,
+	apiPassword aptly_password.Password,
+	sourceRepo aptly_repository.Repository,
+	targetRepo aptly_repository.Repository,
+	targetDistribution aptly_distribution.Distribution,
+	packageName package_name.PackageName,
+	version aptly_version.Version) error {
+	if packageName == aptly_package_name.ALL && version != aptly_version.LATEST {
+		return fmt.Errorf("can't copy with package all and version != latest")
+	}
+	var list []Detail
+	if packageName == aptly_package_name.ALL {
+		list = []Detail{}
+	} else {
+		list = []Detail{Detail{packageName: packageName, version: version}}
+	}
+	return copyList(
+		packageCopier,
+		packageLatestVersion,
+		apiUrl,
+		apiUsername,
+		apiPassword,
+		sourceRepo,
+		targetRepo,
+		targetDistribution,
+		list)
+}
+
+type Detail struct {
+	packageName package_name.PackageName
+	version     aptly_version.Version
+}
+
+func copyList(
+	packageCopier aptly_package_copier.PackageCopier,
+	packageLatestVersion aptly_package_latest_version.PackageLatestVersion,
+	apiUrl aptly_url.Url,
+	apiUsername aptly_user.User,
+	apiPassword aptly_password.Password,
+	sourceRepo aptly_repository.Repository,
+	targetRepo aptly_repository.Repository,
+	targetDistribution aptly_distribution.Distribution,
+	list []Detail) error {
+	for _, e := range list {
+		version := e.version
+		packageName := e.packageName
+		if version == aptly_version.LATEST {
+			latestVersion, err := packageLatestVersion.PackageLatestVersion(apiUrl, apiUsername, apiPassword, sourceRepo, packageName)
+			if err != nil {
+				return err
+			}
+			version = *latestVersion
+		}
+		err := packageCopier.CopyPackage(apiUrl, apiUsername, apiPassword, sourceRepo, targetRepo, targetDistribution, packageName, version)
 		if err != nil {
 			return err
 		}
-		version = string(*latestVersion)
 	}
-	if name == "all" {
-
-	}
-	return packageCopier.CopyPackage(aptly_url.Url(url), aptly_user.User(user), aptly_password.Password(password), aptly_repository.Repository(sourceRepo), aptly_repository.Repository(targetRepo), aptly_distribution.Distribution(targetDistribution), package_name.PackageName(name), aptly_version.Version(version))
+	return nil
 }

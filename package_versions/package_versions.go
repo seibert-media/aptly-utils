@@ -14,15 +14,15 @@ type ListPackages func(
 	apiUrl aptly_url.Url,
 	apiUsername aptly_user.User,
 	apiPassword aptly_password.Password,
-	repo aptly_repository.Repository) ([]map[string]string, error)
+	repository aptly_repository.Repository) ([]map[string]string, error)
 
 type PackageVersions interface {
 	PackageVersions(
 		apiUrl aptly_url.Url,
 		apiUsername aptly_user.User,
 		apiPassword aptly_password.Password,
-		repo aptly_repository.Repository,
-		name package_name.PackageName) ([]aptly_version.Version, error)
+		repository aptly_repository.Repository,
+		packageName package_name.PackageName) ([]aptly_version.Version, error)
 }
 
 type packageVersion struct {
@@ -43,16 +43,16 @@ func (p *packageVersion) PackageVersions(
 	apiUrl aptly_url.Url,
 	apiUsername aptly_user.User,
 	apiPassword aptly_password.Password,
-	repo aptly_repository.Repository,
-	name package_name.PackageName) ([]aptly_version.Version, error) {
-	logger.Debugf("PackageVersions - repo: %s package: %s", repo, name)
-	jsonStruct, err := p.listPackages(apiUrl, apiUsername, apiPassword, repo)
+	repository aptly_repository.Repository,
+	packageName package_name.PackageName) ([]aptly_version.Version, error) {
+	logger.Debugf("PackageVersions - repo: %s package: %s", repository, packageName)
+	jsonStruct, err := p.listPackages(apiUrl, apiUsername, apiPassword, repository)
 	if err != nil {
 		return nil, err
 	}
 	var versions []aptly_version.Version
 	for _, info := range jsonStruct {
-		if info["Package"] == string(name) {
+		if info["Package"] == string(packageName) {
 			v := info["Version"]
 			logger.Debugf("found version: %s", v)
 			versions = append(versions, aptly_version.Version(v))
