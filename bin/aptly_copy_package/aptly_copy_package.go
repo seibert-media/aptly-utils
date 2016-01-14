@@ -144,7 +144,7 @@ func copy(
 			return err
 		}
 	} else {
-		list = []aptly_package_detail.PackageDetail{aptly_package_detail.PackageDetail{PackageName: packageName, Version: version}}
+		list = []aptly_package_detail.PackageDetail{aptly_package_detail.New(packageName, version)}
 	}
 	return copyList(
 		packageCopier,

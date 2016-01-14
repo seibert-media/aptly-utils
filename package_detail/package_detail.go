@@ -10,9 +10,17 @@ type PackageDetail struct {
 	Version     aptly_version.Version
 }
 
-func FromInfo(info map[string]string) PackageDetail {
+func New(packageName aptly_package_name.PackageName, version aptly_version.Version) PackageDetail {
 	return PackageDetail{
-		PackageName: aptly_package_name.PackageName(info["Package"]),
-		Version:     aptly_version.Version(info["Version"]),
+		PackageName: packageName,
+		Version:     version,
 	}
+}
+
+func NewByString(packageName string, version string) PackageDetail {
+	return New(aptly_package_name.PackageName(packageName), aptly_version.Version(version))
+}
+
+func FromInfo(info map[string]string) PackageDetail {
+	return NewByString(info["Package"], info["Version"])
 }
