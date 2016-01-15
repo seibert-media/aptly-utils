@@ -43,7 +43,7 @@ func New(buildRequestAndExecute aptly_requestbuilder_executor.RequestbuilderExec
 }
 
 func (c *repoPublisher) PublishNewRepo(api aptly_api.Api, repository aptly_repository.Repository, distribution aptly_distribution.Distribution, architectures []aptly_architecture.Architecture) error {
-	logger.Debugf("publishRepo - repo: %s arch: %s", repository, aptly_architecture.Join(architectures, ","))
+	logger.Debugf("publishRepo - repo: %s dist: %s arch: %s", repository, distribution, aptly_architecture.Join(architectures, ","))
 	requestbuilder := c.httpRequestBuilderProvider.NewHttpRequestBuilder(fmt.Sprintf("%s/api/publish/%s", api.Url, repository))
 	requestbuilder.AddBasicAuth(string(api.User), string(api.Password))
 	requestbuilder.SetMethod("POST")

@@ -14,3 +14,16 @@ func TestImplementsPackageUploader(t *testing.T) {
 		t.Fatal(err)
 	}
 }
+func TestFromFileNameWithoutSlash(t *testing.T) {
+	name := FromFileName("foo.deb")
+	if err := AssertThat(name, Is("foo.deb")); err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestFromFileNameWithSlash(t *testing.T) {
+	name := FromFileName("asdf/foo.deb")
+	if err := AssertThat(name, Is("foo.deb")); err != nil {
+		t.Fatal(err)
+	}
+}

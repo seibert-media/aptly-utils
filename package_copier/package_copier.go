@@ -49,8 +49,9 @@ func (c *packageCopier) CopyPackage(api aptly_api.Api, sourceRepo aptly_reposito
 		return err
 	}
 	defer resp.Body.Close()
+	logger.Debugf("download package returncode: %d", resp.StatusCode)
 	if resp.StatusCode/100 != 2 {
 		return fmt.Errorf("download package %s %s failed", packageName, version)
 	}
-	return c.uploader.UploadPackageByReader(api, targetRepo, targetDistribution, packageName, resp.Body)
+	return c.uploader.UploadPackageByReader(api, targetRepo, targetDistribution, fmt.Sprintf("%s_%s.deb", packageName, version), resp.Body)
 }
