@@ -74,7 +74,7 @@ aptly_delete_package \
 
 ## Copy package from source to target repo
 
-### Coy package with version
+### Copy package with version
 
 ```
 aptly_copy_package \
