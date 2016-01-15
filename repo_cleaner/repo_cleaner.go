@@ -2,18 +2,19 @@ package repo_deleter
 
 import (
 	aptly_api "github.com/bborbe/aptly_utils/api"
+	aptly_distribution "github.com/bborbe/aptly_utils/distribution"
 	aptly_key "github.com/bborbe/aptly_utils/key"
 	aptly_repository "github.com/bborbe/aptly_utils/repository"
 	aptly_version "github.com/bborbe/aptly_utils/version"
 	"github.com/bborbe/log"
 )
 
-type DeletePackagesByKey func(api aptly_api.Api, repository aptly_repository.Repository, keys []aptly_key.Key) error
+type DeletePackagesByKey func(api aptly_api.Api, repository aptly_repository.Repository, distribution aptly_distribution.Distribution, keys []aptly_key.Key) error
 
 type ListPackages func(api aptly_api.Api, repository aptly_repository.Repository) ([]map[string]string, error)
 
 type RepoCleaner interface {
-	CleanRepo(api aptly_api.Api, repository aptly_repository.Repository) error
+	CleanRepo(api aptly_api.Api, repository aptly_repository.Repository, distribution aptly_distribution.Distribution) error
 }
 
 type repoCleaner struct {
@@ -30,7 +31,7 @@ func New(deletePackagesByKey DeletePackagesByKey, listPackages ListPackages) *re
 	return r
 }
 
-func (r *repoCleaner) CleanRepo(api aptly_api.Api, repository aptly_repository.Repository) error {
+func (r *repoCleaner) CleanRepo(api aptly_api.Api, repository aptly_repository.Repository, distribution aptly_distribution.Distribution) error {
 	logger.Debugf("clean repo: %s", repository)
 	keys, err := r.findKeysToDelete(api, repository)
 	if err != nil {
@@ -40,7 +41,7 @@ func (r *repoCleaner) CleanRepo(api aptly_api.Api, repository aptly_repository.R
 		logger.Debugf("nothing to delete")
 		return nil
 	}
-	return r.deletePackagesByKey(api, repository, keys)
+	return r.deletePackagesByKey(api, repository, distribution, keys)
 }
 
 func (r *repoCleaner) findKeysToDelete(api aptly_api.Api, repository aptly_repository.Repository) ([]aptly_key.Key, error) {
@@ -56,6 +57,7 @@ func packagesToKeys(packages []map[string]string) []aptly_key.Key {
 	latestVersions := make(map[string]map[string]string)
 	var keys []aptly_key.Key
 	for _, currentPackage := range packages {
+		logger.Debugf("handle package %s %s", currentPackage["Package"], currentPackage["Version"])
 		name := currentPackage["Package"]
 		if latestPackage, ok := latestVersions[name]; ok {
 			var packageToDelete map[string]string

@@ -11,6 +11,7 @@ import (
 	"strings"
 
 	aptly_api "github.com/bborbe/aptly_utils/api"
+	aptly_distribution "github.com/bborbe/aptly_utils/distribution"
 	aptly_package_deleter "github.com/bborbe/aptly_utils/package_deleter"
 	aptly_package_lister "github.com/bborbe/aptly_utils/package_lister"
 	aptly_repo_cleaner "github.com/bborbe/aptly_utils/repo_cleaner"
@@ -31,6 +32,7 @@ const (
 	PARAMETER_API_PASSWORD      = "password"
 	PARAMETER_API_PASSWORD_FILE = "passwordfile"
 	PARAMETER_REPO              = "repo"
+	PARAMETER_DISTRIBUTION      = "distribution"
 )
 
 func main() {
@@ -41,6 +43,7 @@ func main() {
 	passwordPtr := flag.String(PARAMETER_API_PASSWORD, "", "password")
 	passwordFilePtr := flag.String(PARAMETER_API_PASSWORD_FILE, "", "passwordfile")
 	repoPtr := flag.String(PARAMETER_REPO, "", "repo")
+	distributionPtr := flag.String(PARAMETER_DISTRIBUTION, string(aptly_distribution.DEFAULT), "distribution")
 	flag.Parse()
 	logger.SetLevelThreshold(log.LogStringToLevel(*logLevelPtr))
 	logger.Debugf("set log level to %s", *logLevelPtr)
@@ -49,14 +52,14 @@ func main() {
 
 	client := http_client.GetClientWithoutProxy()
 	httpRequestBuilderProvider := http_requestbuilder.NewHttpRequestBuilderProvider()
-	package_lister := aptly_package_lister.New(client.Do, httpRequestBuilderProvider.NewHttpRequestBuilder)
+	packageLister := aptly_package_lister.New(client.Do, httpRequestBuilderProvider.NewHttpRequestBuilder)
 	requestbuilder_executor := aptly_requestbuilder_executor.New(client)
-	repo_publisher := aptly_repo_publisher.New(requestbuilder_executor, httpRequestBuilderProvider)
-	package_deleter := aptly_package_deleter.New(client.Do, httpRequestBuilderProvider.NewHttpRequestBuilder, repo_publisher.PublishRepo)
-	repo_cleaner := aptly_repo_cleaner.New(package_deleter.DeletePackagesByKey, package_lister.ListPackages)
+	repoPublisher := aptly_repo_publisher.New(requestbuilder_executor, httpRequestBuilderProvider)
+	packageDeleter := aptly_package_deleter.New(client.Do, httpRequestBuilderProvider.NewHttpRequestBuilder, repoPublisher.PublishRepo)
+	repoCleaner := aptly_repo_cleaner.New(packageDeleter.DeletePackagesByKey, packageLister.ListPackages)
 
 	writer := os.Stdout
-	err := do(writer, repo_cleaner, *urlPtr, *apiUserPtr, *passwordPtr, *passwordFilePtr, *repoPtr)
+	err := do(writer, repoCleaner, *urlPtr, *apiUserPtr, *passwordPtr, *passwordFilePtr, *repoPtr, *distributionPtr)
 	if err != nil {
 		logger.Fatal(err)
 		logger.Close()
@@ -64,7 +67,7 @@ func main() {
 	}
 }
 
-func do(writer io.Writer, repo_cleaner aptly_repo_cleaner.RepoCleaner, url string, user string, password string, passwordfile string, repo string) error {
+func do(writer io.Writer, repo_cleaner aptly_repo_cleaner.RepoCleaner, url string, user string, password string, passwordfile string, repo string, distribution string) error {
 	if len(passwordfile) > 0 {
 		content, err := ioutil.ReadFile(passwordfile)
 		if err != nil {
@@ -78,5 +81,5 @@ func do(writer io.Writer, repo_cleaner aptly_repo_cleaner.RepoCleaner, url strin
 	if len(repo) == 0 {
 		return fmt.Errorf("parameter %s missing", PARAMETER_REPO)
 	}
-	return repo_cleaner.CleanRepo(aptly_api.New(url, user, password), aptly_repository.Repository(repo))
+	return repo_cleaner.CleanRepo(aptly_api.New(url, user, password), aptly_repository.Repository(repo), aptly_distribution.Distribution(distribution))
 }
