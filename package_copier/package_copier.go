@@ -39,6 +39,7 @@ func (c *packageCopier) CopyPackage(api aptly_api.Api, sourceRepo aptly_reposito
 	requestUrl := fmt.Sprintf("%s/%s/pool/main/%s/%s/%s_%s.deb", api.Url, sourceRepo, packageName[0:1], packageName, packageName, version)
 	logger.Debugf("download package url: %s", requestUrl)
 	requestbuilder := c.httpRequestBuilderProvider.NewHttpRequestBuilder(requestUrl)
+	requestbuilder.AddBasicAuth(string(api.User), string(api.Password))
 	req, err := requestbuilder.GetRequest()
 	if err != nil {
 		return err
