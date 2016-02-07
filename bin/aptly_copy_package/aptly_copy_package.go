@@ -24,25 +24,25 @@ import (
 	aptly_repository "github.com/bborbe/aptly_utils/repository"
 	aptly_requestbuilder_executor "github.com/bborbe/aptly_utils/requestbuilder_executor"
 	aptly_version "github.com/bborbe/aptly_utils/version"
-	http_client "github.com/bborbe/http/client"
 	http_requestbuilder "github.com/bborbe/http/requestbuilder"
 	"github.com/bborbe/log"
+	http_client_builder "github.com/bborbe/http/client/builder"
 )
 
 var logger = log.DefaultLogger
 
 const (
-	PARAMETER_SOURCE            = "source"
-	PARAMETER_TARGET            = "target"
-	PARAMETER_NAME              = "name"
-	PARAMETER_VERSION           = "version"
-	PARAMETER_LOGLEVEL          = "loglevel"
-	PARAMETER_API_URL           = "url"
-	PARAMETER_API_USER          = "username"
-	PARAMETER_API_PASSWORD      = "password"
+	PARAMETER_SOURCE = "source"
+	PARAMETER_TARGET = "target"
+	PARAMETER_NAME = "name"
+	PARAMETER_VERSION = "version"
+	PARAMETER_LOGLEVEL = "loglevel"
+	PARAMETER_API_URL = "url"
+	PARAMETER_API_USER = "username"
+	PARAMETER_API_PASSWORD = "password"
 	PARAMETER_API_PASSWORD_FILE = "passwordfile"
-	PARAMETER_REPO              = "repo"
-	PARAMETER_DISTRIBUTION      = "distribution"
+	PARAMETER_REPO = "repo"
+	PARAMETER_DISTRIBUTION = "distribution"
 )
 
 func main() {
@@ -63,14 +63,14 @@ func main() {
 
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
-	client := http_client.GetClientWithoutProxy()
+	httpClient := builder.New().WithoutProxy().Build()
 	httpRequestBuilderProvider := http_requestbuilder.NewHttpRequestBuilderProvider()
-	requestbuilder_executor := aptly_requestbuilder_executor.New(client)
+	requestbuilder_executor := aptly_requestbuilder_executor.New(httpClient)
 	requestbuilder := http_requestbuilder.NewHttpRequestBuilderProvider()
 	repo_publisher := aptly_repo_publisher.New(requestbuilder_executor, requestbuilder)
 	packageUploader := aptly_package_uploader.New(requestbuilder_executor, requestbuilder, repo_publisher.PublishRepo)
-	packageCopier := aptly_package_copier.New(packageUploader, requestbuilder, client)
-	packageLister := aptly_package_lister.New(client.Do, httpRequestBuilderProvider.NewHttpRequestBuilder)
+	packageCopier := aptly_package_copier.New(packageUploader, requestbuilder, httpClient)
+	packageLister := aptly_package_lister.New(httpClient.Do, httpRequestBuilderProvider.NewHttpRequestBuilder)
 	packageDetailLister := aptly_package_detail_lister.New(packageLister.ListPackages)
 	packageVersion := aptly_package_versions.New(packageDetailLister.ListPackageDetails)
 	packageLastestVersion := aptly_package_latest_version.New(packageVersion.PackageVersions)

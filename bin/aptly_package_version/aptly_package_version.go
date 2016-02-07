@@ -17,21 +17,21 @@ import (
 	aptly_package_versions "github.com/bborbe/aptly_utils/package_versions"
 	aptly_repository "github.com/bborbe/aptly_utils/repository"
 	aptly_version "github.com/bborbe/aptly_utils/version"
-	http_client "github.com/bborbe/http/client"
 	http_requestbuilder "github.com/bborbe/http/requestbuilder"
 	"github.com/bborbe/log"
+	http_client_builder "github.com/bborbe/http/client/builder"
 )
 
 var logger = log.DefaultLogger
 
 const (
-	PARAMETER_LOGLEVEL          = "loglevel"
-	PARAMETER_API_URL           = "url"
-	PARAMETER_API_USER          = "username"
-	PARAMETER_API_PASSWORD      = "password"
+	PARAMETER_LOGLEVEL = "loglevel"
+	PARAMETER_API_URL = "url"
+	PARAMETER_API_USER = "username"
+	PARAMETER_API_PASSWORD = "password"
 	PARAMETER_API_PASSWORD_FILE = "passwordfile"
-	PARAMETER_REPO              = "repo"
-	PARAMETER_NAME              = "name"
+	PARAMETER_REPO = "repo"
+	PARAMETER_NAME = "name"
 )
 
 func main() {
@@ -49,9 +49,9 @@ func main() {
 
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
-	client := http_client.GetClientWithoutProxy()
+	httpClient := http_client_builder.New().WithoutProxy().Build()
 	httpRequestBuilderProvider := http_requestbuilder.NewHttpRequestBuilderProvider()
-	packageLister := aptly_package_lister.New(client.Do, httpRequestBuilderProvider.NewHttpRequestBuilder)
+	packageLister := aptly_package_lister.New(httpClient.Do, httpRequestBuilderProvider.NewHttpRequestBuilder)
 	packageDetailLister := aptly_package_detail_lister.New(packageLister.ListPackages)
 	packageVersion := aptly_package_versions.New(packageDetailLister.ListPackageDetails)
 
@@ -92,6 +92,6 @@ func do(writer io.Writer, packageVersions aptly_package_versions.PackageVersions
 		return fmt.Errorf("package %s not found", name)
 	}
 	sort.Sort(aptly_version.VersionByName(versions))
-	fmt.Fprintf(writer, "%s\n", versions[len(versions)-1])
+	fmt.Fprintf(writer, "%s\n", versions[len(versions) - 1])
 	return nil
 }

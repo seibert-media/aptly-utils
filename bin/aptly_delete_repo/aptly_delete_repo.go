@@ -15,21 +15,21 @@ import (
 	aptly_repo_publisher "github.com/bborbe/aptly_utils/repo_publisher"
 	aptly_repository "github.com/bborbe/aptly_utils/repository"
 	aptly_requestbuilder_executor "github.com/bborbe/aptly_utils/requestbuilder_executor"
-	http_client "github.com/bborbe/http/client"
 	http_requestbuilder "github.com/bborbe/http/requestbuilder"
 	"github.com/bborbe/log"
+	http_client_builder "github.com/bborbe/http/client/builder"
 )
 
 var logger = log.DefaultLogger
 
 const (
-	PARAMETER_LOGLEVEL          = "loglevel"
-	PARAMETER_API_URL           = "url"
-	PARAMETER_API_USER          = "username"
-	PARAMETER_API_PASSWORD      = "password"
+	PARAMETER_LOGLEVEL = "loglevel"
+	PARAMETER_API_URL = "url"
+	PARAMETER_API_USER = "username"
+	PARAMETER_API_PASSWORD = "password"
 	PARAMETER_API_PASSWORD_FILE = "passwordfile"
-	PARAMETER_REPO              = "repo"
-	PARAMETER_DISTRIBUTION      = "distribution"
+	PARAMETER_REPO = "repo"
+	PARAMETER_DISTRIBUTION = "distribution"
 )
 
 func main() {
@@ -47,7 +47,8 @@ func main() {
 
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
-	requestbuilderExecutor := aptly_requestbuilder_executor.New(http_client.GetClientWithoutProxy())
+	httpClient := builder.New().WithoutProxy().Build()
+	requestbuilderExecutor := aptly_requestbuilder_executor.New(httpClient)
 	repoPublisher := aptly_repo_publisher.New(requestbuilderExecutor, http_requestbuilder.NewHttpRequestBuilderProvider())
 	repoDeleter := aptly_repo_deleter.New(requestbuilderExecutor, http_requestbuilder.NewHttpRequestBuilderProvider(), repoPublisher.UnPublishRepo)
 	writer := os.Stdout

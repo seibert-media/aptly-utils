@@ -17,23 +17,23 @@ import (
 	aptly_repository "github.com/bborbe/aptly_utils/repository"
 	aptly_requestbuilder_executor "github.com/bborbe/aptly_utils/requestbuilder_executor"
 	aptly_version "github.com/bborbe/aptly_utils/version"
-	http_client "github.com/bborbe/http/client"
 	http_requestbuilder "github.com/bborbe/http/requestbuilder"
 	"github.com/bborbe/log"
+	http_client_builder "github.com/bborbe/http/client/builder"
 )
 
 var logger = log.DefaultLogger
 
 const (
-	PARAMETER_LOGLEVEL          = "loglevel"
-	PARAMETER_API_URL           = "url"
-	PARAMETER_API_USER          = "username"
-	PARAMETER_API_PASSWORD      = "password"
+	PARAMETER_LOGLEVEL = "loglevel"
+	PARAMETER_API_URL = "url"
+	PARAMETER_API_USER = "username"
+	PARAMETER_API_PASSWORD = "password"
 	PARAMETER_API_PASSWORD_FILE = "passwordfile"
-	PARAMETER_REPO              = "repo"
-	PARAMETER_NAME              = "name"
-	PARAMETER_VERSION           = "version"
-	PARAMETER_DISTRIBUTION      = "distribution"
+	PARAMETER_REPO = "repo"
+	PARAMETER_NAME = "name"
+	PARAMETER_VERSION = "version"
+	PARAMETER_DISTRIBUTION = "distribution"
 )
 
 func main() {
@@ -53,11 +53,11 @@ func main() {
 
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
-	client := http_client.GetClientWithoutProxy()
+	httpClient := http_client_builder.New().WithoutProxy().Build()
 	httpRequestBuilderProvider := http_requestbuilder.NewHttpRequestBuilderProvider()
-	requestbuilder_executor := aptly_requestbuilder_executor.New(client)
+	requestbuilder_executor := aptly_requestbuilder_executor.New(httpClient)
 	repo_publisher := aptly_repo_publisher.New(requestbuilder_executor, httpRequestBuilderProvider)
-	package_deleter := aptly_package_deleter.New(client.Do, httpRequestBuilderProvider.NewHttpRequestBuilder, repo_publisher.PublishRepo)
+	package_deleter := aptly_package_deleter.New(httpClient.Do, httpRequestBuilderProvider.NewHttpRequestBuilder, repo_publisher.PublishRepo)
 
 	writer := os.Stdout
 	err := do(writer, package_deleter, *urlPtr, *apiUserPtr, *passwordPtr, *passwordFilePtr, *repoPtr, *distributionPtr, *namePtr, *versionPtr)
