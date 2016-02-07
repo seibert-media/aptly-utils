@@ -13,20 +13,20 @@ import (
 	aptly_api "github.com/bborbe/aptly_utils/api"
 	aptly_package_lister "github.com/bborbe/aptly_utils/package_lister"
 	aptly_repository "github.com/bborbe/aptly_utils/repository"
+	http_client_builder "github.com/bborbe/http/client_builder"
 	http_requestbuilder "github.com/bborbe/http/requestbuilder"
 	"github.com/bborbe/log"
-	http_client_builder "github.com/bborbe/http/client_builder"
 )
 
 var logger = log.DefaultLogger
 
 const (
-	PARAMETER_LOGLEVEL = "loglevel"
-	PARAMETER_API_URL = "url"
-	PARAMETER_API_USER = "username"
-	PARAMETER_API_PASSWORD = "password"
+	PARAMETER_LOGLEVEL          = "loglevel"
+	PARAMETER_API_URL           = "url"
+	PARAMETER_API_USER          = "username"
+	PARAMETER_API_PASSWORD      = "password"
 	PARAMETER_API_PASSWORD_FILE = "passwordfile"
-	PARAMETER_REPO = "repo"
+	PARAMETER_REPO              = "repo"
 )
 
 func main() {

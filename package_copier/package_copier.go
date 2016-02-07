@@ -14,7 +14,7 @@ import (
 	"github.com/bborbe/log"
 )
 
-type ExecuteRequest func (req *http.Request) (resp *http.Response, err error)
+type ExecuteRequest func(req *http.Request) (resp *http.Response, err error)
 
 type PackageCopier interface {
 	CopyPackage(api aptly_api.Api, sourceRepo aptly_repository.Repository, targetRepo aptly_repository.Repository, targetDistribution aptly_distribution.Distribution, packageName package_name.PackageName, version aptly_version.Version) error
@@ -23,7 +23,7 @@ type PackageCopier interface {
 type packageCopier struct {
 	uploader                   aptly_package_uploader.PackageUploader
 	httpRequestBuilderProvider http_requestbuilder.HttpRequestBuilderProvider
-	executeRequest                     ExecuteRequest
+	executeRequest             ExecuteRequest
 }
 
 var logger = log.DefaultLogger

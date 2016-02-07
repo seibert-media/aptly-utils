@@ -8,8 +8,7 @@ import (
 	http_requestbuilder "github.com/bborbe/http/requestbuilder"
 )
 
-
-type ExecuteRequest func (req *http.Request) (resp *http.Response, err error)
+type ExecuteRequest func(req *http.Request) (resp *http.Response, err error)
 
 type RequestbuilderExecutor interface {
 	BuildRequestAndExecute(requestbuilder http_requestbuilder.HttpRequestBuilder) error
