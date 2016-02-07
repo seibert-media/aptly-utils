@@ -70,7 +70,7 @@ func (p *packageDeleter) findKeys(api aptly_api.Api, repository aptly_repository
 	requestbuilder.AddBasicAuth(string(api.User), string(api.Password))
 	requestbuilder.SetMethod("GET")
 	requestbuilder.AddContentType("application/json")
-	req, err := requestbuilder.GetRequest()
+	req, err := requestbuilder.Build()
 	if err != nil {
 		return nil, err
 	}
@@ -113,7 +113,7 @@ func (p *packageDeleter) deletePackagesByKey(api aptly_api.Api, repository aptly
 		return err
 	}
 	requestbuilder.SetBody(bytes.NewBuffer(requestContent))
-	req, err := requestbuilder.GetRequest()
+	req, err := requestbuilder.Build()
 	if err != nil {
 		return err
 	}

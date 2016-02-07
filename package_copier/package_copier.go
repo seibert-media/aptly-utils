@@ -42,7 +42,7 @@ func (c *packageCopier) CopyPackage(api aptly_api.Api, sourceRepo aptly_reposito
 	logger.Debugf("download package url: %s", requestUrl)
 	requestbuilder := c.httpRequestBuilderProvider.NewHttpRequestBuilder(requestUrl)
 	requestbuilder.AddBasicAuth(string(api.User), string(api.Password))
-	req, err := requestbuilder.GetRequest()
+	req, err := requestbuilder.Build()
 	if err != nil {
 		return err
 	}

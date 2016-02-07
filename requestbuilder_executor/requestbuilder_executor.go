@@ -26,7 +26,7 @@ func New(executeRequest ExecuteRequest) *requestbuilderExecutor {
 }
 
 func (r *requestbuilderExecutor) BuildRequestAndExecute(requestbuilder http_requestbuilder.HttpRequestBuilder) error {
-	req, err := requestbuilder.GetRequest()
+	req, err := requestbuilder.Build()
 	if err != nil {
 		return err
 	}
