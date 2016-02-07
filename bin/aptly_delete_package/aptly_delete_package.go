@@ -55,7 +55,7 @@ func main() {
 
 	httpClient := http_client_builder.New().WithoutProxy().Build()
 	httpRequestBuilderProvider := http_requestbuilder.NewHttpRequestBuilderProvider()
-	requestbuilder_executor := aptly_requestbuilder_executor.New(httpClient)
+	requestbuilder_executor := aptly_requestbuilder_executor.New(httpClient.Do)
 	repo_publisher := aptly_repo_publisher.New(requestbuilder_executor, httpRequestBuilderProvider)
 	package_deleter := aptly_package_deleter.New(httpClient.Do, httpRequestBuilderProvider.NewHttpRequestBuilder, repo_publisher.PublishRepo)
 

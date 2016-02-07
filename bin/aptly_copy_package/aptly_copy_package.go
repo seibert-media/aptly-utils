@@ -65,11 +65,11 @@ func main() {
 
 	httpClient := http_client_builder.New().WithoutProxy().Build()
 	httpRequestBuilderProvider := http_requestbuilder.NewHttpRequestBuilderProvider()
-	requestbuilder_executor := aptly_requestbuilder_executor.New(httpClient)
+	requestbuilder_executor := aptly_requestbuilder_executor.New(httpClient.Do)
 	requestbuilder := http_requestbuilder.NewHttpRequestBuilderProvider()
 	repo_publisher := aptly_repo_publisher.New(requestbuilder_executor, requestbuilder)
 	packageUploader := aptly_package_uploader.New(requestbuilder_executor, requestbuilder, repo_publisher.PublishRepo)
-	packageCopier := aptly_package_copier.New(packageUploader, requestbuilder, httpClient)
+	packageCopier := aptly_package_copier.New(packageUploader, requestbuilder, httpClient.Do)
 	packageLister := aptly_package_lister.New(httpClient.Do, httpRequestBuilderProvider.NewHttpRequestBuilder)
 	packageDetailLister := aptly_package_detail_lister.New(packageLister.ListPackages)
 	packageVersion := aptly_package_versions.New(packageDetailLister.ListPackageDetails)
