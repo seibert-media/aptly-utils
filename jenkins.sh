@@ -55,7 +55,7 @@ echo "Create debian package completed, upload"
 
 aptly_upload \
 -loglevel=DEBUG \
--url=http://aptly.benjamin-borbe.de \
+-url=https://www.benjamin-borbe.de/aptly \
 -username=api \
 -passwordfile=/etc/aptly_api_password \
 -file=$DEB \
