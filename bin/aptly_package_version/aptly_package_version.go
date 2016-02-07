@@ -19,7 +19,7 @@ import (
 	aptly_version "github.com/bborbe/aptly_utils/version"
 	http_requestbuilder "github.com/bborbe/http/requestbuilder"
 	"github.com/bborbe/log"
-	http_client_builder "github.com/bborbe/http/client/builder"
+	http_client_builder "github.com/bborbe/http/client_builder"
 )
 
 var logger = log.DefaultLogger

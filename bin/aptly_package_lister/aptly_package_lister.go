@@ -15,7 +15,7 @@ import (
 	aptly_repository "github.com/bborbe/aptly_utils/repository"
 	http_requestbuilder "github.com/bborbe/http/requestbuilder"
 	"github.com/bborbe/log"
-	http_client_builder "github.com/bborbe/http/client/builder"
+	http_client_builder "github.com/bborbe/http/client_builder"
 )
 
 var logger = log.DefaultLogger
