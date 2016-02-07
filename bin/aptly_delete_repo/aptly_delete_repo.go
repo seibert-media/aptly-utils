@@ -47,7 +47,7 @@ func main() {
 
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
-	httpClient := builder.New().WithoutProxy().Build()
+	httpClient := http_client_builder.New().WithoutProxy().Build()
 	requestbuilderExecutor := aptly_requestbuilder_executor.New(httpClient)
 	repoPublisher := aptly_repo_publisher.New(requestbuilderExecutor, http_requestbuilder.NewHttpRequestBuilderProvider())
 	repoDeleter := aptly_repo_deleter.New(requestbuilderExecutor, http_requestbuilder.NewHttpRequestBuilderProvider(), repoPublisher.UnPublishRepo)
