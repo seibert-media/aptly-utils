@@ -3,14 +3,15 @@ package main
 import (
 	"testing"
 
+	"bytes"
+
 	aptly_repo_creater "github.com/bborbe/aptly_utils/repo_creater"
 	. "github.com/bborbe/assert"
-	io_mock "github.com/bborbe/io/mock"
 )
 
 func TestDo(t *testing.T) {
 	var err error
-	writer := io_mock.NewWriter()
+	writer := bytes.NewBufferString("")
 
 	repo_creator := aptly_repo_creater.New(nil, nil, nil)
 

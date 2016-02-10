@@ -5,13 +5,14 @@ import (
 
 	aptly_package_versions "github.com/bborbe/aptly_utils/package_versions"
 
+	"bytes"
+
 	. "github.com/bborbe/assert"
-	io_mock "github.com/bborbe/io/mock"
 )
 
 func TestDo(t *testing.T) {
 	var err error
-	writer := io_mock.NewWriter()
+	writer := bytes.NewBufferString("")
 
 	package_versions := aptly_package_versions.New(nil)
 

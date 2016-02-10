@@ -5,13 +5,14 @@ import (
 
 	aptly_repo_cleaner "github.com/bborbe/aptly_utils/repo_cleaner"
 
+	"bytes"
+
 	. "github.com/bborbe/assert"
-	io_mock "github.com/bborbe/io/mock"
 )
 
 func TestDo(t *testing.T) {
 	var err error
-	writer := io_mock.NewWriter()
+	writer := bytes.NewBufferString("")
 	repo_cleaner := aptly_repo_cleaner.New(nil, nil)
 	err = do(writer, repo_cleaner, "", "", "", "", "", "")
 	err = AssertThat(err, NotNilValue())

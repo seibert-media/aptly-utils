@@ -5,13 +5,14 @@ import (
 
 	aptly_package_deleter "github.com/bborbe/aptly_utils/package_deleter"
 
+	"bytes"
+
 	. "github.com/bborbe/assert"
-	io_mock "github.com/bborbe/io/mock"
 )
 
 func TestDo(t *testing.T) {
 	var err error
-	writer := io_mock.NewWriter()
+	writer := bytes.NewBufferString("")
 
 	package_deleter := aptly_package_deleter.New(nil, nil, nil)
 

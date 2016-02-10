@@ -3,16 +3,17 @@ package main
 import (
 	"testing"
 
+	"bytes"
+
 	aptly_package_copier "github.com/bborbe/aptly_utils/package_copier"
 	aptly_package_detail_lister "github.com/bborbe/aptly_utils/package_detail_latest_lister"
 	aptly_package_latest_version "github.com/bborbe/aptly_utils/package_latest_version"
 	. "github.com/bborbe/assert"
-	io_mock "github.com/bborbe/io/mock"
 )
 
 func TestDo(t *testing.T) {
 	var err error
-	writer := io_mock.NewWriter()
+	writer := bytes.NewBufferString("")
 
 	package_copier := aptly_package_copier.New(nil, nil, nil)
 	packageLastestVersion := aptly_package_latest_version.New(nil)
