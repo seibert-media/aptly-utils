@@ -1,7 +1,6 @@
 #!/bin/sh
 
 SOURCEDIRECTORY="github.com/bborbe/aptly_utils"
-INSTALLS="github.com/bborbe/aptly_utils/bin/aptly_package_lister github.com/bborbe/aptly_utils/bin/aptly_package_version github.com/bborbe/aptly_utils/bin/aptly_copy_package github.com/bborbe/aptly_utils/bin/aptly_create_repo github.com/bborbe/aptly_utils/bin/aptly_delete_package github.com/bborbe/aptly_utils/bin/aptly_delete_repo github.com/bborbe/aptly_utils/bin/aptly_upload github.com/bborbe/aptly_utils/bin/aptly_clean_repo"
 VERSION="1.0.1-b${BUILD_NUMBER}"
 NAME="aptly-utils"
 
@@ -11,6 +10,7 @@ export GOROOT=/opt/go
 export PATH=/opt/go2xunit/bin/:/opt/utils/bin/:/opt/aptly_utils/bin/:/opt/aptly/bin/:/opt/debian_utils/bin/:/opt/debian/bin/:$GOROOT/bin:$PATH
 export GOPATH=${WORKSPACE}
 export REPORT_DIR=${WORKSPACE}/test-reports
+INSTALLS=`cd src && find $SOURCEDIRECTORY/bin -name "*.go" | dirof | unique`
 DEB="${NAME}_${VERSION}.deb"
 rm -rf $REPORT_DIR ${WORKSPACE}/*.deb ${WORKSPACE}/pkg
 mkdir -p $REPORT_DIR
