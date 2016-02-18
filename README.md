@@ -116,8 +116,8 @@ aptly_copy_package \
 -passwordfile=/etc/aptly_api_password \
 -source=unstable \
 -target=stable \
--name=booking \
--version=latest
+-version=latest \
+-name=booking 
 ```
 
 ### Copy latest version of each package
