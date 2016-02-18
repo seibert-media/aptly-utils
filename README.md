@@ -146,10 +146,6 @@ aptly_package_version \
 -name=booking
 ```
 
-## Documentation
-
-[GoDoc](http://godoc.org/github.com/bborbe/aptly_utils/)
-
 ## Continuous integration
 
 [Jenkins](https://www.benjamin-borbe.de/jenkins/job/Go-Aptly-Utils/)
