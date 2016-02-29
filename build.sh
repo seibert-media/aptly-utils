@@ -51,7 +51,7 @@ create_debian_package \
 -version=$VERSION \
 -config=src/$SOURCEDIRECTORY/create_debian_package_config.json || exit 1
 
-echo "Create debian package completed, upload"
+echo "Create debian package completed, start upload to aptly"
 
 aptly_upload \
 -loglevel=DEBUG \
