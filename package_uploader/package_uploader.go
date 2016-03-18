@@ -8,13 +8,14 @@ import (
 
 	"strings"
 
+	"io/ioutil"
+
 	aptly_api "github.com/bborbe/aptly_utils/api"
 	aptly_distribution "github.com/bborbe/aptly_utils/distribution"
 	aptly_repository "github.com/bborbe/aptly_utils/repository"
 	aptly_requestbuilder_executor "github.com/bborbe/aptly_utils/requestbuilder_executor"
 	http_requestbuilder "github.com/bborbe/http/requestbuilder"
 	"github.com/bborbe/log"
-	"io/ioutil"
 )
 
 type PublishRepo func(api aptly_api.Api, repository aptly_repository.Repository, distribution aptly_distribution.Distribution) error
@@ -43,7 +44,7 @@ func New(buildRequestAndExecute aptly_requestbuilder_executor.RequestbuilderExec
 func FromFileName(path string) string {
 	slashPos := strings.LastIndex(path, "/")
 	if slashPos != -1 {
-		return path[slashPos + 1:]
+		return path[slashPos+1:]
 	}
 	return path
 }
