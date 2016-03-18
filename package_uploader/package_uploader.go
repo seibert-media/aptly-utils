@@ -1,7 +1,6 @@
 package package_uploader
 
 import (
-	"bytes"
 	"fmt"
 	"io"
 	"mime/multipart"
@@ -15,6 +14,7 @@ import (
 	aptly_requestbuilder_executor "github.com/bborbe/aptly_utils/requestbuilder_executor"
 	http_requestbuilder "github.com/bborbe/http/requestbuilder"
 	"github.com/bborbe/log"
+	"io/ioutil"
 )
 
 type PublishRepo func(api aptly_api.Api, repository aptly_repository.Repository, distribution aptly_distribution.Distribution) error
@@ -43,7 +43,7 @@ func New(buildRequestAndExecute aptly_requestbuilder_executor.RequestbuilderExec
 func FromFileName(path string) string {
 	slashPos := strings.LastIndex(path, "/")
 	if slashPos != -1 {
-		return path[slashPos+1:]
+		return path[slashPos + 1:]
 	}
 	return path
 }
@@ -74,11 +74,15 @@ func (p *packageUploader) UploadPackageByReader(api aptly_api.Api, repository ap
 
 func (p *packageUploader) uploadFile(api aptly_api.Api, file string, src io.Reader) error {
 	logger.Debugf("uploadFile - package: %s", file)
-	requestbuilder := p.httpRequestBuilderProvider.NewHttpRequestBuilder(fmt.Sprintf("%s/api/files/%s", api.Url, file))
-	requestbuilder.AddBasicAuth(string(api.User), string(api.Password))
-	requestbuilder.SetMethod("POST")
-	bodyBuf := &bytes.Buffer{}
-	bodyWriter := multipart.NewWriter(bodyBuf)
+
+	logger.Debugf("write upload to temp file ...")
+	f, err := ioutil.TempFile("", "upload")
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+	defer os.Remove(f.Name())
+	bodyWriter := multipart.NewWriter(f)
 	fileWriter, err := bodyWriter.CreateFormFile("file", file)
 	if err != nil {
 		return err
@@ -88,8 +92,18 @@ func (p *packageUploader) uploadFile(api aptly_api.Api, file string, src io.Read
 		return err
 	}
 	bodyWriter.Close()
+	f.Seek(0, 0)
+
+	logger.Debugf("write upload to temp file finshed")
+	logger.Debugf("build request ...")
+	requestbuilder := p.httpRequestBuilderProvider.NewHttpRequestBuilder(fmt.Sprintf("%s/api/files/%s", api.Url, file))
+	requestbuilder.AddBasicAuth(string(api.User), string(api.Password))
+	requestbuilder.SetMethod("POST")
 	requestbuilder.AddContentType(bodyWriter.FormDataContentType())
-	requestbuilder.SetBody(bodyBuf)
+	requestbuilder.SetBody(f)
+	logger.Debugf("build request finished")
+	logger.Debugf("uploading ...")
+	defer logger.Debugf("uploading finished")
 	return p.buildRequestAndExecute.BuildRequestAndExecute(requestbuilder)
 }
 
