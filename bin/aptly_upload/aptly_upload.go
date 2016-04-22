@@ -80,5 +80,6 @@ func do(writer io.Writer, package_uploader aptly_package_uploader.PackageUploade
 	if len(file) == 0 {
 		return fmt.Errorf("parameter %s missing", PARAMETER_FILE)
 	}
+	logger.Debugf("upload file %s to repo %s dist %s on server %s", file, repo, distribution, url)
 	return package_uploader.UploadPackageByFile(aptly_api.New(url, user, password), aptly_repository.Repository(repo), aptly_distribution.Distribution(distribution), file)
 }
