@@ -12,9 +12,9 @@ import (
 	aptly_key "github.com/bborbe/aptly_utils/key"
 	aptly_package_name "github.com/bborbe/aptly_utils/package_name"
 	aptly_repository "github.com/bborbe/aptly_utils/repository"
-	aptly_version "github.com/bborbe/version"
 	http_requestbuilder "github.com/bborbe/http/requestbuilder"
 	"github.com/bborbe/log"
+	aptly_version "github.com/bborbe/version"
 )
 
 type ExecuteRequest func(req *http.Request) (resp *http.Response, err error)

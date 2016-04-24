@@ -5,8 +5,8 @@ import (
 	aptly_package_detail "github.com/bborbe/aptly_utils/package_detail"
 	"github.com/bborbe/aptly_utils/package_name"
 	aptly_repository "github.com/bborbe/aptly_utils/repository"
-	aptly_version "github.com/bborbe/version"
 	"github.com/bborbe/log"
+	aptly_version "github.com/bborbe/version"
 )
 
 type ListPackageDetails func(api aptly_api.Api, repository aptly_repository.Repository) ([]aptly_package_detail.PackageDetail, error)

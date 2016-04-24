@@ -7,8 +7,8 @@ import (
 	aptly_api "github.com/bborbe/aptly_utils/api"
 	"github.com/bborbe/aptly_utils/package_name"
 	aptly_repository "github.com/bborbe/aptly_utils/repository"
-	aptly_version "github.com/bborbe/version"
 	"github.com/bborbe/log"
+	aptly_version "github.com/bborbe/version"
 )
 
 var logger = log.DefaultLogger

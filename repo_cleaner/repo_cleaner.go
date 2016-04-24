@@ -5,8 +5,8 @@ import (
 	aptly_distribution "github.com/bborbe/aptly_utils/distribution"
 	aptly_key "github.com/bborbe/aptly_utils/key"
 	aptly_repository "github.com/bborbe/aptly_utils/repository"
-	aptly_version "github.com/bborbe/version"
 	"github.com/bborbe/log"
+	aptly_version "github.com/bborbe/version"
 )
 
 type DeletePackagesByKey func(api aptly_api.Api, repository aptly_repository.Repository, distribution aptly_distribution.Distribution, keys []aptly_key.Key) error
