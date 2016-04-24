@@ -16,7 +16,7 @@ import (
 	aptly_package_name "github.com/bborbe/aptly_utils/package_name"
 	aptly_package_versions "github.com/bborbe/aptly_utils/package_versions"
 	aptly_repository "github.com/bborbe/aptly_utils/repository"
-	aptly_version "github.com/bborbe/aptly_utils/version"
+	aptly_version "github.com/bborbe/version"
 	http_client_builder "github.com/bborbe/http/client_builder"
 	http_requestbuilder "github.com/bborbe/http/requestbuilder"
 	"github.com/bborbe/log"

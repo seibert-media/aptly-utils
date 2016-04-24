@@ -2,7 +2,7 @@ package package_detail
 
 import (
 	aptly_package_name "github.com/bborbe/aptly_utils/package_name"
-	aptly_version "github.com/bborbe/aptly_utils/version"
+	aptly_version "github.com/bborbe/version"
 )
 
 type PackageDetail struct {

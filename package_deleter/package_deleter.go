@@ -12,7 +12,7 @@ import (
 	aptly_key "github.com/bborbe/aptly_utils/key"
 	aptly_package_name "github.com/bborbe/aptly_utils/package_name"
 	aptly_repository "github.com/bborbe/aptly_utils/repository"
-	aptly_version "github.com/bborbe/aptly_utils/version"
+	aptly_version "github.com/bborbe/version"
 	http_requestbuilder "github.com/bborbe/http/requestbuilder"
 	"github.com/bborbe/log"
 )
