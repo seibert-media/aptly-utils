@@ -39,7 +39,7 @@ func (p *packageDetailLatestLister) ListLatestPackageDetails(api aptly_api.Api, 
 func latest(list ...aptly_package_detail.PackageDetail) []aptly_package_detail.PackageDetail {
 	latest := make(map[aptly_package_name.PackageName]aptly_version.Version)
 	for _, e := range list {
-		if val, ok := latest[e.PackageName]; !ok || aptly_version.Less(val, e.Version) {
+		if val, ok := latest[e.PackageName]; !ok || aptly_version.LessThan(val, e.Version) {
 			latest[e.PackageName] = e.Version
 		}
 	}

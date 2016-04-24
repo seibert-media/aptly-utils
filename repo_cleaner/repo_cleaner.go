@@ -62,7 +62,7 @@ func packagesToKeys(packages []map[string]string) []aptly_key.Key {
 		if latestPackage, ok := latestVersions[name]; ok {
 			var packageToDelete map[string]string
 			logger.Tracef("compare %s < %s", currentPackage["Version"], latestPackage["Version"])
-			if aptly_version.Less(aptly_version.Version(currentPackage["Version"]), aptly_version.Version(latestPackage["Version"])) {
+			if aptly_version.LessThan(aptly_version.Version(currentPackage["Version"]), aptly_version.Version(latestPackage["Version"])) {
 				packageToDelete = currentPackage
 			} else {
 				logger.Tracef("set latest version %s %s", currentPackage["Package"], currentPackage["Version"])
