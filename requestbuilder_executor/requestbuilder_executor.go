@@ -2,7 +2,6 @@ package requestbuilder_executor
 
 import (
 	"fmt"
-	"io/ioutil"
 	"net/http"
 
 	http_requestbuilder "github.com/bborbe/http/requestbuilder"
@@ -33,12 +32,8 @@ func (r *requestbuilderExecutor) BuildRequestAndExecute(requestbuilder http_requ
 	if err != nil {
 		return err
 	}
-	content, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return err
-	}
 	if resp.StatusCode/100 != 2 {
-		return fmt.Errorf("request file failed: %s", string(content))
+		return fmt.Errorf("request to %s failed with status %d", req.RequestURI, resp.StatusCode)
 	}
 	return nil
 }

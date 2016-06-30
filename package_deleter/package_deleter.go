@@ -66,7 +66,8 @@ func (p *packageDeleter) DeletePackagesByKey(api aptly_api.Api, repository aptly
 
 func (p *packageDeleter) findKeys(api aptly_api.Api, repository aptly_repository.Repository, packageName aptly_package_name.PackageName, version aptly_version.Version) ([]aptly_key.Key, error) {
 	logger.Debugf("PackageVersions - repo: %s package: %s", repository, packageName)
-	requestbuilder := p.newHttpRequestBuilder(fmt.Sprintf("%s/api/repos/%s/packages?format=details", api.Url, repository))
+	url := fmt.Sprintf("%s/api/repos/%s/packages?format=details", api.Url, repository)
+	requestbuilder := p.newHttpRequestBuilder(url)
 	requestbuilder.AddBasicAuth(string(api.User), string(api.Password))
 	requestbuilder.SetMethod("GET")
 	requestbuilder.AddContentType("application/json")
@@ -83,7 +84,7 @@ func (p *packageDeleter) findKeys(api aptly_api.Api, repository aptly_repository
 		return nil, err
 	}
 	if resp.StatusCode/100 != 2 {
-		return nil, fmt.Errorf("request failed: %s", (content))
+		return nil, fmt.Errorf("request to %s failed with status %d", url, resp.StatusCode)
 	}
 
 	var jsonStruct JsonStruct
@@ -104,7 +105,8 @@ func (p *packageDeleter) findKeys(api aptly_api.Api, repository aptly_repository
 
 func (p *packageDeleter) deletePackagesByKey(api aptly_api.Api, repository aptly_repository.Repository, keys []aptly_key.Key) error {
 	logger.Debugf("delete package with keys: %v", keys)
-	requestbuilder := p.newHttpRequestBuilder(fmt.Sprintf("%s/api/repos/%s/packages?format=details", api.Url, repository))
+	url := fmt.Sprintf("%s/api/repos/%s/packages?format=details", api.Url, repository)
+	requestbuilder := p.newHttpRequestBuilder(url)
 	requestbuilder.AddBasicAuth(string(api.User), string(api.Password))
 	requestbuilder.SetMethod("DELETE")
 	requestbuilder.AddContentType("application/json")
@@ -121,12 +123,8 @@ func (p *packageDeleter) deletePackagesByKey(api aptly_api.Api, repository aptly
 	if err != nil {
 		return err
 	}
-	content, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return err
-	}
 	if resp.StatusCode/100 != 2 {
-		return fmt.Errorf("request failed: %s", (content))
+		return fmt.Errorf("request to %s failed with status %d", url, resp.StatusCode)
 	}
 	return nil
 }

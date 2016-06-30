@@ -36,7 +36,8 @@ func New(executeRequest ExecuteRequest, newHttpRequestBuilder NewHttpRequestBuil
 
 func (p *packageVersion) ListPackages(api aptly_api.Api, repository aptly_repository.Repository) ([]map[string]string, error) {
 	logger.Debugf("PackageVersions - repo: %s", repository)
-	requestbuilder := p.newHttpRequestBuilder(fmt.Sprintf("%s/api/repos/%s/packages?format=details", api.Url, repository))
+	url := fmt.Sprintf("%s/api/repos/%s/packages?format=details", api.Url, repository)
+	requestbuilder := p.newHttpRequestBuilder(url)
 	requestbuilder.AddBasicAuth(string(api.User), string(api.Password))
 	requestbuilder.SetMethod("GET")
 	requestbuilder.AddContentType("application/json")
@@ -53,7 +54,7 @@ func (p *packageVersion) ListPackages(api aptly_api.Api, repository aptly_reposi
 		return nil, err
 	}
 	if resp.StatusCode/100 != 2 {
-		return nil, fmt.Errorf("request failed: %s", (content))
+		return nil, fmt.Errorf("request to %s failed with status %d", url, resp.StatusCode)
 	}
 	var packages []map[string]string
 	err = json.Unmarshal(content, &packages)

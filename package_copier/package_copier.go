@@ -38,9 +38,9 @@ func New(uploader aptly_package_uploader.PackageUploader, httpRequestBuilderProv
 
 func (c *packageCopier) CopyPackage(api aptly_api.Api, sourceRepo aptly_repository.Repository, targetRepo aptly_repository.Repository, targetDistribution aptly_distribution.Distribution, packageName package_name.PackageName, version aptly_version.Version) error {
 	logger.Debugf("CopyPackage - sourceRepo: %s targetRepo: %s, package: %s_%s", sourceRepo, targetRepo, packageName, version)
-	requestUrl := fmt.Sprintf("%s/%s/pool/main/%s/%s/%s_%s.deb", api.Url, sourceRepo, packageName[0:1], packageName, packageName, version)
-	logger.Debugf("download package url: %s", requestUrl)
-	requestbuilder := c.httpRequestBuilderProvider.NewHttpRequestBuilder(requestUrl)
+	url := fmt.Sprintf("%s/%s/pool/main/%s/%s/%s_%s.deb", api.Url, sourceRepo, packageName[0:1], packageName, packageName, version)
+	logger.Debugf("download package url: %s", url)
+	requestbuilder := c.httpRequestBuilderProvider.NewHttpRequestBuilder(url)
 	requestbuilder.AddBasicAuth(string(api.User), string(api.Password))
 	req, err := requestbuilder.Build()
 	if err != nil {
@@ -53,7 +53,7 @@ func (c *packageCopier) CopyPackage(api aptly_api.Api, sourceRepo aptly_reposito
 	defer resp.Body.Close()
 	logger.Debugf("download package returncode: %d", resp.StatusCode)
 	if resp.StatusCode/100 != 2 {
-		return fmt.Errorf("download package %s %s failed", packageName, version)
+		return fmt.Errorf("download package %s %s failed with status %d from url %s", packageName, version, resp.StatusCode, url)
 	}
 	return c.uploader.UploadPackageByReader(api, targetRepo, targetDistribution, fmt.Sprintf("%s_%s.deb", packageName, version), resp.Body)
 }
