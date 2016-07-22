@@ -28,7 +28,11 @@ type repoCreater struct {
 
 var logger = log.DefaultLogger
 
-func New(buildRequestAndExecute aptly_requestbuilder_executor.RequestbuilderExecutor, httpRequestBuilderProvider http_requestbuilder.HttpRequestBuilderProvider, publishNewRepo PublishNewRepo) *repoCreater {
+func New(
+	buildRequestAndExecute aptly_requestbuilder_executor.RequestbuilderExecutor,
+	httpRequestBuilderProvider http_requestbuilder.HttpRequestBuilderProvider,
+	publishNewRepo PublishNewRepo,
+) *repoCreater {
 	p := new(repoCreater)
 	p.buildRequestAndExecute = buildRequestAndExecute
 	p.httpRequestBuilderProvider = httpRequestBuilderProvider

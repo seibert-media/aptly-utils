@@ -35,7 +35,10 @@ type publishJson struct {
 
 var logger = log.DefaultLogger
 
-func New(buildRequestAndExecute aptly_requestbuilder_executor.RequestbuilderExecutor, httpRequestBuilderProvider http_requestbuilder.HttpRequestBuilderProvider) *repoPublisher {
+func New(
+	buildRequestAndExecute aptly_requestbuilder_executor.RequestbuilderExecutor,
+	httpRequestBuilderProvider http_requestbuilder.HttpRequestBuilderProvider,
+) *repoPublisher {
 	p := new(repoPublisher)
 	p.buildRequestAndExecute = buildRequestAndExecute
 	p.httpRequestBuilderProvider = httpRequestBuilderProvider
