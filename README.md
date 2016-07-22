@@ -27,7 +27,7 @@ aptly_create_repo \
 -loglevel=DEBUG \
 -url=http://aptly.tools.seibert-media.net \
 -username=api \
--passwordfile=$HOME/aptly_api_password \
+-passwordfile=$(HOME)/aptly_api_password \
 -repo=unstable \
 -architecture=amd64,all
 ```
@@ -39,7 +39,7 @@ aptly_delete_repo \
 -loglevel=DEBUG \
 -url=http://aptly.tools.seibert-media.net \
 -username=api \
--passwordfile=$HOME/aptly_api_password \
+-passwordfile=$(HOME)/aptly_api_password \
 -repo=unstable
 ```
 
@@ -50,7 +50,7 @@ aptly_clean_repo \
 -loglevel=DEBUG \
 -url=http://aptly.tools.seibert-media.net \
 -username=api \
--passwordfile=$HOME/aptly_api_password \
+-passwordfile=$(HOME)/aptly_api_password \
 -repo=unstable
 ```
 
@@ -61,7 +61,7 @@ aptly_upload \
 -loglevel=DEBUG \
 -url=http://aptly.tools.seibert-media.net \
 -username=api \
--passwordfile=$HOME/aptly_api_password \
+-passwordfile=$(HOME)/aptly_api_password \
 -file=booking_1.0.1-b47.deb \
 -repo=unstable
 ```
@@ -73,7 +73,7 @@ aptly_package_lister \
 -loglevel=DEBUG \
 -url=http://aptly.tools.seibert-media.net \
 -username=api \
--passwordfile=$HOME/aptly_api_password \
+-passwordfile=$(HOME)/aptly_api_password \
 -repo=unstable
 ```
 
@@ -84,7 +84,7 @@ aptly_delete_package \
 -loglevel=DEBUG \
 -url=http://aptly.tools.seibert-media.net \
 -username=api \
--passwordfile=$HOME/aptly_api_password \
+-passwordfile=$(HOME)/aptly_api_password \
 -repo=unstable \
 -name=booking \
 -version=1.0.1-b47
@@ -99,7 +99,7 @@ aptly_copy_package \
 -loglevel=DEBUG \
 -url=http://aptly.tools.seibert-media.net \
 -username=api \
--passwordfile=$HOME/aptly_api_password \
+-passwordfile=$(HOME)/aptly_api_password \
 -source=unstable \
 -target=stable \
 -name=booking \
@@ -113,7 +113,7 @@ aptly_copy_package \
 -loglevel=DEBUG \
 -url=http://aptly.tools.seibert-media.net \
 -username=api \
--passwordfile=$HOME/aptly_api_password \
+-passwordfile=$(HOME)/aptly_api_password \
 -source=unstable \
 -target=stable \
 -version=latest \
@@ -127,7 +127,7 @@ aptly_copy_package \
 -loglevel=DEBUG \
 -url=http://aptly.tools.seibert-media.net \
 -username=api \
--passwordfile=$HOME/aptly_api_password \
+-passwordfile=$(HOME)/aptly_api_password \
 -source=unstable \
 -target=stable \
 -name=all \
@@ -141,7 +141,7 @@ aptly_package_version \
 -loglevel=DEBUG \
 -url=http://aptly.tools.seibert-media.net \
 -username=api \
--passwordfile=$HOME/aptly_api_password \
+-passwordfile=$(HOME)/aptly_api_password \
 -repo=unstable \
 -name=booking
 ```
