@@ -3,12 +3,13 @@ package repo_details
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
+	"net/http"
+
 	aptly_api "github.com/bborbe/aptly_utils/api"
 	aptly_repository "github.com/bborbe/aptly_utils/repository"
 	http_requestbuilder "github.com/bborbe/http/requestbuilder"
 	"github.com/bborbe/log"
-	"io/ioutil"
-	"net/http"
 )
 
 type ExecuteRequest func(req *http.Request) (resp *http.Response, err error)
