@@ -18,8 +18,6 @@ import (
 	"github.com/bborbe/log"
 )
 
-var logger = log.DefaultLogger
-
 const (
 	PARAMETER_LOGLEVEL          = "loglevel"
 	PARAMETER_API_URL           = "url"
@@ -29,15 +27,20 @@ const (
 	PARAMETER_REPO              = "repo"
 )
 
+var (
+	logger          = log.DefaultLogger
+	logLevelPtr     = flag.String(PARAMETER_LOGLEVEL, log.INFO_STRING, log.FLAG_USAGE)
+	urlPtr          = flag.String(PARAMETER_API_URL, "", "url")
+	apiUserPtr      = flag.String(PARAMETER_API_USER, "", "user")
+	passwordPtr     = flag.String(PARAMETER_API_PASSWORD, "", "password")
+	passwordFilePtr = flag.String(PARAMETER_API_PASSWORD_FILE, "", "passwordfile")
+	repoPtr         = flag.String(PARAMETER_REPO, "", "repo")
+)
+
 func main() {
 	defer logger.Close()
-	logLevelPtr := flag.String(PARAMETER_LOGLEVEL, log.INFO_STRING, log.FLAG_USAGE)
-	urlPtr := flag.String(PARAMETER_API_URL, "", "url")
-	apiUserPtr := flag.String(PARAMETER_API_USER, "", "user")
-	passwordPtr := flag.String(PARAMETER_API_PASSWORD, "", "password")
-	passwordFilePtr := flag.String(PARAMETER_API_PASSWORD_FILE, "", "passwordfile")
-	repoPtr := flag.String(PARAMETER_REPO, "", "repo")
 	flag.Parse()
+
 	logger.SetLevelThreshold(log.LogStringToLevel(*logLevelPtr))
 	logger.Debugf("set log level to %s", *logLevelPtr)
 
