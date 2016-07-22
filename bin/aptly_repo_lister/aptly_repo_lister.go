@@ -73,8 +73,9 @@ func do(writer io.Writer, repoLister aptly_repo_lister.RepoLister, url string, u
 	if repos, err = repoLister.ListRepos(aptly_api.New(url, user, password)); err != nil {
 		return err
 	}
-	for _, info := range repos {
-		name := info["Name"]
+	for _, repo := range repos {
+		logger.Debugf("repo: %v", repo)
+		name := repo["Name"]
 		fmt.Fprintf(writer, "%s\n", name)
 	}
 	return nil
