@@ -39,7 +39,7 @@ func (r *requestbuilderExecutor) BuildRequestAndExecute(requestbuilder http_requ
 		return err
 	}
 	if resp.StatusCode/100 != 2 {
-		return fmt.Errorf("%s request to %s failed with status %d", url, resp.StatusCode)
+		return fmt.Errorf("%s request to %s failed with status %d", method, url, resp.StatusCode)
 	}
 	return nil
 }
