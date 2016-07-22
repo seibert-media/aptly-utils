@@ -104,8 +104,11 @@ func (p *packageUploader) uploadFile(api aptly_api.Api, file string, src io.Read
 	requestbuilder.SetBody(f)
 	logger.Debugf("build request finished")
 	logger.Debugf("uploading ...")
-	defer logger.Debugf("uploading finished")
-	return p.buildRequestAndExecute.BuildRequestAndExecute(requestbuilder)
+	if err := p.buildRequestAndExecute.BuildRequestAndExecute(requestbuilder); err != nil {
+		return err
+	}
+	logger.Debugf("uploading finished")
+	return nil
 }
 
 func (p *packageUploader) addPackageToRepo(api aptly_api.Api, repository aptly_repository.Repository, file string) error {
@@ -115,6 +118,9 @@ func (p *packageUploader) addPackageToRepo(api aptly_api.Api, repository aptly_r
 	requestbuilder.SetMethod("POST")
 	requestbuilder.AddContentType("application/json")
 	logger.Debugf("addPackageToRepo ...")
-	defer logger.Debugf("addPackageToRepo finished")
-	return p.buildRequestAndExecute.BuildRequestAndExecute(requestbuilder)
+	if err := p.buildRequestAndExecute.BuildRequestAndExecute(requestbuilder); err != nil {
+		return err
+	}
+	logger.Debugf("addPackageToRepo finished")
+	return nil
 }

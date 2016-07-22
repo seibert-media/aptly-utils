@@ -58,8 +58,11 @@ func (c *repoPublisher) PublishNewRepo(api aptly_api.Api, repository aptly_repos
 	}
 	requestbuilder.SetBody(bytes.NewBuffer(content))
 	logger.Debugf("PublishNewRepo ...")
-	defer logger.Debugf("PublishNewRepo finished")
-	return c.buildRequestAndExecute.BuildRequestAndExecute(requestbuilder)
+	if err := c.buildRequestAndExecute.BuildRequestAndExecute(requestbuilder); err != nil {
+		return err
+	}
+	logger.Debugf("PublishNewRepo finished")
+	return nil
 }
 
 func (p *repoPublisher) PublishRepo(api aptly_api.Api, repository aptly_repository.Repository, distribution aptly_distribution.Distribution) error {
@@ -74,8 +77,11 @@ func (p *repoPublisher) PublishRepo(api aptly_api.Api, repository aptly_reposito
 	}
 	requestbuilder.SetBody(bytes.NewBuffer(content))
 	logger.Debugf("PublishRepo ...")
-	defer logger.Debugf("PublishRepo finished")
-	return p.buildRequestAndExecute.BuildRequestAndExecute(requestbuilder)
+	if err := p.buildRequestAndExecute.BuildRequestAndExecute(requestbuilder); err != nil {
+		return err
+	}
+	logger.Debugf("PublishRepo finished")
+	return nil
 }
 
 func (p *repoPublisher) UnPublishRepo(api aptly_api.Api, repository aptly_repository.Repository, distribution aptly_distribution.Distribution) error {
@@ -84,6 +90,9 @@ func (p *repoPublisher) UnPublishRepo(api aptly_api.Api, repository aptly_reposi
 	requestbuilder.AddBasicAuth(string(api.User), string(api.Password))
 	requestbuilder.SetMethod("DELETE")
 	logger.Debugf("UnPublishRepo ...")
-	defer logger.Debugf("UnPublishRepo finished")
-	return p.buildRequestAndExecute.BuildRequestAndExecute(requestbuilder)
+	if err := p.buildRequestAndExecute.BuildRequestAndExecute(requestbuilder); err != nil {
+		return err
+	}
+	logger.Debugf("UnPublishRepo finished")
+	return nil
 }
