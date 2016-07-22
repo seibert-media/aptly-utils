@@ -46,7 +46,7 @@ func New(
 }
 
 func (c *repoPublisher) PublishNewRepo(api aptly_api.Api, repository aptly_repository.Repository, distribution aptly_distribution.Distribution, architectures []aptly_architecture.Architecture) error {
-	logger.Debugf("publishRepo - repo: %s dist: %s arch: %s", repository, distribution, aptly_architecture.Join(architectures, ","))
+	logger.Debugf("PublishNewRepo - repo: %s dist: %s arch: %s", repository, distribution, aptly_architecture.Join(architectures, ","))
 	requestbuilder := c.httpRequestBuilderProvider.NewHttpRequestBuilder(fmt.Sprintf("%s/api/publish/%s", api.Url, repository))
 	requestbuilder.AddBasicAuth(string(api.User), string(api.Password))
 	requestbuilder.SetMethod("POST")
@@ -57,11 +57,13 @@ func (c *repoPublisher) PublishNewRepo(api aptly_api.Api, repository aptly_repos
 		return err
 	}
 	requestbuilder.SetBody(bytes.NewBuffer(content))
+	logger.Debugf("PublishNewRepo ...")
+	defer logger.Debugf("PublishNewRepo finished")
 	return c.buildRequestAndExecute.BuildRequestAndExecute(requestbuilder)
 }
 
 func (p *repoPublisher) PublishRepo(api aptly_api.Api, repository aptly_repository.Repository, distribution aptly_distribution.Distribution) error {
-	logger.Debugf("publishRepo - repo: %s distribution: %s", repository, distribution)
+	logger.Debugf("PublishRepo - repo: %s distribution: %s", repository, distribution)
 	requestbuilder := p.httpRequestBuilderProvider.NewHttpRequestBuilder(fmt.Sprintf("%s/api/publish/%s/%s", api.Url, repository, distribution))
 	requestbuilder.AddBasicAuth(string(api.User), string(api.Password))
 	requestbuilder.SetMethod("PUT")
@@ -71,13 +73,17 @@ func (p *repoPublisher) PublishRepo(api aptly_api.Api, repository aptly_reposito
 		return err
 	}
 	requestbuilder.SetBody(bytes.NewBuffer(content))
+	logger.Debugf("PublishRepo ...")
+	defer logger.Debugf("PublishRepo finished")
 	return p.buildRequestAndExecute.BuildRequestAndExecute(requestbuilder)
 }
 
 func (p *repoPublisher) UnPublishRepo(api aptly_api.Api, repository aptly_repository.Repository, distribution aptly_distribution.Distribution) error {
-	logger.Debugf("unPublishRepo - repo: %s distribution: %s", repository, distribution)
+	logger.Debugf("UnPublishRepo - repo: %s distribution: %s", repository, distribution)
 	requestbuilder := p.httpRequestBuilderProvider.NewHttpRequestBuilder(fmt.Sprintf("%s/api/publish/%s/%s", api.Url, repository, distribution))
 	requestbuilder.AddBasicAuth(string(api.User), string(api.Password))
 	requestbuilder.SetMethod("DELETE")
+	logger.Debugf("UnPublishRepo ...")
+	defer logger.Debugf("UnPublishRepo finished")
 	return p.buildRequestAndExecute.BuildRequestAndExecute(requestbuilder)
 }

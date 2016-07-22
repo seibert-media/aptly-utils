@@ -114,5 +114,7 @@ func (p *packageUploader) addPackageToRepo(api aptly_api.Api, repository aptly_r
 	requestbuilder.AddBasicAuth(string(api.User), string(api.Password))
 	requestbuilder.SetMethod("POST")
 	requestbuilder.AddContentType("application/json")
+	logger.Debugf("addPackageToRepo ...")
+	defer logger.Debugf("addPackageToRepo finished")
 	return p.buildRequestAndExecute.BuildRequestAndExecute(requestbuilder)
 }

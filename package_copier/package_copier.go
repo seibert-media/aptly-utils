@@ -44,7 +44,7 @@ func (c *packageCopier) CopyPackage(
 	packageName package_name.PackageName,
 	version aptly_version.Version,
 ) error {
-	logger.Debugf("CopyPackage - sourceRepo: %s targetRepo: %s, targetDistribution: %s, package: %s_%s", sourceRepo, targetRepo, packageName, version)
+	logger.Debugf("CopyPackage - sourceRepo: %s targetRepo: %s, targetDistribution: %s, package: %s_%s", sourceRepo, targetRepo, targetDistribution, packageName, version)
 	url := fmt.Sprintf("%s/%s/pool/main/%s/%s/%s_%s.deb", api.Url, sourceRepo, packageName[0:1], packageName, packageName, version)
 	logger.Debugf("download package url: %s", url)
 	requestbuilder := c.httpRequestBuilderProvider.NewHttpRequestBuilder(url)
@@ -62,5 +62,6 @@ func (c *packageCopier) CopyPackage(
 	if resp.StatusCode/100 != 2 {
 		return fmt.Errorf("download package %s %s failed with status %d from url %s", packageName, version, resp.StatusCode, url)
 	}
+	logger.Debug("download completed, start upload")
 	return c.uploader.UploadPackageByReader(api, targetRepo, targetDistribution, fmt.Sprintf("%s_%s.deb", packageName, version), resp.Body)
 }

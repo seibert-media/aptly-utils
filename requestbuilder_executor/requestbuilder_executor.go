@@ -5,7 +5,10 @@ import (
 	"net/http"
 
 	http_requestbuilder "github.com/bborbe/http/requestbuilder"
+	"github.com/bborbe/log"
 )
+
+var logger = log.DefaultLogger
 
 type ExecuteRequest func(req *http.Request) (resp *http.Response, err error)
 
@@ -28,12 +31,15 @@ func (r *requestbuilderExecutor) BuildRequestAndExecute(requestbuilder http_requ
 	if err != nil {
 		return err
 	}
+	url := req.URL.String()
+	method := req.Method
+	logger.Debugf("build %s request to %s", method, url)
 	resp, err := r.executeRequest(req)
 	if err != nil {
 		return err
 	}
 	if resp.StatusCode/100 != 2 {
-		return fmt.Errorf("request to %s failed with status %d", req.RequestURI, resp.StatusCode)
+		return fmt.Errorf("%s request to %s failed with status %d", url, resp.StatusCode)
 	}
 	return nil
 }
