@@ -36,8 +36,15 @@ func New(uploader aptly_package_uploader.PackageUploader, httpRequestBuilderProv
 	return p
 }
 
-func (c *packageCopier) CopyPackage(api aptly_api.Api, sourceRepo aptly_repository.Repository, targetRepo aptly_repository.Repository, targetDistribution aptly_distribution.Distribution, packageName package_name.PackageName, version aptly_version.Version) error {
-	logger.Debugf("CopyPackage - sourceRepo: %s targetRepo: %s, package: %s_%s", sourceRepo, targetRepo, packageName, version)
+func (c *packageCopier) CopyPackage(
+	api aptly_api.Api,
+	sourceRepo aptly_repository.Repository,
+	targetRepo aptly_repository.Repository,
+	targetDistribution aptly_distribution.Distribution,
+	packageName package_name.PackageName,
+	version aptly_version.Version,
+) error {
+	logger.Debugf("CopyPackage - sourceRepo: %s targetRepo: %s, targetDistribution: %s, package: %s_%s", sourceRepo, targetRepo, packageName, version)
 	url := fmt.Sprintf("%s/%s/pool/main/%s/%s/%s_%s.deb", api.Url, sourceRepo, packageName[0:1], packageName, packageName, version)
 	logger.Debugf("download package url: %s", url)
 	requestbuilder := c.httpRequestBuilderProvider.NewHttpRequestBuilder(url)
