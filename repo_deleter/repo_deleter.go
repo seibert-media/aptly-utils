@@ -37,7 +37,7 @@ func (c *repoDeleter) DeleteRepo(api aptly_api.Api, repository aptly_repository.
 	logger.Debugf("DeleteRepo - repo: %s distribution: %s", repository, distribution)
 	err := c.unPublishRepo(api, repository, distribution)
 	if err != nil {
-		return err
+		//return err
 	}
 	return c.deleteRepo(api, repository)
 }
