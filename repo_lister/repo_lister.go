@@ -34,6 +34,7 @@ func New(executeRequest ExecuteRequest, newHttpRequestBuilder NewHttpRequestBuil
 }
 
 func (p *repoVersion) ListRepos(api aptly_api.Api) ([]map[string]string, error) {
+	logger.Debugf("list repos")
 	url := fmt.Sprintf("%s/api/repos", api.Url)
 	requestbuilder := p.newHttpRequestBuilder(url)
 	requestbuilder.AddBasicAuth(string(api.User), string(api.Password))
