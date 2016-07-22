@@ -35,7 +35,7 @@ func New(executeRequest ExecuteRequest, newHttpRequestBuilder NewHttpRequestBuil
 }
 
 func (p *packageVersion) ListPackages(api aptly_api.Api, repository aptly_repository.Repository) ([]map[string]string, error) {
-	logger.Debugf("PackageVersions - repo: %s", repository)
+	logger.Debugf("ListPackages - repo: %s", repository)
 	url := fmt.Sprintf("%s/api/repos/%s/packages?format=details", api.Url, repository)
 	requestbuilder := p.newHttpRequestBuilder(url)
 	requestbuilder.AddBasicAuth(string(api.User), string(api.Password))
