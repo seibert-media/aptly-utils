@@ -9,12 +9,9 @@ import (
 	"runtime"
 	"strings"
 
-	aptly_api "github.com/bborbe/aptly_utils/api"
-	aptly_architecture "github.com/bborbe/aptly_utils/architecture"
-	aptly_distribution "github.com/bborbe/aptly_utils/distribution"
+	aptly_model "github.com/bborbe/aptly_utils/model"
 	aptly_repo_creater "github.com/bborbe/aptly_utils/repo_creater"
 	aptly_repo_publisher "github.com/bborbe/aptly_utils/repo_publisher"
-	aptly_repository "github.com/bborbe/aptly_utils/repository"
 	aptly_requestbuilder_executor "github.com/bborbe/aptly_utils/requestbuilder_executor"
 	http_client_builder "github.com/bborbe/http/client_builder"
 	http_requestbuilder "github.com/bborbe/http/requestbuilder"
@@ -40,8 +37,8 @@ var (
 	passwordPtr     = flag.String(PARAMETER_API_PASSWORD, "", "password")
 	passwordFilePtr = flag.String(PARAMETER_API_PASSWORD_FILE, "", "passwordfile")
 	repoPtr         = flag.String(PARAMETER_REPO, "", "repo")
-	distributionPtr = flag.String(PARAMETER_DISTRIBUTION, string(aptly_distribution.DEFAULT), "distribution")
-	architecturePtr = flag.String(PARAMETER_ARCHITECTURE, string(aptly_architecture.DEFAULT), "architecture")
+	distributionPtr = flag.String(PARAMETER_DISTRIBUTION, string(aptly_model.DISTRIBUTION_DEFAULT), "distribution")
+	architecturePtr = flag.String(PARAMETER_ARCHITECTURE, string(aptly_model.ARCHITECTURE_DEFAULT), "architecture")
 )
 
 func main() {
@@ -82,5 +79,5 @@ func do(writer io.Writer, repo_creater aptly_repo_creater.RepoCreater, url strin
 	if len(repo) == 0 {
 		return fmt.Errorf("parameter %s missing", PARAMETER_REPO)
 	}
-	return repo_creater.CreateRepo(aptly_api.New(url, user, password), aptly_repository.Repository(repo), aptly_distribution.Distribution(distribution), aptly_architecture.Parse(architectures))
+	return repo_creater.CreateRepo(aptly_model.NewApi(url, user, password), aptly_model.Repository(repo), aptly_model.Distribution(distribution), aptly_model.ParseArchitectures(architectures))
 }

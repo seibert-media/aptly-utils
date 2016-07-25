@@ -10,19 +10,17 @@ import (
 
 	"io/ioutil"
 
-	aptly_api "github.com/bborbe/aptly_utils/api"
-	aptly_distribution "github.com/bborbe/aptly_utils/distribution"
-	aptly_repository "github.com/bborbe/aptly_utils/repository"
+	aptly_model "github.com/bborbe/aptly_utils/model"
 	aptly_requestbuilder_executor "github.com/bborbe/aptly_utils/requestbuilder_executor"
 	http_requestbuilder "github.com/bborbe/http/requestbuilder"
 	"github.com/bborbe/log"
 )
 
-type PublishRepo func(api aptly_api.Api, repository aptly_repository.Repository, distribution aptly_distribution.Distribution) error
+type PublishRepo func(api aptly_model.Api, repository aptly_model.Repository, distribution aptly_model.Distribution) error
 
 type PackageUploader interface {
-	UploadPackageByFile(api aptly_api.Api, repository aptly_repository.Repository, distribution aptly_distribution.Distribution, file string) error
-	UploadPackageByReader(api aptly_api.Api, repository aptly_repository.Repository, distribution aptly_distribution.Distribution, file string, src io.Reader) error
+	UploadPackageByFile(api aptly_model.Api, repository aptly_model.Repository, distribution aptly_model.Distribution, file string) error
+	UploadPackageByReader(api aptly_model.Api, repository aptly_model.Repository, distribution aptly_model.Distribution, file string, src io.Reader) error
 }
 
 type packageUploader struct {
@@ -49,7 +47,7 @@ func FromFileName(path string) string {
 	return path
 }
 
-func (p *packageUploader) UploadPackageByFile(api aptly_api.Api, repository aptly_repository.Repository, distribution aptly_distribution.Distribution, file string) error {
+func (p *packageUploader) UploadPackageByFile(api aptly_model.Api, repository aptly_model.Repository, distribution aptly_model.Distribution, file string) error {
 	logger.Debugf("UploadPackageByFile - repo: %s file: %s", repository, file)
 	name := FromFileName(file)
 	fh, err := os.Open(file)
@@ -59,7 +57,7 @@ func (p *packageUploader) UploadPackageByFile(api aptly_api.Api, repository aptl
 	return p.UploadPackageByReader(api, repository, distribution, name, fh)
 }
 
-func (p *packageUploader) UploadPackageByReader(api aptly_api.Api, repository aptly_repository.Repository, distribution aptly_distribution.Distribution, file string, src io.Reader) error {
+func (p *packageUploader) UploadPackageByReader(api aptly_model.Api, repository aptly_model.Repository, distribution aptly_model.Distribution, file string, src io.Reader) error {
 	logger.Debugf("UploadPackageByReader - repo: %s dist: %s file: %s", repository, distribution, file)
 	if err := p.uploadFile(api, file, src); err != nil {
 		return err
@@ -73,7 +71,7 @@ func (p *packageUploader) UploadPackageByReader(api aptly_api.Api, repository ap
 	return nil
 }
 
-func (p *packageUploader) uploadFile(api aptly_api.Api, file string, src io.Reader) error {
+func (p *packageUploader) uploadFile(api aptly_model.Api, file string, src io.Reader) error {
 	logger.Debugf("uploadFile - package: %s", file)
 
 	logger.Debugf("write upload to temp file ...")
@@ -97,8 +95,8 @@ func (p *packageUploader) uploadFile(api aptly_api.Api, file string, src io.Read
 
 	logger.Debugf("write upload to temp file finshed")
 	logger.Debugf("build request ...")
-	requestbuilder := p.httpRequestBuilderProvider.NewHttpRequestBuilder(fmt.Sprintf("%s/api/files/%s", api.Url, file))
-	requestbuilder.AddBasicAuth(string(api.User), string(api.Password))
+	requestbuilder := p.httpRequestBuilderProvider.NewHttpRequestBuilder(fmt.Sprintf("%s/api/files/%s", api.ApiUrl, file))
+	requestbuilder.AddBasicAuth(string(api.ApiUsername), string(api.ApiPassword))
 	requestbuilder.SetMethod("POST")
 	requestbuilder.AddContentType(bodyWriter.FormDataContentType())
 	requestbuilder.SetBody(f)
@@ -111,10 +109,10 @@ func (p *packageUploader) uploadFile(api aptly_api.Api, file string, src io.Read
 	return nil
 }
 
-func (p *packageUploader) addPackageToRepo(api aptly_api.Api, repository aptly_repository.Repository, file string) error {
+func (p *packageUploader) addPackageToRepo(api aptly_model.Api, repository aptly_model.Repository, file string) error {
 	logger.Debugf("addPackageToRepo - repo: %s file: %s", repository, file)
-	requestbuilder := p.httpRequestBuilderProvider.NewHttpRequestBuilder(fmt.Sprintf("%s/api/repos/%s/file/%s?forceReplace=1", api.Url, repository, file))
-	requestbuilder.AddBasicAuth(string(api.User), string(api.Password))
+	requestbuilder := p.httpRequestBuilderProvider.NewHttpRequestBuilder(fmt.Sprintf("%s/api/repos/%s/file/%s?forceReplace=1", api.ApiUrl, repository, file))
+	requestbuilder.AddBasicAuth(string(api.ApiUsername), string(api.ApiPassword))
 	requestbuilder.SetMethod("POST")
 	requestbuilder.AddContentType("application/json")
 	logger.Debugf("addPackageToRepo ...")

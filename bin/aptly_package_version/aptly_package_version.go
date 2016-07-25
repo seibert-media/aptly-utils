@@ -10,12 +10,10 @@ import (
 	"sort"
 	"strings"
 
-	aptly_api "github.com/bborbe/aptly_utils/api"
-	aptly_package_detail_lister "github.com/bborbe/aptly_utils/package_detail_lister"
+	aptly_model "github.com/bborbe/aptly_utils/model"
+	aptly_model_lister "github.com/bborbe/aptly_utils/package_detail_lister"
 	aptly_package_lister "github.com/bborbe/aptly_utils/package_lister"
-	aptly_package_name "github.com/bborbe/aptly_utils/package_name"
 	aptly_package_versions "github.com/bborbe/aptly_utils/package_versions"
-	aptly_repository "github.com/bborbe/aptly_utils/repository"
 	http_client_builder "github.com/bborbe/http/client_builder"
 	http_requestbuilder "github.com/bborbe/http/requestbuilder"
 	"github.com/bborbe/log"
@@ -55,7 +53,7 @@ func main() {
 	httpClient := http_client_builder.New().WithoutProxy().Build()
 	httpRequestBuilderProvider := http_requestbuilder.NewHttpRequestBuilderProvider()
 	packageLister := aptly_package_lister.New(httpClient.Do, httpRequestBuilderProvider.NewHttpRequestBuilder)
-	packageDetailLister := aptly_package_detail_lister.New(packageLister.ListPackages)
+	packageDetailLister := aptly_model_lister.New(packageLister.ListPackages)
 	packageVersion := aptly_package_versions.New(packageDetailLister.ListPackageDetails)
 
 	writer := os.Stdout
@@ -88,7 +86,7 @@ func do(writer io.Writer, packageVersions aptly_package_versions.PackageVersions
 
 	var err error
 	var versions []aptly_version.Version
-	if versions, err = packageVersions.PackageVersions(aptly_api.New(url, user, password), aptly_repository.Repository(repo), aptly_package_name.PackageName(name)); err != nil {
+	if versions, err = packageVersions.PackageVersions(aptly_model.NewApi(url, user, password), aptly_model.Repository(repo), aptly_model.Package(name)); err != nil {
 		return err
 	}
 	if len(versions) == 0 {

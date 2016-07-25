@@ -9,11 +9,9 @@ import (
 	"runtime"
 	"strings"
 
-	aptly_api "github.com/bborbe/aptly_utils/api"
-	aptly_distribution "github.com/bborbe/aptly_utils/distribution"
+	aptly_model "github.com/bborbe/aptly_utils/model"
 	aptly_package_uploader "github.com/bborbe/aptly_utils/package_uploader"
 	aptly_repo_publisher "github.com/bborbe/aptly_utils/repo_publisher"
-	aptly_repository "github.com/bborbe/aptly_utils/repository"
 	aptly_requestbuilder_executor "github.com/bborbe/aptly_utils/requestbuilder_executor"
 	http_client_builder "github.com/bborbe/http/client_builder"
 	http_requestbuilder "github.com/bborbe/http/requestbuilder"
@@ -40,7 +38,7 @@ var (
 	passwordPtr     = flag.String(PARAMETER_API_PASSWORD, "", "password")
 	passwordFilePtr = flag.String(PARAMETER_API_PASSWORD_FILE, "", "passwordfile")
 	repoPtr         = flag.String(PARAMETER_REPO, "", "repo")
-	distributionPtr = flag.String(PARAMETER_DISTRIBUTION, string(aptly_distribution.DEFAULT), "distribution")
+	distributionPtr = flag.String(PARAMETER_DISTRIBUTION, string(aptly_model.DISTRIBUTION_DEFAULT), "distribution")
 )
 
 func main() {
@@ -84,5 +82,5 @@ func do(writer io.Writer, package_uploader aptly_package_uploader.PackageUploade
 		return fmt.Errorf("parameter %s missing", PARAMETER_FILE)
 	}
 	logger.Debugf("upload file %s to repo %s dist %s on server %s", file, repo, distribution, url)
-	return package_uploader.UploadPackageByFile(aptly_api.New(url, user, password), aptly_repository.Repository(repo), aptly_distribution.Distribution(distribution), file)
+	return package_uploader.UploadPackageByFile(aptly_model.NewApi(url, user, password), aptly_model.Repository(repo), aptly_model.Distribution(distribution), file)
 }

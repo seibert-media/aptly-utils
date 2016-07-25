@@ -1,18 +1,16 @@
 package package_versions
 
 import (
-	aptly_api "github.com/bborbe/aptly_utils/api"
-	aptly_package_detail "github.com/bborbe/aptly_utils/package_detail"
-	"github.com/bborbe/aptly_utils/package_name"
-	aptly_repository "github.com/bborbe/aptly_utils/repository"
+	"github.com/bborbe/aptly_utils/model"
+	aptly_model "github.com/bborbe/aptly_utils/model"
 	"github.com/bborbe/log"
 	aptly_version "github.com/bborbe/version"
 )
 
-type ListPackageDetails func(api aptly_api.Api, repository aptly_repository.Repository) ([]aptly_package_detail.PackageDetail, error)
+type ListPackageDetails func(api aptly_model.Api, repository aptly_model.Repository) ([]aptly_model.PackageDetail, error)
 
 type PackageVersions interface {
-	PackageVersions(api aptly_api.Api, repository aptly_repository.Repository, packageName package_name.PackageName) ([]aptly_version.Version, error)
+	PackageVersions(api aptly_model.Api, repository aptly_model.Repository, packageName model.Package) ([]aptly_version.Version, error)
 }
 
 type packageVersion struct {
@@ -27,7 +25,7 @@ func New(listPackages ListPackageDetails) *packageVersion {
 	return p
 }
 
-func (p *packageVersion) PackageVersions(api aptly_api.Api, repository aptly_repository.Repository, packageName package_name.PackageName) ([]aptly_version.Version, error) {
+func (p *packageVersion) PackageVersions(api aptly_model.Api, repository aptly_model.Repository, packageName model.Package) ([]aptly_version.Version, error) {
 	logger.Debugf("PackageVersions - repo: %s package: %s", repository, packageName)
 	packageDetails, err := p.listPackageDetails(api, repository)
 	if err != nil {
@@ -35,7 +33,7 @@ func (p *packageVersion) PackageVersions(api aptly_api.Api, repository aptly_rep
 	}
 	var versions []aptly_version.Version
 	for _, packageDetail := range packageDetails {
-		if packageDetail.PackageName == packageName {
+		if packageDetail.Package == packageName {
 			v := packageDetail.Version
 			logger.Debugf("found version: %s", v)
 			versions = append(versions, aptly_version.Version(v))

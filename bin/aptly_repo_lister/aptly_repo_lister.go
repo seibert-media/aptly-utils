@@ -10,7 +10,7 @@ import (
 
 	"strings"
 
-	aptly_api "github.com/bborbe/aptly_utils/api"
+	aptly_model "github.com/bborbe/aptly_utils/model"
 	aptly_repo_lister "github.com/bborbe/aptly_utils/repo_lister"
 	http_client_builder "github.com/bborbe/http/client_builder"
 	http_requestbuilder "github.com/bborbe/http/requestbuilder"
@@ -70,7 +70,7 @@ func do(writer io.Writer, repoLister aptly_repo_lister.RepoLister, url string, u
 	}
 	var err error
 	var repos []map[string]string
-	if repos, err = repoLister.ListRepos(aptly_api.New(url, user, password)); err != nil {
+	if repos, err = repoLister.ListRepos(aptly_model.NewApi(url, user, password)); err != nil {
 		return err
 	}
 	for _, repo := range repos {

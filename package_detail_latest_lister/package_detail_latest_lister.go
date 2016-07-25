@@ -1,20 +1,17 @@
 package package_detail_latest_lister
 
 import (
-	aptly_api "github.com/bborbe/aptly_utils/api"
-	aptly_package_detail "github.com/bborbe/aptly_utils/package_detail"
-	aptly_package_name "github.com/bborbe/aptly_utils/package_name"
-	aptly_repository "github.com/bborbe/aptly_utils/repository"
+	aptly_model "github.com/bborbe/aptly_utils/model"
 	"github.com/bborbe/log"
 	aptly_version "github.com/bborbe/version"
 )
 
 var logger = log.DefaultLogger
 
-type ListPackageDetails func(api aptly_api.Api, repository aptly_repository.Repository) ([]aptly_package_detail.PackageDetail, error)
+type ListPackageDetails func(api aptly_model.Api, repository aptly_model.Repository) ([]aptly_model.PackageDetail, error)
 
 type PackageDetailLatestLister interface {
-	ListLatestPackageDetails(api aptly_api.Api, repository aptly_repository.Repository) ([]aptly_package_detail.PackageDetail, error)
+	ListLatestPackageDetails(api aptly_model.Api, repository aptly_model.Repository) ([]aptly_model.PackageDetail, error)
 }
 
 type packageDetailLatestLister struct {
@@ -27,7 +24,7 @@ func New(listPackageDetails ListPackageDetails) *packageDetailLatestLister {
 	return p
 }
 
-func (p *packageDetailLatestLister) ListLatestPackageDetails(api aptly_api.Api, repository aptly_repository.Repository) ([]aptly_package_detail.PackageDetail, error) {
+func (p *packageDetailLatestLister) ListLatestPackageDetails(api aptly_model.Api, repository aptly_model.Repository) ([]aptly_model.PackageDetail, error) {
 	logger.Debugf("ListPackageDetails")
 	list, err := p.listPackageDetails(api, repository)
 	if err != nil {
@@ -36,16 +33,16 @@ func (p *packageDetailLatestLister) ListLatestPackageDetails(api aptly_api.Api, 
 	return latest(list...), nil
 }
 
-func latest(list ...aptly_package_detail.PackageDetail) []aptly_package_detail.PackageDetail {
-	latest := make(map[aptly_package_name.PackageName]aptly_version.Version)
+func latest(list ...aptly_model.PackageDetail) []aptly_model.PackageDetail {
+	latest := make(map[aptly_model.Package]aptly_version.Version)
 	for _, e := range list {
-		if val, ok := latest[e.PackageName]; !ok || aptly_version.LessThan(val, e.Version) {
-			latest[e.PackageName] = e.Version
+		if val, ok := latest[e.Package]; !ok || aptly_version.LessThan(val, e.Version) {
+			latest[e.Package] = e.Version
 		}
 	}
-	var result []aptly_package_detail.PackageDetail
+	var result []aptly_model.PackageDetail
 	for k, v := range latest {
-		result = append(result, aptly_package_detail.New(k, v))
+		result = append(result, aptly_model.NewPackageDetail(k, v))
 	}
 	return result
 }

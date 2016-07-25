@@ -4,7 +4,7 @@ import (
 	"sort"
 	"testing"
 
-	aptly_key "github.com/bborbe/aptly_utils/key"
+	aptly_model "github.com/bborbe/aptly_utils/model"
 	. "github.com/bborbe/assert"
 )
 
@@ -53,7 +53,7 @@ func TestPackagesToKeysThreeDifferentVersions(t *testing.T) {
 	if err := AssertThat(len(keys), Is(2)); err != nil {
 		t.Fatal(err)
 	}
-	sort.Sort(aptly_key.KeySlice(keys))
+	sort.Sort(aptly_model.KeySlice(keys))
 	if err := AssertThat(string(keys[0]), Is("keyA")); err != nil {
 		t.Fatal(err)
 	}

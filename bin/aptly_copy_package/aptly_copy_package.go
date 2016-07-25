@@ -9,19 +9,15 @@ import (
 	"runtime"
 	"strings"
 
-	aptly_api "github.com/bborbe/aptly_utils/api"
-	aptly_distribution "github.com/bborbe/aptly_utils/distribution"
+	aptly_model "github.com/bborbe/aptly_utils/model"
 	aptly_package_copier "github.com/bborbe/aptly_utils/package_copier"
-	aptly_package_detail "github.com/bborbe/aptly_utils/package_detail"
-	aptly_package_detail_latest_lister "github.com/bborbe/aptly_utils/package_detail_latest_lister"
-	aptly_package_detail_lister "github.com/bborbe/aptly_utils/package_detail_lister"
+	aptly_model_latest_lister "github.com/bborbe/aptly_utils/package_detail_latest_lister"
+	aptly_model_lister "github.com/bborbe/aptly_utils/package_detail_lister"
 	aptly_package_latest_version "github.com/bborbe/aptly_utils/package_latest_version"
 	aptly_package_lister "github.com/bborbe/aptly_utils/package_lister"
-	aptly_package_name "github.com/bborbe/aptly_utils/package_name"
 	aptly_package_uploader "github.com/bborbe/aptly_utils/package_uploader"
 	aptly_package_versions "github.com/bborbe/aptly_utils/package_versions"
 	aptly_repo_publisher "github.com/bborbe/aptly_utils/repo_publisher"
-	aptly_repository "github.com/bborbe/aptly_utils/repository"
 	aptly_requestbuilder_executor "github.com/bborbe/aptly_utils/requestbuilder_executor"
 	http_client_builder "github.com/bborbe/http/client_builder"
 	http_requestbuilder "github.com/bborbe/http/requestbuilder"
@@ -54,7 +50,7 @@ var (
 	targetPtr             = flag.String(PARAMETER_TARGET, "", "target")
 	namePtr               = flag.String(PARAMETER_NAME, "", "name")
 	versionPtr            = flag.String(PARAMETER_VERSION, "", "version")
-	targetDistributionPtr = flag.String(PARAMETER_DISTRIBUTION, string(aptly_distribution.DEFAULT), "distribution")
+	targetDistributionPtr = flag.String(PARAMETER_DISTRIBUTION, string(aptly_model.DISTRIBUTION_DEFAULT), "distribution")
 )
 
 func main() {
@@ -74,10 +70,10 @@ func main() {
 	packageUploader := aptly_package_uploader.New(requestbuilder_executor, requestbuilder, repo_publisher.PublishRepo)
 	packageCopier := aptly_package_copier.New(packageUploader, requestbuilder, httpClient.Do)
 	packageLister := aptly_package_lister.New(httpClient.Do, httpRequestBuilderProvider.NewHttpRequestBuilder)
-	packageDetailLister := aptly_package_detail_lister.New(packageLister.ListPackages)
+	packageDetailLister := aptly_model_lister.New(packageLister.ListPackages)
 	packageVersion := aptly_package_versions.New(packageDetailLister.ListPackageDetails)
 	packageLastestVersion := aptly_package_latest_version.New(packageVersion.PackageVersions)
-	packageDetailLatestLister := aptly_package_detail_latest_lister.New(packageDetailLister.ListPackageDetails)
+	packageDetailLatestLister := aptly_model_latest_lister.New(packageDetailLister.ListPackageDetails)
 
 	writer := os.Stdout
 	err := do(writer, packageCopier, packageLastestVersion, packageDetailLatestLister, *urlPtr, *apiUserPtr, *passwordPtr, *passwordFilePtr, *sourcePtr, *targetPtr, *targetDistributionPtr, *namePtr, *versionPtr)
@@ -88,7 +84,7 @@ func main() {
 	}
 }
 
-func do(writer io.Writer, packageCopier aptly_package_copier.PackageCopier, packageLatestVersion aptly_package_latest_version.PackageLatestVersion, packageDetailLatestLister aptly_package_detail_latest_lister.PackageDetailLatestLister, url string, user string, password string, passwordfile string, sourceRepo string, targetRepo string, targetDistribution, name string, version string) error {
+func do(writer io.Writer, packageCopier aptly_package_copier.PackageCopier, packageLatestVersion aptly_package_latest_version.PackageLatestVersion, packageDetailLatestLister aptly_model_latest_lister.PackageDetailLatestLister, url string, user string, password string, passwordfile string, sourceRepo string, targetRepo string, targetDistribution, name string, version string) error {
 	if len(passwordfile) > 0 {
 		content, err := ioutil.ReadFile(passwordfile)
 		if err != nil {
@@ -111,30 +107,30 @@ func do(writer io.Writer, packageCopier aptly_package_copier.PackageCopier, pack
 	if len(version) == 0 {
 		return fmt.Errorf("parameter %s missing", PARAMETER_VERSION)
 	}
-	return copy(packageCopier, packageLatestVersion, packageDetailLatestLister, aptly_api.New(url, user, password), aptly_repository.Repository(sourceRepo), aptly_repository.Repository(targetRepo), aptly_distribution.Distribution(targetDistribution), aptly_package_name.PackageName(name), aptly_version.Version(version))
+	return copy(packageCopier, packageLatestVersion, packageDetailLatestLister, aptly_model.NewApi(url, user, password), aptly_model.Repository(sourceRepo), aptly_model.Repository(targetRepo), aptly_model.Distribution(targetDistribution), aptly_model.Package(name), aptly_version.Version(version))
 }
 
-func copy(packageCopier aptly_package_copier.PackageCopier, packageLatestVersion aptly_package_latest_version.PackageLatestVersion, packageDetailLatestLister aptly_package_detail_latest_lister.PackageDetailLatestLister, api aptly_api.Api, sourceRepo aptly_repository.Repository, targetRepo aptly_repository.Repository, targetDistribution aptly_distribution.Distribution, packageName aptly_package_name.PackageName, version aptly_version.Version) error {
-	if packageName == aptly_package_name.ALL && version != aptly_version.LATEST {
+func copy(packageCopier aptly_package_copier.PackageCopier, packageLatestVersion aptly_package_latest_version.PackageLatestVersion, packageDetailLatestLister aptly_model_latest_lister.PackageDetailLatestLister, api aptly_model.Api, sourceRepo aptly_model.Repository, targetRepo aptly_model.Repository, targetDistribution aptly_model.Distribution, packageName aptly_model.Package, version aptly_version.Version) error {
+	if packageName == aptly_model.PACKAGE_ALL && version != aptly_version.LATEST {
 		return fmt.Errorf("can't copy with package all and version != latest")
 	}
-	var list []aptly_package_detail.PackageDetail
+	var list []aptly_model.PackageDetail
 	var err error
-	if packageName == aptly_package_name.ALL {
+	if packageName == aptly_model.PACKAGE_ALL {
 		list, err = packageDetailLatestLister.ListLatestPackageDetails(api, sourceRepo)
 		if err != nil {
 			return err
 		}
 	} else {
-		list = []aptly_package_detail.PackageDetail{aptly_package_detail.New(packageName, version)}
+		list = []aptly_model.PackageDetail{aptly_model.NewPackageDetail(packageName, version)}
 	}
 	return copyList(packageCopier, packageLatestVersion, api, sourceRepo, targetRepo, targetDistribution, list)
 }
 
-func copyList(packageCopier aptly_package_copier.PackageCopier, packageLatestVersion aptly_package_latest_version.PackageLatestVersion, api aptly_api.Api, sourceRepo aptly_repository.Repository, targetRepo aptly_repository.Repository, targetDistribution aptly_distribution.Distribution, list []aptly_package_detail.PackageDetail) error {
+func copyList(packageCopier aptly_package_copier.PackageCopier, packageLatestVersion aptly_package_latest_version.PackageLatestVersion, api aptly_model.Api, sourceRepo aptly_model.Repository, targetRepo aptly_model.Repository, targetDistribution aptly_model.Distribution, list []aptly_model.PackageDetail) error {
 	for _, e := range list {
 		version := e.Version
-		packageName := e.PackageName
+		packageName := e.Package
 		if version == aptly_version.LATEST {
 			latestVersion, err := packageLatestVersion.PackageLatestVersion(api, sourceRepo, packageName)
 			if err != nil {

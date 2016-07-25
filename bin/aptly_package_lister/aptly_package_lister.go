@@ -10,9 +10,8 @@ import (
 
 	"strings"
 
-	aptly_api "github.com/bborbe/aptly_utils/api"
+	aptly_model "github.com/bborbe/aptly_utils/model"
 	aptly_package_lister "github.com/bborbe/aptly_utils/package_lister"
-	aptly_repository "github.com/bborbe/aptly_utils/repository"
 	http_client_builder "github.com/bborbe/http/client_builder"
 	http_requestbuilder "github.com/bborbe/http/requestbuilder"
 	"github.com/bborbe/log"
@@ -75,7 +74,7 @@ func do(writer io.Writer, packageLister aptly_package_lister.PackageLister, url 
 	}
 	var err error
 	var packages []map[string]string
-	if packages, err = packageLister.ListPackages(aptly_api.New(url, user, password), aptly_repository.Repository(repo)); err != nil {
+	if packages, err = packageLister.ListPackages(aptly_model.NewApi(url, user, password), aptly_model.Repository(repo)); err != nil {
 		return err
 	}
 	for _, info := range packages {

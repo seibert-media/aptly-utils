@@ -6,7 +6,7 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	aptly_api "github.com/bborbe/aptly_utils/api"
+	aptly_model "github.com/bborbe/aptly_utils/model"
 	http_requestbuilder "github.com/bborbe/http/requestbuilder"
 	"github.com/bborbe/log"
 )
@@ -16,7 +16,7 @@ type ExecuteRequest func(req *http.Request) (resp *http.Response, err error)
 type NewHttpRequestBuilder func(url string) http_requestbuilder.HttpRequestBuilder
 
 type RepoLister interface {
-	ListRepos(api aptly_api.Api) ([]map[string]string, error)
+	ListRepos(api aptly_model.Api) ([]map[string]string, error)
 }
 
 type repoVersion struct {
@@ -33,11 +33,11 @@ func New(executeRequest ExecuteRequest, newHttpRequestBuilder NewHttpRequestBuil
 	return p
 }
 
-func (p *repoVersion) ListRepos(api aptly_api.Api) ([]map[string]string, error) {
+func (p *repoVersion) ListRepos(api aptly_model.Api) ([]map[string]string, error) {
 	logger.Debugf("list repos")
-	url := fmt.Sprintf("%s/api/repos", api.Url)
+	url := fmt.Sprintf("%s/api/repos", api.ApiUrl)
 	requestbuilder := p.newHttpRequestBuilder(url)
-	requestbuilder.AddBasicAuth(string(api.User), string(api.Password))
+	requestbuilder.AddBasicAuth(string(api.ApiUsername), string(api.ApiPassword))
 	requestbuilder.SetMethod("GET")
 	requestbuilder.AddContentType("application/json")
 	req, err := requestbuilder.Build()

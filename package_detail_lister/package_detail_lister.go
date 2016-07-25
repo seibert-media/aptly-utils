@@ -1,18 +1,16 @@
 package package_detail_lister
 
 import (
-	aptly_api "github.com/bborbe/aptly_utils/api"
-	aptly_package_detail "github.com/bborbe/aptly_utils/package_detail"
-	aptly_repository "github.com/bborbe/aptly_utils/repository"
+	aptly_model "github.com/bborbe/aptly_utils/model"
 	"github.com/bborbe/log"
 )
 
 var logger = log.DefaultLogger
 
-type ListPackages func(api aptly_api.Api, repository aptly_repository.Repository) ([]map[string]string, error)
+type ListPackages func(api aptly_model.Api, repository aptly_model.Repository) ([]map[string]string, error)
 
 type PackageDetailLister interface {
-	ListPackageDetails(api aptly_api.Api, repository aptly_repository.Repository) ([]aptly_package_detail.PackageDetail, error)
+	ListPackageDetails(api aptly_model.Api, repository aptly_model.Repository) ([]aptly_model.PackageDetail, error)
 }
 
 type packageDetailLister struct {
@@ -25,11 +23,11 @@ func New(listPackages ListPackages) *packageDetailLister {
 	return p
 }
 
-func (p *packageDetailLister) ListPackageDetails(api aptly_api.Api, repository aptly_repository.Repository) ([]aptly_package_detail.PackageDetail, error) {
+func (p *packageDetailLister) ListPackageDetails(api aptly_model.Api, repository aptly_model.Repository) ([]aptly_model.PackageDetail, error) {
 	logger.Debugf("ListPackageDetails")
 	infos, err := p.listPackages(api, repository)
 	if err != nil {
 		return nil, err
 	}
-	return aptly_package_detail.FromInfos(infos), nil
+	return aptly_model.FromInfos(infos), nil
 }

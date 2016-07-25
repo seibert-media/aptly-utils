@@ -9,12 +9,10 @@ import (
 	"runtime"
 	"strings"
 
-	aptly_api "github.com/bborbe/aptly_utils/api"
-	aptly_distribution "github.com/bborbe/aptly_utils/distribution"
+	"github.com/bborbe/aptly_utils/model"
+	aptly_model "github.com/bborbe/aptly_utils/model"
 	aptly_package_deleter "github.com/bborbe/aptly_utils/package_deleter"
-	"github.com/bborbe/aptly_utils/package_name"
 	aptly_repo_publisher "github.com/bborbe/aptly_utils/repo_publisher"
-	aptly_repository "github.com/bborbe/aptly_utils/repository"
 	aptly_requestbuilder_executor "github.com/bborbe/aptly_utils/requestbuilder_executor"
 	http_client_builder "github.com/bborbe/http/client_builder"
 	http_requestbuilder "github.com/bborbe/http/requestbuilder"
@@ -44,7 +42,7 @@ var (
 	repoPtr         = flag.String(PARAMETER_REPO, "", "repo")
 	namePtr         = flag.String(PARAMETER_NAME, "", "name")
 	versionPtr      = flag.String(PARAMETER_VERSION, "", "version")
-	distributionPtr = flag.String(PARAMETER_DISTRIBUTION, string(aptly_distribution.DEFAULT), "distribution")
+	distributionPtr = flag.String(PARAMETER_DISTRIBUTION, string(aptly_model.DISTRIBUTION_DEFAULT), "distribution")
 )
 
 func main() {
@@ -91,5 +89,5 @@ func do(writer io.Writer, package_deleter aptly_package_deleter.PackageDeleter, 
 	if len(version) == 0 {
 		return fmt.Errorf("parameter %s missing", PARAMETER_VERSION)
 	}
-	return package_deleter.DeletePackageByNameAndVersion(aptly_api.New(url, user, password), aptly_repository.Repository(repo), aptly_distribution.Distribution(distribution), package_name.PackageName(name), aptly_version.Version(version))
+	return package_deleter.DeletePackageByNameAndVersion(aptly_model.NewApi(url, user, password), aptly_model.Repository(repo), aptly_model.Distribution(distribution), model.Package(name), aptly_version.Version(version))
 }

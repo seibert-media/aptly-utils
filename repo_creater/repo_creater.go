@@ -5,19 +5,16 @@ import (
 	"encoding/json"
 	"fmt"
 
-	aptly_api "github.com/bborbe/aptly_utils/api"
-	aptly_architecture "github.com/bborbe/aptly_utils/architecture"
-	aptly_distribution "github.com/bborbe/aptly_utils/distribution"
-	aptly_repository "github.com/bborbe/aptly_utils/repository"
+	aptly_model "github.com/bborbe/aptly_utils/model"
 	aptly_requestbuilder_executor "github.com/bborbe/aptly_utils/requestbuilder_executor"
 	http_requestbuilder "github.com/bborbe/http/requestbuilder"
 	"github.com/bborbe/log"
 )
 
-type PublishNewRepo func(api aptly_api.Api, repository aptly_repository.Repository, distribution aptly_distribution.Distribution, architectures []aptly_architecture.Architecture) error
+type PublishNewRepo func(api aptly_model.Api, repository aptly_model.Repository, distribution aptly_model.Distribution, architectures []aptly_model.Architecture) error
 
 type RepoCreater interface {
-	CreateRepo(api aptly_api.Api, repository aptly_repository.Repository, distribution aptly_distribution.Distribution, architectures []aptly_architecture.Architecture) error
+	CreateRepo(api aptly_model.Api, repository aptly_model.Repository, distribution aptly_model.Distribution, architectures []aptly_model.Architecture) error
 }
 
 type repoCreater struct {
@@ -40,7 +37,7 @@ func New(
 	return p
 }
 
-func (c *repoCreater) CreateRepo(api aptly_api.Api, repository aptly_repository.Repository, distribution aptly_distribution.Distribution, architectures []aptly_architecture.Architecture) error {
+func (c *repoCreater) CreateRepo(api aptly_model.Api, repository aptly_model.Repository, distribution aptly_model.Distribution, architectures []aptly_model.Architecture) error {
 	if err := c.createRepo(api, repository); err != nil {
 		//return err
 	}
@@ -50,13 +47,13 @@ func (c *repoCreater) CreateRepo(api aptly_api.Api, repository aptly_repository.
 	return nil
 }
 
-func (c *repoCreater) createRepo(api aptly_api.Api, repository aptly_repository.Repository) error {
+func (c *repoCreater) createRepo(api aptly_model.Api, repository aptly_model.Repository) error {
 	logger.Debugf("createRepo")
-	requestbuilder := c.httpRequestBuilderProvider.NewHttpRequestBuilder(fmt.Sprintf("%s/api/repos", api.Url))
-	requestbuilder.AddBasicAuth(string(api.User), string(api.Password))
+	requestbuilder := c.httpRequestBuilderProvider.NewHttpRequestBuilder(fmt.Sprintf("%s/api/repos", api.ApiUrl))
+	requestbuilder.AddBasicAuth(string(api.ApiUsername), string(api.ApiPassword))
 	requestbuilder.SetMethod("POST")
 	requestbuilder.AddContentType("application/json")
-	content, err := json.Marshal(map[string]aptly_repository.Repository{"Name": repository})
+	content, err := json.Marshal(map[string]aptly_model.Repository{"Name": repository})
 	if err != nil {
 		return err
 	}

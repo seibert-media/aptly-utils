@@ -3,9 +3,7 @@ package repo_deleter
 import (
 	"fmt"
 
-	aptly_api "github.com/bborbe/aptly_utils/api"
-	aptly_distribution "github.com/bborbe/aptly_utils/distribution"
-	aptly_repository "github.com/bborbe/aptly_utils/repository"
+	aptly_model "github.com/bborbe/aptly_utils/model"
 	aptly_requestbuilder_executor "github.com/bborbe/aptly_utils/requestbuilder_executor"
 	http_requestbuilder "github.com/bborbe/http/requestbuilder"
 	"github.com/bborbe/log"
@@ -13,10 +11,10 @@ import (
 
 var logger = log.DefaultLogger
 
-type UnPublishRepo func(api aptly_api.Api, repository aptly_repository.Repository, distribution aptly_distribution.Distribution) error
+type UnPublishRepo func(api aptly_model.Api, repository aptly_model.Repository, distribution aptly_model.Distribution) error
 
 type RepoDeleter interface {
-	DeleteRepo(api aptly_api.Api, repository aptly_repository.Repository, distribution aptly_distribution.Distribution) error
+	DeleteRepo(api aptly_model.Api, repository aptly_model.Repository, distribution aptly_model.Distribution) error
 }
 
 type repoDeleter struct {
@@ -33,7 +31,7 @@ func New(buildRequestAndExecute aptly_requestbuilder_executor.RequestbuilderExec
 	return p
 }
 
-func (c *repoDeleter) DeleteRepo(api aptly_api.Api, repository aptly_repository.Repository, distribution aptly_distribution.Distribution) error {
+func (c *repoDeleter) DeleteRepo(api aptly_model.Api, repository aptly_model.Repository, distribution aptly_model.Distribution) error {
 	logger.Debugf("DeleteRepo - repo: %s distribution: %s", repository, distribution)
 	err := c.unPublishRepo(api, repository, distribution)
 	if err != nil {
@@ -42,10 +40,10 @@ func (c *repoDeleter) DeleteRepo(api aptly_api.Api, repository aptly_repository.
 	return c.deleteRepo(api, repository)
 }
 
-func (p *repoDeleter) deleteRepo(api aptly_api.Api, repository aptly_repository.Repository) error {
+func (p *repoDeleter) deleteRepo(api aptly_model.Api, repository aptly_model.Repository) error {
 	logger.Debugf("deleteRepo - repo: %s", repository)
-	requestbuilder := p.httpRequestBuilderProvider.NewHttpRequestBuilder(fmt.Sprintf("%s/api/repos/%s", api.Url, repository))
-	requestbuilder.AddBasicAuth(string(api.User), string(api.Password))
+	requestbuilder := p.httpRequestBuilderProvider.NewHttpRequestBuilder(fmt.Sprintf("%s/api/repos/%s", api.ApiUrl, repository))
+	requestbuilder.AddBasicAuth(string(api.ApiUsername), string(api.ApiPassword))
 	requestbuilder.SetMethod("DELETE")
 	return p.buildRequestAndExecute.BuildRequestAndExecute(requestbuilder)
 }

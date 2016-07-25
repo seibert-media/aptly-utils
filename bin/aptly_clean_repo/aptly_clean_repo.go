@@ -10,13 +10,11 @@ import (
 
 	"strings"
 
-	aptly_api "github.com/bborbe/aptly_utils/api"
-	aptly_distribution "github.com/bborbe/aptly_utils/distribution"
+	aptly_model "github.com/bborbe/aptly_utils/model"
 	aptly_package_deleter "github.com/bborbe/aptly_utils/package_deleter"
 	aptly_package_lister "github.com/bborbe/aptly_utils/package_lister"
 	aptly_repo_cleaner "github.com/bborbe/aptly_utils/repo_cleaner"
 	aptly_repo_publisher "github.com/bborbe/aptly_utils/repo_publisher"
-	aptly_repository "github.com/bborbe/aptly_utils/repository"
 	aptly_requestbuilder_executor "github.com/bborbe/aptly_utils/requestbuilder_executor"
 	http_client_builder "github.com/bborbe/http/client_builder"
 	http_requestbuilder "github.com/bborbe/http/requestbuilder"
@@ -41,7 +39,7 @@ var (
 	passwordPtr     = flag.String(PARAMETER_API_PASSWORD, "", "password")
 	passwordFilePtr = flag.String(PARAMETER_API_PASSWORD_FILE, "", "passwordfile")
 	repoPtr         = flag.String(PARAMETER_REPO, "", "repo")
-	distributionPtr = flag.String(PARAMETER_DISTRIBUTION, string(aptly_distribution.DEFAULT), "distribution")
+	distributionPtr = flag.String(PARAMETER_DISTRIBUTION, string(aptly_model.DISTRIBUTION_DEFAULT), "distribution")
 )
 
 func main() {
@@ -70,7 +68,16 @@ func main() {
 	}
 }
 
-func do(writer io.Writer, repo_cleaner aptly_repo_cleaner.RepoCleaner, url string, user string, password string, passwordfile string, repo string, distribution string) error {
+func do(
+	writer io.Writer,
+	repo_cleaner aptly_repo_cleaner.RepoCleaner,
+	url string,
+	user string,
+	password string,
+	passwordfile string,
+	repo string,
+	distribution string,
+) error {
 	if len(passwordfile) > 0 {
 		content, err := ioutil.ReadFile(passwordfile)
 		if err != nil {
@@ -84,5 +91,10 @@ func do(writer io.Writer, repo_cleaner aptly_repo_cleaner.RepoCleaner, url strin
 	if len(repo) == 0 {
 		return fmt.Errorf("parameter %s missing", PARAMETER_REPO)
 	}
-	return repo_cleaner.CleanRepo(aptly_api.New(url, user, password), aptly_repository.Repository(repo), aptly_distribution.Distribution(distribution))
+	err := repo_cleaner.CleanRepo(aptly_model.NewApi(url, user, password), aptly_model.Repository(repo), aptly_model.Distribution(distribution))
+	if err != nil {
+		return err
+	}
+	fmt.Fprintf(writer, "clean repo finished\n")
+	return nil
 }
