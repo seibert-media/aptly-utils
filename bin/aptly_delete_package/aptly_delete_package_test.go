@@ -16,7 +16,7 @@ func TestDo(t *testing.T) {
 
 	package_deleter := aptly_package_deleter.New(nil, nil, nil)
 
-	err = do(writer, package_deleter, "", "", "", "", "", "", "", "")
+	err = do(writer, package_deleter, "", "", "", "", "", "", "", "", "")
 	err = AssertThat(err, NotNilValue())
 	if err != nil {
 		t.Fatal(err)

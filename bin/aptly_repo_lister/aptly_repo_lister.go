@@ -23,16 +23,17 @@ const (
 	PARAMETER_API_USER          = "username"
 	PARAMETER_API_PASSWORD      = "password"
 	PARAMETER_API_PASSWORD_FILE = "passwordfile"
-	PARAMETER_REPO              = "repo"
+	PARAMETER_REPO_URL          = "repo-url"
 )
 
 var (
-	logger          = log.DefaultLogger
-	logLevelPtr     = flag.String(PARAMETER_LOGLEVEL, log.INFO_STRING, log.FLAG_USAGE)
-	urlPtr          = flag.String(PARAMETER_API_URL, "", "url")
-	apiUserPtr      = flag.String(PARAMETER_API_USER, "", "user")
-	passwordPtr     = flag.String(PARAMETER_API_PASSWORD, "", "password")
-	passwordFilePtr = flag.String(PARAMETER_API_PASSWORD_FILE, "", "passwordfile")
+	logger             = log.DefaultLogger
+	logLevelPtr        = flag.String(PARAMETER_LOGLEVEL, log.INFO_STRING, log.FLAG_USAGE)
+	apiUrlPtr          = flag.String(PARAMETER_API_URL, "", "api url")
+	repoUrlPtr         = flag.String(PARAMETER_REPO_URL, "", "repo url")
+	apiUserPtr         = flag.String(PARAMETER_API_USER, "", "user")
+	apiPasswordPtr     = flag.String(PARAMETER_API_PASSWORD, "", "password")
+	apiPasswordFilePtr = flag.String(PARAMETER_API_PASSWORD_FILE, "", "passwordfile")
 )
 
 func main() {
@@ -48,8 +49,19 @@ func main() {
 	httpRequestBuilderProvider := http_requestbuilder.NewHttpRequestBuilderProvider()
 	repo_lister := aptly_repo_lister.New(httpClient.Do, httpRequestBuilderProvider.NewHttpRequestBuilder)
 
+	if len(*repoUrlPtr) == 0 {
+		*repoUrlPtr = *apiUrlPtr
+	}
+
 	writer := os.Stdout
-	err := do(writer, repo_lister, *urlPtr, *apiUserPtr, *passwordPtr, *passwordFilePtr)
+	err := do(
+		writer,
+		repo_lister,
+		*repoUrlPtr,
+		*apiUrlPtr,
+		*apiUserPtr,
+		*apiPasswordPtr,
+		*apiPasswordFilePtr)
 	if err != nil {
 		logger.Fatal(err)
 		logger.Close()
@@ -57,20 +69,28 @@ func main() {
 	}
 }
 
-func do(writer io.Writer, repoLister aptly_repo_lister.RepoLister, url string, user string, password string, passwordfile string) error {
-	if len(passwordfile) > 0 {
-		content, err := ioutil.ReadFile(passwordfile)
+func do(
+	writer io.Writer,
+	repoLister aptly_repo_lister.RepoLister,
+	repoUrl string,
+	apiUrl string,
+	apiUsername string,
+	apiPassword string,
+	apiPasswordfile string,
+) error {
+	if len(apiPasswordfile) > 0 {
+		content, err := ioutil.ReadFile(apiPasswordfile)
 		if err != nil {
 			return err
 		}
-		password = strings.TrimSpace(string(content))
+		apiPassword = strings.TrimSpace(string(content))
 	}
-	if len(url) == 0 {
+	if len(apiUrl) == 0 {
 		return fmt.Errorf("parameter %s missing", PARAMETER_API_URL)
 	}
 	var err error
 	var repos []map[string]string
-	if repos, err = repoLister.ListRepos(aptly_model.NewApi(url, user, password)); err != nil {
+	if repos, err = repoLister.ListRepos(aptly_model.NewApi(repoUrl, apiUrl, apiUsername, apiPassword)); err != nil {
 		return err
 	}
 	for _, repo := range repos {

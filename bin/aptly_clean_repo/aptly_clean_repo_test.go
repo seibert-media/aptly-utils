@@ -14,7 +14,7 @@ func TestDo(t *testing.T) {
 	var err error
 	writer := bytes.NewBufferString("")
 	repo_cleaner := aptly_repo_cleaner.New(nil, nil)
-	err = do(writer, repo_cleaner, "", "", "", "", "", "")
+	err = do(writer, repo_cleaner, "", "", "", "", "", "", "")
 	err = AssertThat(err, NotNilValue())
 	if err != nil {
 		t.Fatal(err)

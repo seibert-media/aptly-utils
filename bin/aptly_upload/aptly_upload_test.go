@@ -15,7 +15,7 @@ func TestDo(t *testing.T) {
 
 	package_uploader := aptly_package_uploader.New(nil, nil, nil)
 
-	err = do(writer, package_uploader, "", "", "", "", "", "", "")
+	err = do(writer, package_uploader, "", "", "", "", "", "", "", "")
 	err = AssertThat(err, NotNilValue())
 	if err != nil {
 		t.Fatal(err)

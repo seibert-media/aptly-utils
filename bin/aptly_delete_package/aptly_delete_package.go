@@ -26,6 +26,7 @@ const (
 	PARAMETER_API_USER          = "username"
 	PARAMETER_API_PASSWORD      = "password"
 	PARAMETER_API_PASSWORD_FILE = "passwordfile"
+	PARAMETER_REPO_URL          = "repo-url"
 	PARAMETER_REPO              = "repo"
 	PARAMETER_NAME              = "name"
 	PARAMETER_VERSION           = "version"
@@ -33,16 +34,17 @@ const (
 )
 
 var (
-	logger          = log.DefaultLogger
-	logLevelPtr     = flag.String(PARAMETER_LOGLEVEL, log.INFO_STRING, log.FLAG_USAGE)
-	urlPtr          = flag.String(PARAMETER_API_URL, "", "url")
-	apiUserPtr      = flag.String(PARAMETER_API_USER, "", "user")
-	passwordPtr     = flag.String(PARAMETER_API_PASSWORD, "", "password")
-	passwordFilePtr = flag.String(PARAMETER_API_PASSWORD_FILE, "", "passwordfile")
-	repoPtr         = flag.String(PARAMETER_REPO, "", "repo")
-	namePtr         = flag.String(PARAMETER_NAME, "", "name")
-	versionPtr      = flag.String(PARAMETER_VERSION, "", "version")
-	distributionPtr = flag.String(PARAMETER_DISTRIBUTION, string(aptly_model.DISTRIBUTION_DEFAULT), "distribution")
+	logger             = log.DefaultLogger
+	logLevelPtr        = flag.String(PARAMETER_LOGLEVEL, log.INFO_STRING, log.FLAG_USAGE)
+	apiUrlPtr          = flag.String(PARAMETER_API_URL, "", "url")
+	apiUserPtr         = flag.String(PARAMETER_API_USER, "", "user")
+	apiPasswordPtr     = flag.String(PARAMETER_API_PASSWORD, "", "password")
+	apiPasswordFilePtr = flag.String(PARAMETER_API_PASSWORD_FILE, "", "passwordfile")
+	repoPtr            = flag.String(PARAMETER_REPO, "", "repo")
+	namePtr            = flag.String(PARAMETER_NAME, "", "name")
+	versionPtr         = flag.String(PARAMETER_VERSION, "", "version")
+	distributionPtr    = flag.String(PARAMETER_DISTRIBUTION, string(aptly_model.DISTRIBUTION_DEFAULT), "distribution")
+	repoUrlPtr         = flag.String(PARAMETER_REPO_URL, "", "repo url")
 )
 
 func main() {
@@ -60,8 +62,24 @@ func main() {
 	repo_publisher := aptly_repo_publisher.New(requestbuilder_executor, httpRequestBuilderProvider)
 	package_deleter := aptly_package_deleter.New(httpClient.Do, httpRequestBuilderProvider.NewHttpRequestBuilder, repo_publisher.PublishRepo)
 
+	if len(*repoUrlPtr) == 0 {
+		*repoUrlPtr = *apiUrlPtr
+	}
+
 	writer := os.Stdout
-	err := do(writer, package_deleter, *urlPtr, *apiUserPtr, *passwordPtr, *passwordFilePtr, *repoPtr, *distributionPtr, *namePtr, *versionPtr)
+	err := do(
+		writer,
+		package_deleter,
+		*repoUrlPtr,
+		*apiUrlPtr,
+		*apiUserPtr,
+		*apiPasswordPtr,
+		*apiPasswordFilePtr,
+		*repoPtr,
+		*distributionPtr,
+		*namePtr,
+		*versionPtr,
+	)
 	if err != nil {
 		logger.Fatal(err)
 		logger.Close()
@@ -69,15 +87,27 @@ func main() {
 	}
 }
 
-func do(writer io.Writer, package_deleter aptly_package_deleter.PackageDeleter, url string, user string, password string, passwordfile string, repo string, distribution string, name string, version string) error {
-	if len(passwordfile) > 0 {
-		content, err := ioutil.ReadFile(passwordfile)
+func do(
+	writer io.Writer,
+	package_deleter aptly_package_deleter.PackageDeleter,
+	repoUrl string,
+	apiUrl string,
+	apiUsername string,
+	apiPassword string,
+	apiPasswordfile string,
+	repo string,
+	distribution string,
+	name string,
+	version string,
+) error {
+	if len(apiPasswordfile) > 0 {
+		content, err := ioutil.ReadFile(apiPasswordfile)
 		if err != nil {
 			return err
 		}
-		password = strings.TrimSpace(string(content))
+		apiPassword = strings.TrimSpace(string(content))
 	}
-	if len(url) == 0 {
+	if len(apiUrl) == 0 {
 		return fmt.Errorf("parameter %s missing", PARAMETER_API_URL)
 	}
 	if len(repo) == 0 {
@@ -89,5 +119,5 @@ func do(writer io.Writer, package_deleter aptly_package_deleter.PackageDeleter, 
 	if len(version) == 0 {
 		return fmt.Errorf("parameter %s missing", PARAMETER_VERSION)
 	}
-	return package_deleter.DeletePackageByNameAndVersion(aptly_model.NewApi(url, user, password), aptly_model.Repository(repo), aptly_model.Distribution(distribution), model.Package(name), aptly_version.Version(version))
+	return package_deleter.DeletePackageByNameAndVersion(aptly_model.NewApi(repoUrl, apiUrl, apiUsername, apiPassword), aptly_model.Repository(repo), aptly_model.Distribution(distribution), model.Package(name), aptly_version.Version(version))
 }

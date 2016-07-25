@@ -19,7 +19,7 @@ func TestDo(t *testing.T) {
 	packageLastestVersion := aptly_package_latest_version.New(nil)
 	packageDetailLister := aptly_model_lister.New(nil)
 
-	err = do(writer, package_copier, packageLastestVersion, packageDetailLister, "", "", "", "", "", "", "", "", "")
+	err = do(writer, package_copier, packageLastestVersion, packageDetailLister, "", "", "", "", "", "", "", "", "", "")
 	err = AssertThat(err, NotNilValue())
 	if err != nil {
 		t.Fatal(err)

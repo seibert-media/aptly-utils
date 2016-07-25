@@ -26,19 +26,21 @@ const (
 	PARAMETER_API_PASSWORD      = "password"
 	PARAMETER_API_PASSWORD_FILE = "passwordfile"
 	PARAMETER_REPO              = "repo"
+	PARAMETER_REPO_URL          = "repo-url"
 	PARAMETER_DISTRIBUTION      = "distribution"
 )
 
 var (
-	logger          = log.DefaultLogger
-	logLevelPtr     = flag.String(PARAMETER_LOGLEVEL, log.INFO_STRING, log.FLAG_USAGE)
-	filePtr         = flag.String(PARAMETER_FILE, "", "file")
-	urlPtr          = flag.String(PARAMETER_API_URL, "", "url")
-	apiUserPtr      = flag.String(PARAMETER_API_USER, "", "user")
-	passwordPtr     = flag.String(PARAMETER_API_PASSWORD, "", "password")
-	passwordFilePtr = flag.String(PARAMETER_API_PASSWORD_FILE, "", "passwordfile")
-	repoPtr         = flag.String(PARAMETER_REPO, "", "repo")
-	distributionPtr = flag.String(PARAMETER_DISTRIBUTION, string(aptly_model.DISTRIBUTION_DEFAULT), "distribution")
+	logger             = log.DefaultLogger
+	logLevelPtr        = flag.String(PARAMETER_LOGLEVEL, log.INFO_STRING, log.FLAG_USAGE)
+	filePtr            = flag.String(PARAMETER_FILE, "", "file")
+	apiUrlPtr          = flag.String(PARAMETER_API_URL, "", "url")
+	apiUserPtr         = flag.String(PARAMETER_API_USER, "", "user")
+	apiPasswordPtr     = flag.String(PARAMETER_API_PASSWORD, "", "password")
+	apiPasswordFilePtr = flag.String(PARAMETER_API_PASSWORD_FILE, "", "passwordfile")
+	repoPtr            = flag.String(PARAMETER_REPO, "", "repo")
+	distributionPtr    = flag.String(PARAMETER_DISTRIBUTION, string(aptly_model.DISTRIBUTION_DEFAULT), "distribution")
+	repoUrlPtr         = flag.String(PARAMETER_REPO_URL, "", "repo url")
 )
 
 func main() {
@@ -55,8 +57,23 @@ func main() {
 	repo_publisher := aptly_repo_publisher.New(requestbuilder_executor, http_requestbuilder.NewHttpRequestBuilderProvider())
 	package_uploader := aptly_package_uploader.New(requestbuilder_executor, http_requestbuilder.NewHttpRequestBuilderProvider(), repo_publisher.PublishRepo)
 
+	if len(*repoUrlPtr) == 0 {
+		*repoUrlPtr = *apiUrlPtr
+	}
+
 	writer := os.Stdout
-	err := do(writer, package_uploader, *urlPtr, *apiUserPtr, *passwordPtr, *passwordFilePtr, *filePtr, *repoPtr, *distributionPtr)
+	err := do(
+		writer,
+		package_uploader,
+		*repoUrlPtr,
+		*apiUrlPtr,
+		*apiUserPtr,
+		*apiPasswordPtr,
+		*apiPasswordFilePtr,
+		*filePtr,
+		*repoPtr,
+		*distributionPtr,
+	)
 	if err != nil {
 		logger.Fatal(err)
 		logger.Close()
@@ -64,15 +81,26 @@ func main() {
 	}
 }
 
-func do(writer io.Writer, package_uploader aptly_package_uploader.PackageUploader, url string, user string, password string, passwordfile string, file string, repo string, distribution string) error {
-	if len(passwordfile) > 0 {
-		content, err := ioutil.ReadFile(passwordfile)
+func do(
+	writer io.Writer,
+	package_uploader aptly_package_uploader.PackageUploader,
+	repoUrl string,
+	apiUrl string,
+	apiUsername string,
+	apiPassword string,
+	apiPasswordfile string,
+	file string,
+	repo string,
+	distribution string,
+) error {
+	if len(apiPasswordfile) > 0 {
+		content, err := ioutil.ReadFile(apiPasswordfile)
 		if err != nil {
 			return err
 		}
-		password = strings.TrimSpace(string(content))
+		apiPassword = strings.TrimSpace(string(content))
 	}
-	if len(url) == 0 {
+	if len(apiUrl) == 0 {
 		return fmt.Errorf("parameter %s missing", PARAMETER_API_URL)
 	}
 	if len(repo) == 0 {
@@ -81,6 +109,6 @@ func do(writer io.Writer, package_uploader aptly_package_uploader.PackageUploade
 	if len(file) == 0 {
 		return fmt.Errorf("parameter %s missing", PARAMETER_FILE)
 	}
-	logger.Debugf("upload file %s to repo %s dist %s on server %s", file, repo, distribution, url)
-	return package_uploader.UploadPackageByFile(aptly_model.NewApi(url, user, password), aptly_model.Repository(repo), aptly_model.Distribution(distribution), file)
+	logger.Debugf("upload file %s to repo %s dist %s on server %s", file, repo, distribution, apiUrl)
+	return package_uploader.UploadPackageByFile(aptly_model.NewApi(repoUrl, apiUrl, apiUsername, apiPassword), aptly_model.Repository(repo), aptly_model.Distribution(distribution), file)
 }

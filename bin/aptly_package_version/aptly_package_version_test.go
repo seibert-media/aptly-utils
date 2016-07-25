@@ -16,7 +16,7 @@ func TestDo(t *testing.T) {
 
 	package_versions := aptly_package_versions.New(nil)
 
-	err = do(writer, package_versions, "", "", "", "", "", "")
+	err = do(writer, package_versions, "", "", "", "", "", "", "")
 	err = AssertThat(err, NotNilValue())
 	if err != nil {
 		t.Fatal(err)

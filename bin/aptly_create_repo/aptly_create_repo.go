@@ -27,18 +27,20 @@ const (
 	PARAMETER_REPO              = "repo"
 	PARAMETER_DISTRIBUTION      = "distribution"
 	PARAMETER_ARCHITECTURE      = "architecture"
+	PARAMETER_REPO_URL          = "repo-url"
 )
 
 var (
-	logger          = log.DefaultLogger
-	logLevelPtr     = flag.String(PARAMETER_LOGLEVEL, log.INFO_STRING, log.FLAG_USAGE)
-	urlPtr          = flag.String(PARAMETER_API_URL, "", "url")
-	apiUserPtr      = flag.String(PARAMETER_API_USER, "", "user")
-	passwordPtr     = flag.String(PARAMETER_API_PASSWORD, "", "password")
-	passwordFilePtr = flag.String(PARAMETER_API_PASSWORD_FILE, "", "passwordfile")
-	repoPtr         = flag.String(PARAMETER_REPO, "", "repo")
-	distributionPtr = flag.String(PARAMETER_DISTRIBUTION, string(aptly_model.DISTRIBUTION_DEFAULT), "distribution")
-	architecturePtr = flag.String(PARAMETER_ARCHITECTURE, string(aptly_model.ARCHITECTURE_DEFAULT), "architecture")
+	logger             = log.DefaultLogger
+	logLevelPtr        = flag.String(PARAMETER_LOGLEVEL, log.INFO_STRING, log.FLAG_USAGE)
+	apiUrlPtr          = flag.String(PARAMETER_API_URL, "", "url")
+	apiUserPtr         = flag.String(PARAMETER_API_USER, "", "user")
+	apiPasswordPtr     = flag.String(PARAMETER_API_PASSWORD, "", "password")
+	apiPasswordFilePtr = flag.String(PARAMETER_API_PASSWORD_FILE, "", "passwordfile")
+	repoPtr            = flag.String(PARAMETER_REPO, "", "repo")
+	distributionPtr    = flag.String(PARAMETER_DISTRIBUTION, string(aptly_model.DISTRIBUTION_DEFAULT), "distribution")
+	architecturePtr    = flag.String(PARAMETER_ARCHITECTURE, string(aptly_model.ARCHITECTURE_DEFAULT), "architecture")
+	repoUrlPtr         = flag.String(PARAMETER_REPO_URL, "", "repo url")
 )
 
 func main() {
@@ -56,8 +58,23 @@ func main() {
 	repo_publisher := aptly_repo_publisher.New(requestbuilder_executor, requestbuilder)
 	repo_creater := aptly_repo_creater.New(requestbuilder_executor, requestbuilder, repo_publisher.PublishNewRepo)
 
+	if len(*repoUrlPtr) == 0 {
+		*repoUrlPtr = *apiUrlPtr
+	}
+
 	writer := os.Stdout
-	err := do(writer, repo_creater, *urlPtr, *apiUserPtr, *passwordPtr, *passwordFilePtr, *repoPtr, *distributionPtr, strings.Split(*architecturePtr, ","))
+	err := do(
+		writer,
+		repo_creater,
+		*repoUrlPtr,
+		*apiUrlPtr,
+		*apiUserPtr,
+		*apiPasswordPtr,
+		*apiPasswordFilePtr,
+		*repoPtr,
+		*distributionPtr,
+		strings.Split(*architecturePtr, ","),
+	)
 	if err != nil {
 		logger.Fatal(err)
 		logger.Close()
@@ -65,19 +82,30 @@ func main() {
 	}
 }
 
-func do(writer io.Writer, repo_creater aptly_repo_creater.RepoCreater, url string, user string, password string, passwordfile string, repo string, distribution string, architectures []string) error {
-	if len(passwordfile) > 0 {
-		content, err := ioutil.ReadFile(passwordfile)
+func do(
+	writer io.Writer,
+	repo_creater aptly_repo_creater.RepoCreater,
+	repoUrl string,
+	apiUrl string,
+	apiUsername string,
+	apiPassword string,
+	apiPasswordfile string,
+	repo string,
+	distribution string,
+	architectures []string,
+) error {
+	if len(apiPasswordfile) > 0 {
+		content, err := ioutil.ReadFile(apiPasswordfile)
 		if err != nil {
 			return err
 		}
-		password = strings.TrimSpace(string(content))
+		apiPassword = strings.TrimSpace(string(content))
 	}
-	if len(url) == 0 {
+	if len(apiUrl) == 0 {
 		return fmt.Errorf("parameter %s missing", PARAMETER_API_URL)
 	}
 	if len(repo) == 0 {
 		return fmt.Errorf("parameter %s missing", PARAMETER_REPO)
 	}
-	return repo_creater.CreateRepo(aptly_model.NewApi(url, user, password), aptly_model.Repository(repo), aptly_model.Distribution(distribution), aptly_model.ParseArchitectures(architectures))
+	return repo_creater.CreateRepo(aptly_model.NewApi(repoUrl, apiUrl, apiUsername, apiPassword), aptly_model.Repository(repo), aptly_model.Distribution(distribution), aptly_model.ParseArchitectures(architectures))
 }

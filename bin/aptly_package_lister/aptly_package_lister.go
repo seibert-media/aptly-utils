@@ -19,6 +19,7 @@ import (
 
 const (
 	PARAMETER_LOGLEVEL          = "loglevel"
+	PARAMETER_REPO_URL          = "repo-url"
 	PARAMETER_API_URL           = "url"
 	PARAMETER_API_USER          = "username"
 	PARAMETER_API_PASSWORD      = "password"
@@ -27,13 +28,14 @@ const (
 )
 
 var (
-	logger          = log.DefaultLogger
-	logLevelPtr     = flag.String(PARAMETER_LOGLEVEL, log.INFO_STRING, log.FLAG_USAGE)
-	urlPtr          = flag.String(PARAMETER_API_URL, "", "url")
-	apiUserPtr      = flag.String(PARAMETER_API_USER, "", "user")
-	passwordPtr     = flag.String(PARAMETER_API_PASSWORD, "", "password")
-	passwordFilePtr = flag.String(PARAMETER_API_PASSWORD_FILE, "", "passwordfile")
-	repoPtr         = flag.String(PARAMETER_REPO, "", "repo")
+	logger             = log.DefaultLogger
+	logLevelPtr        = flag.String(PARAMETER_LOGLEVEL, log.INFO_STRING, log.FLAG_USAGE)
+	repoUrlPtr         = flag.String(PARAMETER_REPO_URL, "", "repo url")
+	apiUrlPtr          = flag.String(PARAMETER_API_URL, "", "api url")
+	apiUserPtr         = flag.String(PARAMETER_API_USER, "", "user")
+	apiPasswordPtr     = flag.String(PARAMETER_API_PASSWORD, "", "password")
+	apiPasswordFilePtr = flag.String(PARAMETER_API_PASSWORD_FILE, "", "passwordfile")
+	repoPtr            = flag.String(PARAMETER_REPO, "", "repo")
 )
 
 func main() {
@@ -49,8 +51,21 @@ func main() {
 	httpRequestBuilderProvider := http_requestbuilder.NewHttpRequestBuilderProvider()
 	package_lister := aptly_package_lister.New(httpClient.Do, httpRequestBuilderProvider.NewHttpRequestBuilder)
 
+	if len(*repoUrlPtr) == 0 {
+		*repoUrlPtr = *apiUrlPtr
+	}
+
 	writer := os.Stdout
-	err := do(writer, package_lister, *urlPtr, *apiUserPtr, *passwordPtr, *passwordFilePtr, *repoPtr)
+	err := do(
+		writer,
+		package_lister,
+		*repoUrlPtr,
+		*apiUrlPtr,
+		*apiUserPtr,
+		*apiPasswordPtr,
+		*apiPasswordFilePtr,
+		*repoPtr,
+	)
 	if err != nil {
 		logger.Fatal(err)
 		logger.Close()
@@ -58,15 +73,23 @@ func main() {
 	}
 }
 
-func do(writer io.Writer, packageLister aptly_package_lister.PackageLister, url string, user string, password string, passwordfile string, repo string) error {
+func do(writer io.Writer,
+	packageLister aptly_package_lister.PackageLister,
+	repoUrl string,
+	apiUrl string,
+	apiUsername string,
+	apiPassword string,
+	passwordfile string,
+	repo string,
+) error {
 	if len(passwordfile) > 0 {
 		content, err := ioutil.ReadFile(passwordfile)
 		if err != nil {
 			return err
 		}
-		password = strings.TrimSpace(string(content))
+		apiPassword = strings.TrimSpace(string(content))
 	}
-	if len(url) == 0 {
+	if len(apiUrl) == 0 {
 		return fmt.Errorf("parameter %s missing", PARAMETER_API_URL)
 	}
 	if len(repo) == 0 {
@@ -74,7 +97,7 @@ func do(writer io.Writer, packageLister aptly_package_lister.PackageLister, url 
 	}
 	var err error
 	var packages []map[string]string
-	if packages, err = packageLister.ListPackages(aptly_model.NewApi(url, user, password), aptly_model.Repository(repo)); err != nil {
+	if packages, err = packageLister.ListPackages(aptly_model.NewApi(repoUrl, apiUrl, apiUsername, apiPassword), aptly_model.Repository(repo)); err != nil {
 		return err
 	}
 	for _, info := range packages {

@@ -16,7 +16,7 @@ func TestDo(t *testing.T) {
 
 	repo_deleter := aptly_repo_deleter.New(nil, nil, nil)
 
-	err = do(writer, repo_deleter, "", "", "", "", "", "")
+	err = do(writer, repo_deleter, "", "", "", "", "", "", "")
 	err = AssertThat(err, NotNilValue())
 	if err != nil {
 		t.Fatal(err)

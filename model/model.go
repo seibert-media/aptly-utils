@@ -15,6 +15,7 @@ const (
 )
 
 type Api struct {
+	RepoUrl     RepoUrl
 	ApiUrl      ApiUrl
 	ApiUsername ApiUsername
 	ApiPassword ApiPassword
@@ -65,14 +66,16 @@ func FromInfos(infos []map[string]string) []PackageDetail {
 }
 
 func NewApi(
+	repoUrl string,
 	apiUrl string,
-	user string,
-	password string,
+	apiUsername string,
+	apiPassword string,
 ) Api {
 	return Api{
+		RepoUrl:     RepoUrl(repoUrl),
 		ApiUrl:      ApiUrl(apiUrl),
-		ApiUsername: ApiUsername(user),
-		ApiPassword: ApiPassword(password),
+		ApiUsername: ApiUsername(apiUsername),
+		ApiPassword: ApiPassword(apiPassword),
 	}
 }
 

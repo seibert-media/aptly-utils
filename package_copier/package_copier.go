@@ -43,7 +43,7 @@ func (c *packageCopier) CopyPackage(
 	version aptly_version.Version,
 ) error {
 	logger.Debugf("CopyPackage - sourceRepo: %s targetRepo: %s, targetDistribution: %s, package: %s_%s", sourceRepo, targetRepo, targetDistribution, packageName, version)
-	url := fmt.Sprintf("%s/%s/pool/main/%s/%s/%s_%s.deb", api.ApiUrl, sourceRepo, packageName[0:1], packageName, packageName, version)
+	url := fmt.Sprintf("%s/%s/pool/main/%s/%s/%s_%s.deb", api.RepoUrl, sourceRepo, packageName[0:1], packageName, packageName, version)
 	logger.Debugf("download package url: %s", url)
 	requestbuilder := c.httpRequestBuilderProvider.NewHttpRequestBuilder(url)
 	requestbuilder.AddBasicAuth(string(api.ApiUsername), string(api.ApiPassword))
