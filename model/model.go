@@ -2,6 +2,7 @@ package model
 
 import (
 	"bytes"
+
 	aptly_version "github.com/bborbe/version"
 )
 
