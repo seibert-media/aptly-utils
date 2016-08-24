@@ -1,0 +1,10 @@
+package: github.com/bborbe/aptly_utils
+import:
+- package: github.com/bborbe/http
+  subpackages:
+  - client_builder
+  - requestbuilder
+- package: github.com/bborbe/log
+- package: github.com/bborbe/version
+testImport:
+- package: github.com/bborbe/assert
