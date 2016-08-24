@@ -93,12 +93,18 @@ func (p *packageUploader) uploadFile(api aptly_model.Api, file string, src io.Re
 	bodyWriter.Close()
 	f.Seek(0, 0)
 
+	fileInfo, err := f.Stat()
+	if err != nil {
+		return err
+	}
+
 	logger.Debugf("write upload to temp file finshed")
 	logger.Debugf("build request ...")
 	requestbuilder := p.httpRequestBuilderProvider.NewHttpRequestBuilder(fmt.Sprintf("%s/api/files/%s", api.ApiUrl, file))
 	requestbuilder.AddBasicAuth(string(api.ApiUsername), string(api.ApiPassword))
 	requestbuilder.SetMethod("POST")
 	requestbuilder.AddContentType(bodyWriter.FormDataContentType())
+	requestbuilder.SetContentLength(fileInfo.Size())
 	requestbuilder.SetBody(f)
 	logger.Debugf("build request finished")
 	logger.Debugf("uploading ...")

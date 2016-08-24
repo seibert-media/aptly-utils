@@ -3,7 +3,6 @@ package main
 import (
 	"flag"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"os"
 	"runtime"
@@ -54,16 +53,15 @@ func main() {
 
 	httpClient := http_client_builder.New().WithoutProxy().Build()
 	requestbuilder_executor := aptly_requestbuilder_executor.New(httpClient.Do)
-	repo_publisher := aptly_repo_publisher.New(requestbuilder_executor, http_requestbuilder.NewHttpRequestBuilderProvider())
-	package_uploader := aptly_package_uploader.New(requestbuilder_executor, http_requestbuilder.NewHttpRequestBuilderProvider(), repo_publisher.PublishRepo)
+	httpRequestBuilderProvider := http_requestbuilder.NewHttpRequestBuilderProvider()
+	repo_publisher := aptly_repo_publisher.New(requestbuilder_executor, httpRequestBuilderProvider)
+	package_uploader := aptly_package_uploader.New(requestbuilder_executor, httpRequestBuilderProvider, repo_publisher.PublishRepo)
 
 	if len(*repoUrlPtr) == 0 {
 		*repoUrlPtr = *apiUrlPtr
 	}
 
-	writer := os.Stdout
 	err := do(
-		writer,
 		package_uploader,
 		*repoUrlPtr,
 		*apiUrlPtr,
@@ -82,7 +80,6 @@ func main() {
 }
 
 func do(
-	writer io.Writer,
 	package_uploader aptly_package_uploader.PackageUploader,
 	repoUrl string,
 	apiUrl string,
