@@ -10,9 +10,14 @@ install:
 	GOBIN=$(GOPATH)/bin GO15VENDOREXPERIMENT=1 go install bin/aptly_upload/aptly_upload.go
 test:
 	GO15VENDOREXPERIMENT=1 go test `glide novendor`
-check:
-	golint ./...
+vet:
+	go tool vet .
+	go tool vet .-shadow .
+lint:
+	golint -min_confidence 1 ./...
+errcheck:
 	errcheck -ignore '(Close|Write)' ./...
+check: lint vet errcheck
 format:
 	find . -name "*.go" -exec gofmt -w "{}" \;
 	goimports -w=true .
