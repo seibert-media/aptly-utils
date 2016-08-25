@@ -7,10 +7,10 @@ import (
 	aptly_version "github.com/bborbe/version"
 )
 
-type ListPackageDetails func(api aptly_model.Api, repository aptly_model.Repository) ([]aptly_model.PackageDetail, error)
+type ListPackageDetails func(api aptly_model.API, repository aptly_model.Repository) ([]aptly_model.PackageDetail, error)
 
 type PackageVersions interface {
-	PackageVersions(api aptly_model.Api, repository aptly_model.Repository, packageName model.Package) ([]aptly_version.Version, error)
+	PackageVersions(api aptly_model.API, repository aptly_model.Repository, packageName model.Package) ([]aptly_version.Version, error)
 }
 
 type packageVersion struct {
@@ -25,7 +25,7 @@ func New(listPackages ListPackageDetails) *packageVersion {
 	return p
 }
 
-func (p *packageVersion) PackageVersions(api aptly_model.Api, repository aptly_model.Repository, packageName model.Package) ([]aptly_version.Version, error) {
+func (p *packageVersion) PackageVersions(api aptly_model.API, repository aptly_model.Repository, packageName model.Package) ([]aptly_version.Version, error) {
 	logger.Debugf("PackageVersions - repo: %s package: %s", repository, packageName)
 	packageDetails, err := p.listPackageDetails(api, repository)
 	if err != nil {

@@ -2,12 +2,13 @@ package package_uploader
 
 import (
 	"bytes"
+	"net/http"
+	"testing"
+
 	aptly_model "github.com/bborbe/aptly_utils/model"
 	aptly_requestbuilder_executor "github.com/bborbe/aptly_utils/requestbuilder_executor"
 	. "github.com/bborbe/assert"
 	http_requestbuilder "github.com/bborbe/http/requestbuilder"
-	"net/http"
-	"testing"
 )
 
 func TestImplementsPackageUploader(t *testing.T) {
@@ -34,7 +35,7 @@ func TestFromFileNameWithSlash(t *testing.T) {
 
 func TestUploadFile(t *testing.T) {
 	filecontent := "hello"
-	httpRequestBuilderProvider := http_requestbuilder.NewHttpRequestBuilderProvider()
+	httpRequestBuilderProvider := http_requestbuilder.NewHTTPRequestBuilderProvider()
 	counter := 0
 	requestbuilder_executor := aptly_requestbuilder_executor.New(func(req *http.Request) (resp *http.Response, err error) {
 		counter++
@@ -47,7 +48,7 @@ func TestUploadFile(t *testing.T) {
 	})
 	uploader := New(requestbuilder_executor, httpRequestBuilderProvider, nil)
 	reader := bytes.NewBufferString(filecontent)
-	err := uploader.uploadFile(aptly_model.Api{}, "filename", reader)
+	err := uploader.uploadFile(aptly_model.API{}, "filename", reader)
 	if err := AssertThat(err, NilValue()); err != nil {
 		t.Fatal(err)
 	}

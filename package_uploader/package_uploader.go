@@ -16,22 +16,22 @@ import (
 	"github.com/bborbe/log"
 )
 
-type PublishRepo func(api aptly_model.Api, repository aptly_model.Repository, distribution aptly_model.Distribution) error
+type PublishRepo func(api aptly_model.API, repository aptly_model.Repository, distribution aptly_model.Distribution) error
 
 type PackageUploader interface {
-	UploadPackageByFile(api aptly_model.Api, repository aptly_model.Repository, distribution aptly_model.Distribution, file string) error
-	UploadPackageByReader(api aptly_model.Api, repository aptly_model.Repository, distribution aptly_model.Distribution, file string, src io.Reader) error
+	UploadPackageByFile(api aptly_model.API, repository aptly_model.Repository, distribution aptly_model.Distribution, file string) error
+	UploadPackageByReader(api aptly_model.API, repository aptly_model.Repository, distribution aptly_model.Distribution, file string, src io.Reader) error
 }
 
 type packageUploader struct {
 	buildRequestAndExecute     aptly_requestbuilder_executor.RequestbuilderExecutor
-	httpRequestBuilderProvider http_requestbuilder.HttpRequestBuilderProvider
+	httpRequestBuilderProvider http_requestbuilder.HTTPRequestBuilderProvider
 	publishRepo                PublishRepo
 }
 
 var logger = log.DefaultLogger
 
-func New(buildRequestAndExecute aptly_requestbuilder_executor.RequestbuilderExecutor, httpRequestBuilderProvider http_requestbuilder.HttpRequestBuilderProvider, publishRepo PublishRepo) *packageUploader {
+func New(buildRequestAndExecute aptly_requestbuilder_executor.RequestbuilderExecutor, httpRequestBuilderProvider http_requestbuilder.HTTPRequestBuilderProvider, publishRepo PublishRepo) *packageUploader {
 	p := new(packageUploader)
 	p.buildRequestAndExecute = buildRequestAndExecute
 	p.httpRequestBuilderProvider = httpRequestBuilderProvider
@@ -47,7 +47,7 @@ func FromFileName(path string) string {
 	return path
 }
 
-func (p *packageUploader) UploadPackageByFile(api aptly_model.Api, repository aptly_model.Repository, distribution aptly_model.Distribution, file string) error {
+func (p *packageUploader) UploadPackageByFile(api aptly_model.API, repository aptly_model.Repository, distribution aptly_model.Distribution, file string) error {
 	logger.Debugf("UploadPackageByFile - repo: %s file: %s", repository, file)
 	name := FromFileName(file)
 	fh, err := os.Open(file)
@@ -57,7 +57,7 @@ func (p *packageUploader) UploadPackageByFile(api aptly_model.Api, repository ap
 	return p.UploadPackageByReader(api, repository, distribution, name, fh)
 }
 
-func (p *packageUploader) UploadPackageByReader(api aptly_model.Api, repository aptly_model.Repository, distribution aptly_model.Distribution, file string, src io.Reader) error {
+func (p *packageUploader) UploadPackageByReader(api aptly_model.API, repository aptly_model.Repository, distribution aptly_model.Distribution, file string, src io.Reader) error {
 	logger.Debugf("UploadPackageByReader - repo: %s dist: %s file: %s", repository, distribution, file)
 	if err := p.uploadFile(api, file, src); err != nil {
 		return err
@@ -71,7 +71,7 @@ func (p *packageUploader) UploadPackageByReader(api aptly_model.Api, repository 
 	return nil
 }
 
-func (p *packageUploader) uploadFile(api aptly_model.Api, file string, src io.Reader) error {
+func (p *packageUploader) uploadFile(api aptly_model.API, file string, src io.Reader) error {
 	logger.Debugf("uploadFile - package: %s", file)
 
 	logger.Debugf("write upload to temp file ...")
@@ -80,7 +80,11 @@ func (p *packageUploader) uploadFile(api aptly_model.Api, file string, src io.Re
 		return err
 	}
 	defer f.Close()
-	defer os.Remove(f.Name())
+	defer func() {
+		if err := os.Remove(f.Name()); err != nil {
+			logger.Warnf("remove %s failed: %v", f.Name(), err)
+		}
+	}()
 	bodyWriter := multipart.NewWriter(f)
 	fileWriter, err := bodyWriter.CreateFormFile("file", file)
 	if err != nil {
@@ -91,7 +95,9 @@ func (p *packageUploader) uploadFile(api aptly_model.Api, file string, src io.Re
 		return err
 	}
 	bodyWriter.Close()
-	f.Seek(0, 0)
+	if _, err := f.Seek(0, 0); err != nil {
+		return err
+	}
 
 	fileInfo, err := f.Stat()
 	if err != nil {
@@ -100,8 +106,8 @@ func (p *packageUploader) uploadFile(api aptly_model.Api, file string, src io.Re
 
 	logger.Debugf("write upload to temp file finshed")
 	logger.Debugf("build request ...")
-	requestbuilder := p.httpRequestBuilderProvider.NewHttpRequestBuilder(fmt.Sprintf("%s/api/files/%s", api.ApiUrl, file))
-	requestbuilder.AddBasicAuth(string(api.ApiUsername), string(api.ApiPassword))
+	requestbuilder := p.httpRequestBuilderProvider.NewHTTPRequestBuilder(fmt.Sprintf("%s/api/files/%s", api.APIUrl, file))
+	requestbuilder.AddBasicAuth(string(api.APIUsername), string(api.APIPassword))
 	requestbuilder.SetMethod("POST")
 	requestbuilder.AddContentType(bodyWriter.FormDataContentType())
 	requestbuilder.SetContentLength(fileInfo.Size())
@@ -115,10 +121,10 @@ func (p *packageUploader) uploadFile(api aptly_model.Api, file string, src io.Re
 	return nil
 }
 
-func (p *packageUploader) addPackageToRepo(api aptly_model.Api, repository aptly_model.Repository, file string) error {
+func (p *packageUploader) addPackageToRepo(api aptly_model.API, repository aptly_model.Repository, file string) error {
 	logger.Debugf("addPackageToRepo - repo: %s file: %s", repository, file)
-	requestbuilder := p.httpRequestBuilderProvider.NewHttpRequestBuilder(fmt.Sprintf("%s/api/repos/%s/file/%s?forceReplace=1", api.ApiUrl, repository, file))
-	requestbuilder.AddBasicAuth(string(api.ApiUsername), string(api.ApiPassword))
+	requestbuilder := p.httpRequestBuilderProvider.NewHTTPRequestBuilder(fmt.Sprintf("%s/api/repos/%s/file/%s?forceReplace=1", api.APIUrl, repository, file))
+	requestbuilder.AddBasicAuth(string(api.APIUsername), string(api.APIPassword))
 	requestbuilder.SetMethod("POST")
 	requestbuilder.AddContentType("application/json")
 	logger.Debugf("addPackageToRepo ...")

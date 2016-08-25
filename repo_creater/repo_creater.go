@@ -11,15 +11,15 @@ import (
 	"github.com/bborbe/log"
 )
 
-type PublishNewRepo func(api aptly_model.Api, repository aptly_model.Repository, distribution aptly_model.Distribution, architectures []aptly_model.Architecture) error
+type PublishNewRepo func(api aptly_model.API, repository aptly_model.Repository, distribution aptly_model.Distribution, architectures []aptly_model.Architecture) error
 
 type RepoCreater interface {
-	CreateRepo(api aptly_model.Api, repository aptly_model.Repository, distribution aptly_model.Distribution, architectures []aptly_model.Architecture) error
+	CreateRepo(api aptly_model.API, repository aptly_model.Repository, distribution aptly_model.Distribution, architectures []aptly_model.Architecture) error
 }
 
 type repoCreater struct {
 	buildRequestAndExecute     aptly_requestbuilder_executor.RequestbuilderExecutor
-	httpRequestBuilderProvider http_requestbuilder.HttpRequestBuilderProvider
+	httpRequestBuilderProvider http_requestbuilder.HTTPRequestBuilderProvider
 	publishNewRepo             PublishNewRepo
 }
 
@@ -27,7 +27,7 @@ var logger = log.DefaultLogger
 
 func New(
 	buildRequestAndExecute aptly_requestbuilder_executor.RequestbuilderExecutor,
-	httpRequestBuilderProvider http_requestbuilder.HttpRequestBuilderProvider,
+	httpRequestBuilderProvider http_requestbuilder.HTTPRequestBuilderProvider,
 	publishNewRepo PublishNewRepo,
 ) *repoCreater {
 	p := new(repoCreater)
@@ -37,7 +37,7 @@ func New(
 	return p
 }
 
-func (c *repoCreater) CreateRepo(api aptly_model.Api, repository aptly_model.Repository, distribution aptly_model.Distribution, architectures []aptly_model.Architecture) error {
+func (c *repoCreater) CreateRepo(api aptly_model.API, repository aptly_model.Repository, distribution aptly_model.Distribution, architectures []aptly_model.Architecture) error {
 	if err := c.createRepo(api, repository); err != nil {
 		//return err
 	}
@@ -47,10 +47,10 @@ func (c *repoCreater) CreateRepo(api aptly_model.Api, repository aptly_model.Rep
 	return nil
 }
 
-func (c *repoCreater) createRepo(api aptly_model.Api, repository aptly_model.Repository) error {
+func (c *repoCreater) createRepo(api aptly_model.API, repository aptly_model.Repository) error {
 	logger.Debugf("createRepo")
-	requestbuilder := c.httpRequestBuilderProvider.NewHttpRequestBuilder(fmt.Sprintf("%s/api/repos", api.ApiUrl))
-	requestbuilder.AddBasicAuth(string(api.ApiUsername), string(api.ApiPassword))
+	requestbuilder := c.httpRequestBuilderProvider.NewHTTPRequestBuilder(fmt.Sprintf("%s/api/repos", api.APIUrl))
+	requestbuilder.AddBasicAuth(string(api.APIUsername), string(api.APIPassword))
 	requestbuilder.SetMethod("POST")
 	requestbuilder.AddContentType("application/json")
 	content, err := json.Marshal(map[string]aptly_model.Repository{"Name": repository})

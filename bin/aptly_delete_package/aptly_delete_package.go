@@ -21,30 +21,30 @@ import (
 )
 
 const (
-	PARAMETER_LOGLEVEL          = "loglevel"
-	PARAMETER_API_URL           = "url"
-	PARAMETER_API_USER          = "username"
-	PARAMETER_API_PASSWORD      = "password"
-	PARAMETER_API_PASSWORD_FILE = "passwordfile"
-	PARAMETER_REPO_URL          = "repo-url"
-	PARAMETER_REPO              = "repo"
-	PARAMETER_NAME              = "name"
-	PARAMETER_VERSION           = "version"
-	PARAMETER_DISTRIBUTION      = "distribution"
+	parameterLoglevel        = "loglevel"
+	parameterAPIURL          = "url"
+	parameterAPIUser         = "username"
+	parameterAPIPassword     = "password"
+	parameterAPIPasswordFile = "passwordfile"
+	parameterRepoURL         = "repo-url"
+	parameterRepo            = "repo"
+	parameterName            = "name"
+	parameterVersion         = "version"
+	parameterDistribution    = "distribution"
 )
 
 var (
 	logger             = log.DefaultLogger
-	logLevelPtr        = flag.String(PARAMETER_LOGLEVEL, log.INFO_STRING, log.FLAG_USAGE)
-	apiUrlPtr          = flag.String(PARAMETER_API_URL, "", "url")
-	apiUserPtr         = flag.String(PARAMETER_API_USER, "", "user")
-	apiPasswordPtr     = flag.String(PARAMETER_API_PASSWORD, "", "password")
-	apiPasswordFilePtr = flag.String(PARAMETER_API_PASSWORD_FILE, "", "passwordfile")
-	repoPtr            = flag.String(PARAMETER_REPO, "", "repo")
-	namePtr            = flag.String(PARAMETER_NAME, "", "name")
-	versionPtr         = flag.String(PARAMETER_VERSION, "", "version")
-	distributionPtr    = flag.String(PARAMETER_DISTRIBUTION, string(aptly_model.DISTRIBUTION_DEFAULT), "distribution")
-	repoUrlPtr         = flag.String(PARAMETER_REPO_URL, "", "repo url")
+	logLevelPtr        = flag.String(parameterLoglevel, log.INFO_STRING, log.FLAG_USAGE)
+	apiURLPtr          = flag.String(parameterAPIURL, "", "url")
+	apiUserPtr         = flag.String(parameterAPIUser, "", "user")
+	apiPasswordPtr     = flag.String(parameterAPIPassword, "", "password")
+	apiPasswordFilePtr = flag.String(parameterAPIPasswordFile, "", "passwordfile")
+	repoPtr            = flag.String(parameterRepo, "", "repo")
+	namePtr            = flag.String(parameterName, "", "name")
+	versionPtr         = flag.String(parameterVersion, "", "version")
+	distributionPtr    = flag.String(parameterDistribution, string(aptly_model.DistribuionDefault), "distribution")
+	repoURLPtr         = flag.String(parameterRepoURL, "", "repo url")
 )
 
 func main() {
@@ -57,21 +57,21 @@ func main() {
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
 	httpClient := http_client_builder.New().WithoutProxy().Build()
-	httpRequestBuilderProvider := http_requestbuilder.NewHttpRequestBuilderProvider()
+	httpRequestBuilderProvider := http_requestbuilder.NewHTTPRequestBuilderProvider()
 	requestbuilder_executor := aptly_requestbuilder_executor.New(httpClient.Do)
 	repo_publisher := aptly_repo_publisher.New(requestbuilder_executor, httpRequestBuilderProvider)
-	package_deleter := aptly_package_deleter.New(httpClient.Do, httpRequestBuilderProvider.NewHttpRequestBuilder, repo_publisher.PublishRepo)
+	package_deleter := aptly_package_deleter.New(httpClient.Do, httpRequestBuilderProvider.NewHTTPRequestBuilder, repo_publisher.PublishRepo)
 
-	if len(*repoUrlPtr) == 0 {
-		*repoUrlPtr = *apiUrlPtr
+	if len(*repoURLPtr) == 0 {
+		*repoURLPtr = *apiURLPtr
 	}
 
 	writer := os.Stdout
 	err := do(
 		writer,
 		package_deleter,
-		*repoUrlPtr,
-		*apiUrlPtr,
+		*repoURLPtr,
+		*apiURLPtr,
 		*apiUserPtr,
 		*apiPasswordPtr,
 		*apiPasswordFilePtr,
@@ -90,8 +90,8 @@ func main() {
 func do(
 	writer io.Writer,
 	package_deleter aptly_package_deleter.PackageDeleter,
-	repoUrl string,
-	apiUrl string,
+	repoURL string,
+	apiURL string,
 	apiUsername string,
 	apiPassword string,
 	apiPasswordfile string,
@@ -107,17 +107,17 @@ func do(
 		}
 		apiPassword = strings.TrimSpace(string(content))
 	}
-	if len(apiUrl) == 0 {
-		return fmt.Errorf("parameter %s missing", PARAMETER_API_URL)
+	if len(apiURL) == 0 {
+		return fmt.Errorf("parameter %s missing", parameterAPIURL)
 	}
 	if len(repo) == 0 {
-		return fmt.Errorf("parameter %s missing", PARAMETER_REPO)
+		return fmt.Errorf("parameter %s missing", parameterRepo)
 	}
 	if len(name) == 0 {
-		return fmt.Errorf("parameter %s missing", PARAMETER_NAME)
+		return fmt.Errorf("parameter %s missing", parameterName)
 	}
 	if len(version) == 0 {
-		return fmt.Errorf("parameter %s missing", PARAMETER_VERSION)
+		return fmt.Errorf("parameter %s missing", parameterVersion)
 	}
-	return package_deleter.DeletePackageByNameAndVersion(aptly_model.NewApi(repoUrl, apiUrl, apiUsername, apiPassword), aptly_model.Repository(repo), aptly_model.Distribution(distribution), model.Package(name), aptly_version.Version(version))
+	return package_deleter.DeletePackageByNameAndVersion(aptly_model.NewAPI(repoURL, apiURL, apiUsername, apiPassword), aptly_model.Repository(repo), aptly_model.Distribution(distribution), model.Package(name), aptly_version.Version(version))
 }

@@ -6,12 +6,12 @@ import (
 	aptly_version "github.com/bborbe/version"
 )
 
-type DeletePackagesByKey func(api aptly_model.Api, repository aptly_model.Repository, distribution aptly_model.Distribution, keys []aptly_model.Key) error
+type DeletePackagesByKey func(api aptly_model.API, repository aptly_model.Repository, distribution aptly_model.Distribution, keys []aptly_model.Key) error
 
-type ListPackages func(api aptly_model.Api, repository aptly_model.Repository) ([]map[string]string, error)
+type ListPackages func(api aptly_model.API, repository aptly_model.Repository) ([]map[string]string, error)
 
 type RepoCleaner interface {
-	CleanRepo(api aptly_model.Api, repository aptly_model.Repository, distribution aptly_model.Distribution) error
+	CleanRepo(api aptly_model.API, repository aptly_model.Repository, distribution aptly_model.Distribution) error
 }
 
 type repoCleaner struct {
@@ -28,7 +28,7 @@ func New(deletePackagesByKey DeletePackagesByKey, listPackages ListPackages) *re
 	return r
 }
 
-func (r *repoCleaner) CleanRepo(api aptly_model.Api, repository aptly_model.Repository, distribution aptly_model.Distribution) error {
+func (r *repoCleaner) CleanRepo(api aptly_model.API, repository aptly_model.Repository, distribution aptly_model.Distribution) error {
 	logger.Debugf("clean repo: %s", repository)
 	keys, err := r.findKeysToDelete(api, repository)
 	if err != nil {
@@ -41,7 +41,7 @@ func (r *repoCleaner) CleanRepo(api aptly_model.Api, repository aptly_model.Repo
 	return r.deletePackagesByKey(api, repository, distribution, keys)
 }
 
-func (r *repoCleaner) findKeysToDelete(api aptly_model.Api, repository aptly_model.Repository) ([]aptly_model.Key, error) {
+func (r *repoCleaner) findKeysToDelete(api aptly_model.API, repository aptly_model.Repository) ([]aptly_model.Key, error) {
 	logger.Debugf("find keys to delete repo: %s", repository)
 	packages, err := r.listPackages(api, repository)
 	if err != nil {

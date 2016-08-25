@@ -11,39 +11,39 @@ import (
 
 var logger = log.DefaultLogger
 
-type UnPublishRepo func(api aptly_model.Api, repository aptly_model.Repository, distribution aptly_model.Distribution) error
+type UnPublishRepo func(api aptly_model.API, repository aptly_model.Repository, distribution aptly_model.Distribution) error
 
 type RepoDeleter interface {
-	DeleteRepo(api aptly_model.Api, repository aptly_model.Repository, distribution aptly_model.Distribution) error
+	DeleteRepo(api aptly_model.API, repository aptly_model.Repository, distribution aptly_model.Distribution) error
 }
 
 type repoDeleter struct {
 	unPublishRepo              UnPublishRepo
 	buildRequestAndExecute     aptly_requestbuilder_executor.RequestbuilderExecutor
-	httpRequestBuilderProvider http_requestbuilder.HttpRequestBuilderProvider
+	httpRequestBuilderProvider http_requestbuilder.HTTPRequestBuilderProvider
 }
 
-func New(buildRequestAndExecute aptly_requestbuilder_executor.RequestbuilderExecutor, httpRequestBuilderProvider http_requestbuilder.HttpRequestBuilderProvider, unPublishRepo UnPublishRepo) *repoDeleter {
-	p := new(repoDeleter)
-	p.buildRequestAndExecute = buildRequestAndExecute
-	p.httpRequestBuilderProvider = httpRequestBuilderProvider
-	p.unPublishRepo = unPublishRepo
-	return p
+func New(buildRequestAndExecute aptly_requestbuilder_executor.RequestbuilderExecutor, httpRequestBuilderProvider http_requestbuilder.HTTPRequestBuilderProvider, unPublishRepo UnPublishRepo) *repoDeleter {
+	r := new(repoDeleter)
+	r.buildRequestAndExecute = buildRequestAndExecute
+	r.httpRequestBuilderProvider = httpRequestBuilderProvider
+	r.unPublishRepo = unPublishRepo
+	return r
 }
 
-func (c *repoDeleter) DeleteRepo(api aptly_model.Api, repository aptly_model.Repository, distribution aptly_model.Distribution) error {
+func (r *repoDeleter) DeleteRepo(api aptly_model.API, repository aptly_model.Repository, distribution aptly_model.Distribution) error {
 	logger.Debugf("DeleteRepo - repo: %s distribution: %s", repository, distribution)
-	err := c.unPublishRepo(api, repository, distribution)
+	err := r.unPublishRepo(api, repository, distribution)
 	if err != nil {
 		//return err
 	}
-	return c.deleteRepo(api, repository)
+	return r.deleteRepo(api, repository)
 }
 
-func (p *repoDeleter) deleteRepo(api aptly_model.Api, repository aptly_model.Repository) error {
+func (r *repoDeleter) deleteRepo(api aptly_model.API, repository aptly_model.Repository) error {
 	logger.Debugf("deleteRepo - repo: %s", repository)
-	requestbuilder := p.httpRequestBuilderProvider.NewHttpRequestBuilder(fmt.Sprintf("%s/api/repos/%s", api.ApiUrl, repository))
-	requestbuilder.AddBasicAuth(string(api.ApiUsername), string(api.ApiPassword))
+	requestbuilder := r.httpRequestBuilderProvider.NewHTTPRequestBuilder(fmt.Sprintf("%s/api/repos/%s", api.APIUrl, repository))
+	requestbuilder.AddBasicAuth(string(api.APIUsername), string(api.APIPassword))
 	requestbuilder.SetMethod("DELETE")
-	return p.buildRequestAndExecute.BuildRequestAndExecute(requestbuilder)
+	return r.buildRequestAndExecute.BuildRequestAndExecute(requestbuilder)
 }

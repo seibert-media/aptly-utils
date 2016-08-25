@@ -21,26 +21,26 @@ import (
 )
 
 const (
-	PARAMETER_LOGLEVEL          = "loglevel"
-	PARAMETER_API_URL           = "url"
-	PARAMETER_API_USER          = "username"
-	PARAMETER_API_PASSWORD      = "password"
-	PARAMETER_API_PASSWORD_FILE = "passwordfile"
-	PARAMETER_REPO_URL          = "repo-url"
-	PARAMETER_REPO              = "repo"
-	PARAMETER_NAME              = "name"
+	parameterLoglevel        = "loglevel"
+	parameterAPIURL          = "url"
+	parameterAPIUser         = "username"
+	parameterAPIPassword     = "password"
+	parameterAPIPasswordFile = "passwordfile"
+	parameterRepoURL         = "repo-url"
+	parameterRepo            = "repo"
+	parameterName            = "name"
 )
 
 var (
 	logger             = log.DefaultLogger
-	logLevelPtr        = flag.String(PARAMETER_LOGLEVEL, log.INFO_STRING, log.FLAG_USAGE)
-	apiUrlPtr          = flag.String(PARAMETER_API_URL, "", "url")
-	apiUserPtr         = flag.String(PARAMETER_API_USER, "", "user")
-	apiPasswordPtr     = flag.String(PARAMETER_API_PASSWORD, "", "password")
-	apiPasswordFilePtr = flag.String(PARAMETER_API_PASSWORD_FILE, "", "passwordfile")
-	repoPtr            = flag.String(PARAMETER_REPO, "", "repo")
-	namePtr            = flag.String(PARAMETER_NAME, "", "name")
-	repoUrlPtr         = flag.String(PARAMETER_REPO_URL, "", "repo url")
+	logLevelPtr        = flag.String(parameterLoglevel, log.INFO_STRING, log.FLAG_USAGE)
+	apiURLPtr          = flag.String(parameterAPIURL, "", "url")
+	apiUserPtr         = flag.String(parameterAPIUser, "", "user")
+	apiPasswordPtr     = flag.String(parameterAPIPassword, "", "password")
+	apiPasswordFilePtr = flag.String(parameterAPIPasswordFile, "", "passwordfile")
+	repoPtr            = flag.String(parameterRepo, "", "repo")
+	namePtr            = flag.String(parameterName, "", "name")
+	repoURLPtr         = flag.String(parameterRepoURL, "", "repo url")
 )
 
 func main() {
@@ -53,21 +53,21 @@ func main() {
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
 	httpClient := http_client_builder.New().WithoutProxy().Build()
-	httpRequestBuilderProvider := http_requestbuilder.NewHttpRequestBuilderProvider()
-	packageLister := aptly_package_lister.New(httpClient.Do, httpRequestBuilderProvider.NewHttpRequestBuilder)
+	httpRequestBuilderProvider := http_requestbuilder.NewHTTPRequestBuilderProvider()
+	packageLister := aptly_package_lister.New(httpClient.Do, httpRequestBuilderProvider.NewHTTPRequestBuilder)
 	packageDetailLister := aptly_model_lister.New(packageLister.ListPackages)
 	packageVersion := aptly_package_versions.New(packageDetailLister.ListPackageDetails)
 
-	if len(*repoUrlPtr) == 0 {
-		*repoUrlPtr = *apiUrlPtr
+	if len(*repoURLPtr) == 0 {
+		*repoURLPtr = *apiURLPtr
 	}
 
 	writer := os.Stdout
 	err := do(
 		writer,
 		packageVersion,
-		*repoUrlPtr,
-		*apiUrlPtr,
+		*repoURLPtr,
+		*apiURLPtr,
 		*apiUserPtr,
 		*apiPasswordPtr,
 		*apiPasswordFilePtr,
@@ -84,8 +84,8 @@ func main() {
 func do(
 	writer io.Writer,
 	packageVersions aptly_package_versions.PackageVersions,
-	repoUrl string,
-	apiUrl string,
+	repoURL string,
+	apiURL string,
 	apiUsername string,
 	apiPassword string,
 	apiPasswordfile string,
@@ -100,19 +100,19 @@ func do(
 		apiPassword = strings.TrimSpace(string(content))
 	}
 
-	if len(apiUrl) == 0 {
-		return fmt.Errorf("parameter %s missing", PARAMETER_API_URL)
+	if len(apiURL) == 0 {
+		return fmt.Errorf("parameter %s missing", parameterAPIURL)
 	}
 	if len(repo) == 0 {
-		return fmt.Errorf("parameter %s missing", PARAMETER_REPO)
+		return fmt.Errorf("parameter %s missing", parameterRepo)
 	}
 	if len(name) == 0 {
-		return fmt.Errorf("parameter %s missing", PARAMETER_NAME)
+		return fmt.Errorf("parameter %s missing", parameterName)
 	}
 
 	var err error
 	var versions []aptly_version.Version
-	if versions, err = packageVersions.PackageVersions(aptly_model.NewApi(repoUrl, apiUrl, apiUsername, apiPassword), aptly_model.Repository(repo), aptly_model.Package(name)); err != nil {
+	if versions, err = packageVersions.PackageVersions(aptly_model.NewAPI(repoURL, apiURL, apiUsername, apiPassword), aptly_model.Repository(repo), aptly_model.Package(name)); err != nil {
 		return err
 	}
 	if len(versions) == 0 {

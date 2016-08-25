@@ -13,31 +13,31 @@ import (
 
 type ExecuteRequest func(req *http.Request) (resp *http.Response, err error)
 
-type NewHttpRequestBuilder func(url string) http_requestbuilder.HttpRequestBuilder
+type NewHTTPRequestBuilder func(url string) http_requestbuilder.HttpRequestBuilder
 
 type RepoLister interface {
-	ListRepos(api aptly_model.Api) ([]map[string]string, error)
+	ListRepos(api aptly_model.API) ([]map[string]string, error)
 }
 
 type repoVersion struct {
 	executeRequest        ExecuteRequest
-	newHttpRequestBuilder NewHttpRequestBuilder
+	newHTTPRequestBuilder NewHTTPRequestBuilder
 }
 
 var logger = log.DefaultLogger
 
-func New(executeRequest ExecuteRequest, newHttpRequestBuilder NewHttpRequestBuilder) *repoVersion {
+func New(executeRequest ExecuteRequest, newHTTPRequestBuilder NewHTTPRequestBuilder) *repoVersion {
 	p := new(repoVersion)
-	p.newHttpRequestBuilder = newHttpRequestBuilder
+	p.newHTTPRequestBuilder = newHTTPRequestBuilder
 	p.executeRequest = executeRequest
 	return p
 }
 
-func (p *repoVersion) ListRepos(api aptly_model.Api) ([]map[string]string, error) {
+func (p *repoVersion) ListRepos(api aptly_model.API) ([]map[string]string, error) {
 	logger.Debugf("list repos")
-	url := fmt.Sprintf("%s/api/repos", api.ApiUrl)
-	requestbuilder := p.newHttpRequestBuilder(url)
-	requestbuilder.AddBasicAuth(string(api.ApiUsername), string(api.ApiPassword))
+	url := fmt.Sprintf("%s/api/repos", api.APIUrl)
+	requestbuilder := p.newHTTPRequestBuilder(url)
+	requestbuilder.AddBasicAuth(string(api.APIUsername), string(api.APIPassword))
 	requestbuilder.SetMethod("GET")
 	requestbuilder.AddContentType("application/json")
 	req, err := requestbuilder.Build()

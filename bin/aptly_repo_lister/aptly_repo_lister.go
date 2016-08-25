@@ -18,22 +18,22 @@ import (
 )
 
 const (
-	PARAMETER_LOGLEVEL          = "loglevel"
-	PARAMETER_API_URL           = "url"
-	PARAMETER_API_USER          = "username"
-	PARAMETER_API_PASSWORD      = "password"
-	PARAMETER_API_PASSWORD_FILE = "passwordfile"
-	PARAMETER_REPO_URL          = "repo-url"
+	parameterLoglevel        = "loglevel"
+	parameterAPIURL          = "url"
+	parameterAPIUser         = "username"
+	parameterAPIPassword     = "password"
+	parameterAPIPasswordFile = "passwordfile"
+	parameterRepoURL         = "repo-url"
 )
 
 var (
 	logger             = log.DefaultLogger
-	logLevelPtr        = flag.String(PARAMETER_LOGLEVEL, log.INFO_STRING, log.FLAG_USAGE)
-	apiUrlPtr          = flag.String(PARAMETER_API_URL, "", "api url")
-	repoUrlPtr         = flag.String(PARAMETER_REPO_URL, "", "repo url")
-	apiUserPtr         = flag.String(PARAMETER_API_USER, "", "user")
-	apiPasswordPtr     = flag.String(PARAMETER_API_PASSWORD, "", "password")
-	apiPasswordFilePtr = flag.String(PARAMETER_API_PASSWORD_FILE, "", "passwordfile")
+	logLevelPtr        = flag.String(parameterLoglevel, log.INFO_STRING, log.FLAG_USAGE)
+	apiURLPtr          = flag.String(parameterAPIURL, "", "api url")
+	repoURLPtr         = flag.String(parameterRepoURL, "", "repo url")
+	apiUserPtr         = flag.String(parameterAPIUser, "", "user")
+	apiPasswordPtr     = flag.String(parameterAPIPassword, "", "password")
+	apiPasswordFilePtr = flag.String(parameterAPIPasswordFile, "", "passwordfile")
 )
 
 func main() {
@@ -46,19 +46,19 @@ func main() {
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
 	httpClient := http_client_builder.New().WithoutProxy().Build()
-	httpRequestBuilderProvider := http_requestbuilder.NewHttpRequestBuilderProvider()
-	repo_lister := aptly_repo_lister.New(httpClient.Do, httpRequestBuilderProvider.NewHttpRequestBuilder)
+	httpRequestBuilderProvider := http_requestbuilder.NewHTTPRequestBuilderProvider()
+	repo_lister := aptly_repo_lister.New(httpClient.Do, httpRequestBuilderProvider.NewHTTPRequestBuilder)
 
-	if len(*repoUrlPtr) == 0 {
-		*repoUrlPtr = *apiUrlPtr
+	if len(*repoURLPtr) == 0 {
+		*repoURLPtr = *apiURLPtr
 	}
 
 	writer := os.Stdout
 	err := do(
 		writer,
 		repo_lister,
-		*repoUrlPtr,
-		*apiUrlPtr,
+		*repoURLPtr,
+		*apiURLPtr,
 		*apiUserPtr,
 		*apiPasswordPtr,
 		*apiPasswordFilePtr)
@@ -72,8 +72,8 @@ func main() {
 func do(
 	writer io.Writer,
 	repoLister aptly_repo_lister.RepoLister,
-	repoUrl string,
-	apiUrl string,
+	repoURL string,
+	apiURL string,
 	apiUsername string,
 	apiPassword string,
 	apiPasswordfile string,
@@ -85,12 +85,12 @@ func do(
 		}
 		apiPassword = strings.TrimSpace(string(content))
 	}
-	if len(apiUrl) == 0 {
-		return fmt.Errorf("parameter %s missing", PARAMETER_API_URL)
+	if len(apiURL) == 0 {
+		return fmt.Errorf("parameter %s missing", parameterAPIURL)
 	}
 	var err error
 	var repos []map[string]string
-	if repos, err = repoLister.ListRepos(aptly_model.NewApi(repoUrl, apiUrl, apiUsername, apiPassword)); err != nil {
+	if repos, err = repoLister.ListRepos(aptly_model.NewAPI(repoURL, apiURL, apiUsername, apiPassword)); err != nil {
 		return err
 	}
 	for _, repo := range repos {

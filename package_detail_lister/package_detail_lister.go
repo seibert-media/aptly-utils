@@ -7,10 +7,10 @@ import (
 
 var logger = log.DefaultLogger
 
-type ListPackages func(api aptly_model.Api, repository aptly_model.Repository) ([]map[string]string, error)
+type ListPackages func(api aptly_model.API, repository aptly_model.Repository) ([]map[string]string, error)
 
 type PackageDetailLister interface {
-	ListPackageDetails(api aptly_model.Api, repository aptly_model.Repository) ([]aptly_model.PackageDetail, error)
+	ListPackageDetails(api aptly_model.API, repository aptly_model.Repository) ([]aptly_model.PackageDetail, error)
 }
 
 type packageDetailLister struct {
@@ -23,7 +23,7 @@ func New(listPackages ListPackages) *packageDetailLister {
 	return p
 }
 
-func (p *packageDetailLister) ListPackageDetails(api aptly_model.Api, repository aptly_model.Repository) ([]aptly_model.PackageDetail, error) {
+func (p *packageDetailLister) ListPackageDetails(api aptly_model.API, repository aptly_model.Repository) ([]aptly_model.PackageDetail, error) {
 	logger.Debugf("ListPackageDetails")
 	infos, err := p.listPackages(api, repository)
 	if err != nil {

@@ -19,26 +19,26 @@ import (
 )
 
 const (
-	PARAMETER_LOGLEVEL          = "loglevel"
-	PARAMETER_API_URL           = "url"
-	PARAMETER_API_USER          = "username"
-	PARAMETER_API_PASSWORD      = "password"
-	PARAMETER_API_PASSWORD_FILE = "passwordfile"
-	PARAMETER_REPO              = "repo"
-	PARAMETER_DISTRIBUTION      = "distribution"
-	PARAMETER_REPO_URL          = "repo-url"
+	parameterLoglevel        = "loglevel"
+	parameterAPIURL          = "url"
+	parameterAPIUser         = "username"
+	parameterAPIPassword     = "password"
+	parameterAPIPasswordFile = "passwordfile"
+	parameterRepo            = "repo"
+	parameterDistribution    = "distribution"
+	parameterRepoURL         = "repo-url"
 )
 
 var (
 	logger             = log.DefaultLogger
-	logLevelPtr        = flag.String(PARAMETER_LOGLEVEL, log.INFO_STRING, log.FLAG_USAGE)
-	apiUrlPtr          = flag.String(PARAMETER_API_URL, "", "url")
-	apiUserPtr         = flag.String(PARAMETER_API_USER, "", "user")
-	apiPasswordPtr     = flag.String(PARAMETER_API_PASSWORD, "", "password")
-	apiPasswordFilePtr = flag.String(PARAMETER_API_PASSWORD_FILE, "", "passwordfile")
-	repoPtr            = flag.String(PARAMETER_REPO, "", "repo")
-	distributionPtr    = flag.String(PARAMETER_DISTRIBUTION, string(aptly_model.DISTRIBUTION_DEFAULT), "distribution")
-	repoUrlPtr         = flag.String(PARAMETER_REPO_URL, "", "repo url")
+	logLevelPtr        = flag.String(parameterLoglevel, log.INFO_STRING, log.FLAG_USAGE)
+	apiURLPtr          = flag.String(parameterAPIURL, "", "url")
+	apiUserPtr         = flag.String(parameterAPIUser, "", "user")
+	apiPasswordPtr     = flag.String(parameterAPIPassword, "", "password")
+	apiPasswordFilePtr = flag.String(parameterAPIPasswordFile, "", "passwordfile")
+	repoPtr            = flag.String(parameterRepo, "", "repo")
+	distributionPtr    = flag.String(parameterDistribution, string(aptly_model.DistribuionDefault), "distribution")
+	repoURLPtr         = flag.String(parameterRepoURL, "", "repo url")
 )
 
 func main() {
@@ -52,19 +52,19 @@ func main() {
 
 	httpClient := http_client_builder.New().WithoutProxy().Build()
 	requestbuilderExecutor := aptly_requestbuilder_executor.New(httpClient.Do)
-	repoPublisher := aptly_repo_publisher.New(requestbuilderExecutor, http_requestbuilder.NewHttpRequestBuilderProvider())
-	repoDeleter := aptly_repo_deleter.New(requestbuilderExecutor, http_requestbuilder.NewHttpRequestBuilderProvider(), repoPublisher.UnPublishRepo)
+	repoPublisher := aptly_repo_publisher.New(requestbuilderExecutor, http_requestbuilder.NewHTTPRequestBuilderProvider())
+	repoDeleter := aptly_repo_deleter.New(requestbuilderExecutor, http_requestbuilder.NewHTTPRequestBuilderProvider(), repoPublisher.UnPublishRepo)
 
-	if len(*repoUrlPtr) == 0 {
-		*repoUrlPtr = *apiUrlPtr
+	if len(*repoURLPtr) == 0 {
+		*repoURLPtr = *apiURLPtr
 	}
 
 	writer := os.Stdout
 	err := do(
 		writer,
 		repoDeleter,
-		*repoUrlPtr,
-		*apiUrlPtr,
+		*repoURLPtr,
+		*apiURLPtr,
 		*apiUserPtr,
 		*apiPasswordPtr,
 		*apiPasswordFilePtr,
@@ -81,8 +81,8 @@ func main() {
 func do(
 	writer io.Writer,
 	repo_deleter aptly_repo_deleter.RepoDeleter,
-	repoUrl string,
-	apiUrl string,
+	repoURL string,
+	apiURL string,
 	apiUsername string,
 	apiPassword string,
 	apiPasswordfile string,
@@ -96,11 +96,11 @@ func do(
 		}
 		apiPassword = strings.TrimSpace(string(content))
 	}
-	if len(apiUrl) == 0 {
-		return fmt.Errorf("parameter %s missing", PARAMETER_API_URL)
+	if len(apiURL) == 0 {
+		return fmt.Errorf("parameter %s missing", parameterAPIURL)
 	}
 	if len(repo) == 0 {
-		return fmt.Errorf("parameter %s missing", PARAMETER_REPO)
+		return fmt.Errorf("parameter %s missing", parameterRepo)
 	}
-	return repo_deleter.DeleteRepo(aptly_model.NewApi(repoUrl, apiUrl, apiUsername, apiPassword), aptly_model.Repository(repo), aptly_model.Distribution(distribution))
+	return repo_deleter.DeleteRepo(aptly_model.NewAPI(repoURL, apiURL, apiUsername, apiPassword), aptly_model.Repository(repo), aptly_model.Distribution(distribution))
 }

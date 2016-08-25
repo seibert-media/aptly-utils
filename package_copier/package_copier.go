@@ -15,18 +15,18 @@ import (
 type ExecuteRequest func(req *http.Request) (resp *http.Response, err error)
 
 type PackageCopier interface {
-	CopyPackage(api aptly_model.Api, sourceRepo aptly_model.Repository, targetRepo aptly_model.Repository, targetDistribution aptly_model.Distribution, packageName model.Package, version aptly_version.Version) error
+	CopyPackage(api aptly_model.API, sourceRepo aptly_model.Repository, targetRepo aptly_model.Repository, targetDistribution aptly_model.Distribution, packageName model.Package, version aptly_version.Version) error
 }
 
 type packageCopier struct {
 	uploader                   aptly_package_uploader.PackageUploader
-	httpRequestBuilderProvider http_requestbuilder.HttpRequestBuilderProvider
+	httpRequestBuilderProvider http_requestbuilder.HTTPRequestBuilderProvider
 	executeRequest             ExecuteRequest
 }
 
 var logger = log.DefaultLogger
 
-func New(uploader aptly_package_uploader.PackageUploader, httpRequestBuilderProvider http_requestbuilder.HttpRequestBuilderProvider, executeRequest ExecuteRequest) *packageCopier {
+func New(uploader aptly_package_uploader.PackageUploader, httpRequestBuilderProvider http_requestbuilder.HTTPRequestBuilderProvider, executeRequest ExecuteRequest) *packageCopier {
 	p := new(packageCopier)
 	p.executeRequest = executeRequest
 	p.uploader = uploader
@@ -35,7 +35,7 @@ func New(uploader aptly_package_uploader.PackageUploader, httpRequestBuilderProv
 }
 
 func (c *packageCopier) CopyPackage(
-	api aptly_model.Api,
+	api aptly_model.API,
 	sourceRepo aptly_model.Repository,
 	targetRepo aptly_model.Repository,
 	targetDistribution aptly_model.Distribution,
@@ -43,10 +43,10 @@ func (c *packageCopier) CopyPackage(
 	version aptly_version.Version,
 ) error {
 	logger.Debugf("CopyPackage - sourceRepo: %s targetRepo: %s, targetDistribution: %s, package: %s_%s", sourceRepo, targetRepo, targetDistribution, packageName, version)
-	url := fmt.Sprintf("%s/%s/pool/main/%s/%s/%s_%s.deb", api.RepoUrl, sourceRepo, packageName[0:1], packageName, packageName, version)
+	url := fmt.Sprintf("%s/%s/pool/main/%s/%s/%s_%s.deb", api.RepoURL, sourceRepo, packageName[0:1], packageName, packageName, version)
 	logger.Debugf("download package url: %s", url)
-	requestbuilder := c.httpRequestBuilderProvider.NewHttpRequestBuilder(url)
-	requestbuilder.AddBasicAuth(string(api.ApiUsername), string(api.ApiPassword))
+	requestbuilder := c.httpRequestBuilderProvider.NewHTTPRequestBuilder(url)
+	requestbuilder.AddBasicAuth(string(api.APIUsername), string(api.APIPassword))
 	req, err := requestbuilder.Build()
 	if err != nil {
 		return err

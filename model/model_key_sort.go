@@ -2,6 +2,6 @@ package model
 
 type KeySlice []Key
 
-func (v KeySlice) Len() int           { return len(v) }
-func (v KeySlice) Swap(i, j int)      { v[i], v[j] = v[j], v[i] }
-func (p KeySlice) Less(i, j int) bool { return p[i] < p[j] }
+func (k KeySlice) Len() int           { return len(k) }
+func (k KeySlice) Swap(i, j int)      { k[i], k[j] = k[j], k[i] }
+func (k KeySlice) Less(i, j int) bool { return k[i] < k[j] }

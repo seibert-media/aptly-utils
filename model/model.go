@@ -7,19 +7,19 @@ import (
 )
 
 const (
-	DISTRIBUTION_DEFAULT = Distribution("default")
-	ARCHITECTURE_ALL     = Architecture("all")
-	ARCHITECTURE_I386    = Architecture("i386")
-	ARCHITECTURE_AMD64   = Architecture("amd64")
-	ARCHITECTURE_DEFAULT = ARCHITECTURE_AMD64
-	PACKAGE_ALL          = Package("all")
+	DistribuionDefault  = Distribution("default")
+	ArchitectureALL     = Architecture("all")
+	ArchitectureI386    = Architecture("i386")
+	ArchitectureAMD64   = Architecture("amd64")
+	ArchitectureDefault = ArchitectureAMD64
+	PackageAll          = Package("all")
 )
 
-type Api struct {
-	RepoUrl     RepoUrl
-	ApiUrl      ApiUrl
-	ApiUsername ApiUsername
-	ApiPassword ApiPassword
+type API struct {
+	RepoURL     RepoURL
+	APIUrl      APIUrl
+	APIUsername APIUsername
+	APIPassword APIPassword
 }
 
 type Package string
@@ -30,13 +30,13 @@ type Key string
 
 type Distribution string
 
-type RepoUrl string
+type RepoURL string
 
-type ApiUrl string
+type APIUrl string
 
-type ApiUsername string
+type APIUsername string
 
-type ApiPassword string
+type APIPassword string
 
 type Repository string
 
@@ -66,17 +66,17 @@ func FromInfos(infos []map[string]string) []PackageDetail {
 	return result
 }
 
-func NewApi(
-	repoUrl string,
-	apiUrl string,
+func NewAPI(
+	repoURL string,
+	apiURL string,
 	apiUsername string,
 	apiPassword string,
-) Api {
-	return Api{
-		RepoUrl:     RepoUrl(repoUrl),
-		ApiUrl:      ApiUrl(apiUrl),
-		ApiUsername: ApiUsername(apiUsername),
-		ApiPassword: ApiPassword(apiPassword),
+) API {
+	return API{
+		RepoURL:     RepoURL(repoURL),
+		APIUrl:      APIUrl(apiURL),
+		APIUsername: APIUsername(apiUsername),
+		APIPassword: APIPassword(apiPassword),
 	}
 }
 

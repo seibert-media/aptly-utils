@@ -26,32 +26,32 @@ import (
 )
 
 const (
-	PARAMETER_SOURCE            = "source"
-	PARAMETER_TARGET            = "target"
-	PARAMETER_NAME              = "name"
-	PARAMETER_VERSION           = "version"
-	PARAMETER_LOGLEVEL          = "loglevel"
-	PARAMETER_API_URL           = "url"
-	PARAMETER_API_USER          = "username"
-	PARAMETER_API_PASSWORD      = "password"
-	PARAMETER_API_PASSWORD_FILE = "passwordfile"
-	PARAMETER_DISTRIBUTION      = "distribution"
-	PARAMETER_REPO_URL          = "repo-url"
+	parameterSource          = "source"
+	parameterTarget          = "target"
+	parameterName            = "name"
+	parameterVersion         = "version"
+	parameterLoglevel        = "loglevel"
+	parameterAPIURL          = "url"
+	parameterAPIUser         = "username"
+	parameterAPIPassword     = "password"
+	parameterAPIPasswordFile = "passwordfile"
+	parameterDistribution    = "distribution"
+	parameterRepoURL         = "repo-url"
 )
 
 var (
 	logger                = log.DefaultLogger
-	logLevelPtr           = flag.String(PARAMETER_LOGLEVEL, log.INFO_STRING, log.FLAG_USAGE)
-	apiUrlPtr             = flag.String(PARAMETER_API_URL, "", "url")
-	apiUserPtr            = flag.String(PARAMETER_API_USER, "", "user")
-	apiPasswordPtr        = flag.String(PARAMETER_API_PASSWORD, "", "password")
-	apiPasswordFilePtr    = flag.String(PARAMETER_API_PASSWORD_FILE, "", "passwordfile")
-	sourcePtr             = flag.String(PARAMETER_SOURCE, "", "source")
-	targetPtr             = flag.String(PARAMETER_TARGET, "", "target")
-	namePtr               = flag.String(PARAMETER_NAME, "", "name")
-	versionPtr            = flag.String(PARAMETER_VERSION, "", "version")
-	targetDistributionPtr = flag.String(PARAMETER_DISTRIBUTION, string(aptly_model.DISTRIBUTION_DEFAULT), "distribution")
-	repoUrlPtr            = flag.String(PARAMETER_REPO_URL, "", "repo url")
+	logLevelPtr           = flag.String(parameterLoglevel, log.INFO_STRING, log.FLAG_USAGE)
+	apiURLPtr             = flag.String(parameterAPIURL, "", "url")
+	apiUserPtr            = flag.String(parameterAPIUser, "", "user")
+	apiPasswordPtr        = flag.String(parameterAPIPassword, "", "password")
+	apiPasswordFilePtr    = flag.String(parameterAPIPasswordFile, "", "passwordfile")
+	sourcePtr             = flag.String(parameterSource, "", "source")
+	targetPtr             = flag.String(parameterTarget, "", "target")
+	namePtr               = flag.String(parameterName, "", "name")
+	versionPtr            = flag.String(parameterVersion, "", "version")
+	targetDistributionPtr = flag.String(parameterDistribution, string(aptly_model.DistribuionDefault), "distribution")
+	repoURLPtr            = flag.String(parameterRepoURL, "", "repo url")
 )
 
 func main() {
@@ -64,20 +64,20 @@ func main() {
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
 	httpClient := http_client_builder.New().WithoutProxy().Build()
-	httpRequestBuilderProvider := http_requestbuilder.NewHttpRequestBuilderProvider()
+	httpRequestBuilderProvider := http_requestbuilder.NewHTTPRequestBuilderProvider()
 	requestbuilder_executor := aptly_requestbuilder_executor.New(httpClient.Do)
-	requestbuilder := http_requestbuilder.NewHttpRequestBuilderProvider()
+	requestbuilder := http_requestbuilder.NewHTTPRequestBuilderProvider()
 	repo_publisher := aptly_repo_publisher.New(requestbuilder_executor, requestbuilder)
 	packageUploader := aptly_package_uploader.New(requestbuilder_executor, requestbuilder, repo_publisher.PublishRepo)
 	packageCopier := aptly_package_copier.New(packageUploader, requestbuilder, httpClient.Do)
-	packageLister := aptly_package_lister.New(httpClient.Do, httpRequestBuilderProvider.NewHttpRequestBuilder)
+	packageLister := aptly_package_lister.New(httpClient.Do, httpRequestBuilderProvider.NewHTTPRequestBuilder)
 	packageDetailLister := aptly_model_lister.New(packageLister.ListPackages)
 	packageVersion := aptly_package_versions.New(packageDetailLister.ListPackageDetails)
 	packageLastestVersion := aptly_package_latest_version.New(packageVersion.PackageVersions)
 	packageDetailLatestLister := aptly_model_latest_lister.New(packageDetailLister.ListPackageDetails)
 
-	if len(*repoUrlPtr) == 0 {
-		*repoUrlPtr = *apiUrlPtr
+	if len(*repoURLPtr) == 0 {
+		*repoURLPtr = *apiURLPtr
 	}
 
 	writer := os.Stdout
@@ -86,8 +86,8 @@ func main() {
 		packageCopier,
 		packageLastestVersion,
 		packageDetailLatestLister,
-		*repoUrlPtr,
-		*apiUrlPtr,
+		*repoURLPtr,
+		*apiURLPtr,
 		*apiUserPtr,
 		*apiPasswordPtr,
 		*apiPasswordFilePtr,
@@ -109,8 +109,8 @@ func do(
 	packageCopier aptly_package_copier.PackageCopier,
 	packageLatestVersion aptly_package_latest_version.PackageLatestVersion,
 	packageDetailLatestLister aptly_model_latest_lister.PackageDetailLatestLister,
-	repoUrl string,
-	apiUrl string,
+	repoURL string,
+	apiURL string,
 	apiUsername string,
 	apiPassword string,
 	apiPasswordfile string,
@@ -127,31 +127,31 @@ func do(
 		}
 		apiPassword = strings.TrimSpace(string(content))
 	}
-	if len(apiUrl) == 0 {
-		return fmt.Errorf("parameter %s missing", PARAMETER_API_URL)
+	if len(apiURL) == 0 {
+		return fmt.Errorf("parameter %s missing", parameterAPIURL)
 	}
 	if len(sourceRepo) == 0 {
-		return fmt.Errorf("parameter %s missing", PARAMETER_SOURCE)
+		return fmt.Errorf("parameter %s missing", parameterSource)
 	}
 	if len(targetRepo) == 0 {
-		return fmt.Errorf("parameter %s missing", PARAMETER_TARGET)
+		return fmt.Errorf("parameter %s missing", parameterTarget)
 	}
 	if len(name) == 0 {
-		return fmt.Errorf("parameter %s missing", PARAMETER_NAME)
+		return fmt.Errorf("parameter %s missing", parameterName)
 	}
 	if len(version) == 0 {
-		return fmt.Errorf("parameter %s missing", PARAMETER_VERSION)
+		return fmt.Errorf("parameter %s missing", parameterVersion)
 	}
-	return copy(packageCopier, packageLatestVersion, packageDetailLatestLister, aptly_model.NewApi(repoUrl, apiUrl, apiUsername, apiPassword), aptly_model.Repository(sourceRepo), aptly_model.Repository(targetRepo), aptly_model.Distribution(targetDistribution), aptly_model.Package(name), aptly_version.Version(version))
+	return copy(packageCopier, packageLatestVersion, packageDetailLatestLister, aptly_model.NewAPI(repoURL, apiURL, apiUsername, apiPassword), aptly_model.Repository(sourceRepo), aptly_model.Repository(targetRepo), aptly_model.Distribution(targetDistribution), aptly_model.Package(name), aptly_version.Version(version))
 }
 
-func copy(packageCopier aptly_package_copier.PackageCopier, packageLatestVersion aptly_package_latest_version.PackageLatestVersion, packageDetailLatestLister aptly_model_latest_lister.PackageDetailLatestLister, api aptly_model.Api, sourceRepo aptly_model.Repository, targetRepo aptly_model.Repository, targetDistribution aptly_model.Distribution, packageName aptly_model.Package, version aptly_version.Version) error {
-	if packageName == aptly_model.PACKAGE_ALL && version != aptly_version.LATEST {
+func copy(packageCopier aptly_package_copier.PackageCopier, packageLatestVersion aptly_package_latest_version.PackageLatestVersion, packageDetailLatestLister aptly_model_latest_lister.PackageDetailLatestLister, api aptly_model.API, sourceRepo aptly_model.Repository, targetRepo aptly_model.Repository, targetDistribution aptly_model.Distribution, packageName aptly_model.Package, version aptly_version.Version) error {
+	if packageName == aptly_model.PackageAll && version != aptly_version.LATEST {
 		return fmt.Errorf("can't copy with package all and version != latest")
 	}
 	var list []aptly_model.PackageDetail
 	var err error
-	if packageName == aptly_model.PACKAGE_ALL {
+	if packageName == aptly_model.PackageAll {
 		list, err = packageDetailLatestLister.ListLatestPackageDetails(api, sourceRepo)
 		if err != nil {
 			return err
@@ -162,7 +162,7 @@ func copy(packageCopier aptly_package_copier.PackageCopier, packageLatestVersion
 	return copyList(packageCopier, packageLatestVersion, api, sourceRepo, targetRepo, targetDistribution, list)
 }
 
-func copyList(packageCopier aptly_package_copier.PackageCopier, packageLatestVersion aptly_package_latest_version.PackageLatestVersion, api aptly_model.Api, sourceRepo aptly_model.Repository, targetRepo aptly_model.Repository, targetDistribution aptly_model.Distribution, list []aptly_model.PackageDetail) error {
+func copyList(packageCopier aptly_package_copier.PackageCopier, packageLatestVersion aptly_package_latest_version.PackageLatestVersion, api aptly_model.API, sourceRepo aptly_model.Repository, targetRepo aptly_model.Repository, targetDistribution aptly_model.Distribution, list []aptly_model.PackageDetail) error {
 	for _, e := range list {
 		version := e.Version
 		packageName := e.Package

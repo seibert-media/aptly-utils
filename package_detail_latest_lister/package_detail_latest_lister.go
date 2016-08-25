@@ -8,10 +8,10 @@ import (
 
 var logger = log.DefaultLogger
 
-type ListPackageDetails func(api aptly_model.Api, repository aptly_model.Repository) ([]aptly_model.PackageDetail, error)
+type ListPackageDetails func(api aptly_model.API, repository aptly_model.Repository) ([]aptly_model.PackageDetail, error)
 
 type PackageDetailLatestLister interface {
-	ListLatestPackageDetails(api aptly_model.Api, repository aptly_model.Repository) ([]aptly_model.PackageDetail, error)
+	ListLatestPackageDetails(api aptly_model.API, repository aptly_model.Repository) ([]aptly_model.PackageDetail, error)
 }
 
 type packageDetailLatestLister struct {
@@ -24,7 +24,7 @@ func New(listPackageDetails ListPackageDetails) *packageDetailLatestLister {
 	return p
 }
 
-func (p *packageDetailLatestLister) ListLatestPackageDetails(api aptly_model.Api, repository aptly_model.Repository) ([]aptly_model.PackageDetail, error) {
+func (p *packageDetailLatestLister) ListLatestPackageDetails(api aptly_model.API, repository aptly_model.Repository) ([]aptly_model.PackageDetail, error) {
 	logger.Debugf("ListPackageDetails")
 	list, err := p.listPackageDetails(api, repository)
 	if err != nil {
