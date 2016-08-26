@@ -26,6 +26,10 @@ type Package string
 
 type Architecture string
 
+func (a Architecture) String() string {
+	return string(a)
+}
+
 type Key string
 
 type Distribution string
@@ -39,6 +43,10 @@ type APIUsername string
 type APIPassword string
 
 type Repository string
+
+func (r Repository) String() string {
+	return string(r)
+}
 
 type PackageDetail struct {
 	Package Package
