@@ -15,6 +15,8 @@ const (
 	PackageAll          = Package("all")
 )
 
+var AllowedArchitectures = []Architecture{ArchitectureALL, ArchitectureI386, ArchitectureAMD64}
+
 type API struct {
 	RepoURL     RepoURL
 	APIUrl      APIUrl

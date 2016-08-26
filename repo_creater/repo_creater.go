@@ -38,11 +38,29 @@ func New(
 }
 
 func (c *repoCreater) CreateRepo(api aptly_model.API, repository aptly_model.Repository, distribution aptly_model.Distribution, architectures []aptly_model.Architecture) error {
+	if err := validateArchitectures(architectures...); err != nil {
+		return err
+	}
 	if err := c.createRepo(api, repository); err != nil {
 		//return err
 	}
 	if err := c.publishNewRepo(api, repository, distribution, architectures); err != nil {
 		return err
+	}
+	return nil
+}
+
+func validateArchitectures(architectures ...aptly_model.Architecture) error {
+	for _, architecture := range architectures {
+		allowed := false
+		for _, allowedArchitecture := range aptly_model.AllowedArchitectures {
+			if architecture == allowedArchitecture {
+				allowed = true
+			}
+		}
+		if !allowed {
+			return fmt.Errorf("not support architecture: %v", architecture)
+		}
 	}
 	return nil
 }
