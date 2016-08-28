@@ -25,7 +25,7 @@ Package provide some aptly utils
 ```
 aptly_repo_lister \
 -loglevel=DEBUG \
--url=http://aptly.tools.seibert-media.net \
+-url=https://aptly.tools.seibert-media.net \
 -username=api \
 -passwordfile=$HOME/aptly_api_password
 ```
@@ -35,7 +35,7 @@ aptly_repo_lister \
 ```
 aptly_create_repo \
 -loglevel=DEBUG \
--url=http://aptly.tools.seibert-media.net \
+-url=https://aptly.tools.seibert-media.net \
 -username=api \
 -passwordfile=$HOME/aptly_api_password \
 -repo=unstable \
@@ -47,7 +47,7 @@ aptly_create_repo \
 ```
 aptly_delete_repo \
 -loglevel=DEBUG \
--url=http://aptly.tools.seibert-media.net \
+-url=https://aptly.tools.seibert-media.net \
 -username=api \
 -passwordfile=$HOME/aptly_api_password \
 -repo=unstable
@@ -58,7 +58,7 @@ aptly_delete_repo \
 ```
 aptly_clean_repo \
 -loglevel=DEBUG \
--url=http://aptly.tools.seibert-media.net \
+-url=https://aptly.tools.seibert-media.net \
 -username=api \
 -passwordfile=$HOME/aptly_api_password \
 -repo=unstable
@@ -69,7 +69,7 @@ aptly_clean_repo \
 ```
 aptly_upload \
 -loglevel=DEBUG \
--url=http://aptly.tools.seibert-media.net \
+-url=https://aptly.tools.seibert-media.net \
 -username=api \
 -passwordfile=$HOME/aptly_api_password \
 -file=booking_1.0.1-b47.deb \
@@ -81,7 +81,7 @@ aptly_upload \
 ```
 aptly_package_lister \
 -loglevel=DEBUG \
--url=http://aptly.tools.seibert-media.net \
+-url=https://aptly.tools.seibert-media.net \
 -username=api \
 -passwordfile=$HOME/aptly_api_password \
 -repo=unstable
@@ -92,7 +92,7 @@ aptly_package_lister \
 ```
 aptly_delete_package \
 -loglevel=DEBUG \
--url=http://aptly.tools.seibert-media.net \
+-url=https://aptly.tools.seibert-media.net \
 -username=api \
 -passwordfile=$HOME/aptly_api_password \
 -repo=unstable \
@@ -107,7 +107,7 @@ aptly_delete_package \
 ```
 aptly_copy_package \
 -loglevel=DEBUG \
--url=http://aptly.tools.seibert-media.net \
+-url=https://aptly.tools.seibert-media.net \
 -username=api \
 -passwordfile=$HOME/aptly_api_password \
 -source=unstable \
@@ -121,7 +121,7 @@ aptly_copy_package \
 ```
 aptly_copy_package \
 -loglevel=DEBUG \
--url=http://aptly.tools.seibert-media.net \
+-url=https://aptly.tools.seibert-media.net \
 -username=api \
 -passwordfile=$HOME/aptly_api_password \
 -source=unstable \
@@ -135,7 +135,7 @@ aptly_copy_package \
 ```
 aptly_copy_package \
 -loglevel=DEBUG \
--url=http://aptly.tools.seibert-media.net \
+-url=https://aptly.tools.seibert-media.net \
 -username=api \
 -passwordfile=$HOME/aptly_api_password \
 -source=unstable \
@@ -149,7 +149,7 @@ aptly_copy_package \
 ```
 aptly_package_version \
 -loglevel=DEBUG \
--url=http://aptly.tools.seibert-media.net \
+-url=https://aptly.tools.seibert-media.net \
 -username=api \
 -passwordfile=$HOME/aptly_api_password \
 -repo=unstable \
