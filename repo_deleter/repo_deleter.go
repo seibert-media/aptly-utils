@@ -6,10 +6,8 @@ import (
 	aptly_model "github.com/bborbe/aptly_utils/model"
 	aptly_requestbuilder_executor "github.com/bborbe/aptly_utils/requestbuilder_executor"
 	http_requestbuilder "github.com/bborbe/http/requestbuilder"
-	"github.com/bborbe/log"
+	"github.com/golang/glog"
 )
-
-var logger = log.DefaultLogger
 
 type UnPublishRepo func(api aptly_model.API, repository aptly_model.Repository, distribution aptly_model.Distribution) error
 
@@ -32,7 +30,7 @@ func New(buildRequestAndExecute aptly_requestbuilder_executor.RequestbuilderExec
 }
 
 func (r *repoDeleter) DeleteRepo(api aptly_model.API, repository aptly_model.Repository, distribution aptly_model.Distribution) error {
-	logger.Debugf("DeleteRepo - repo: %s distribution: %s", repository, distribution)
+	glog.V(2).Infof("DeleteRepo - repo: %s distribution: %s", repository, distribution)
 	err := r.unPublishRepo(api, repository, distribution)
 	if err != nil {
 		//return err
@@ -41,7 +39,7 @@ func (r *repoDeleter) DeleteRepo(api aptly_model.API, repository aptly_model.Rep
 }
 
 func (r *repoDeleter) deleteRepo(api aptly_model.API, repository aptly_model.Repository) error {
-	logger.Debugf("deleteRepo - repo: %s", repository)
+	glog.V(2).Infof("deleteRepo - repo: %s", repository)
 	requestbuilder := r.httpRequestBuilderProvider.NewHTTPRequestBuilder(fmt.Sprintf("%s/api/repos/%s", api.APIUrl, repository))
 	requestbuilder.AddBasicAuth(string(api.APIUsername), string(api.APIPassword))
 	requestbuilder.SetMethod("DELETE")

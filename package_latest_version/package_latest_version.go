@@ -6,11 +6,9 @@ import (
 
 	"github.com/bborbe/aptly_utils/model"
 	aptly_model "github.com/bborbe/aptly_utils/model"
-	"github.com/bborbe/log"
 	aptly_version "github.com/bborbe/version"
+	"github.com/golang/glog"
 )
-
-var logger = log.DefaultLogger
 
 type PackageVersions func(api aptly_model.API, repository aptly_model.Repository, packageName model.Package) ([]aptly_version.Version, error)
 
@@ -29,7 +27,7 @@ func New(packageVersions PackageVersions) *packageLatestVersion {
 }
 
 func (p *packageLatestVersion) PackageLatestVersion(api aptly_model.API, repository aptly_model.Repository, packageName model.Package) (*aptly_version.Version, error) {
-	logger.Debugf("PackageLatestVersion")
+	glog.V(2).Infof("PackageLatestVersion")
 	var err error
 	var versions []aptly_version.Version
 	if versions, err = p.packageVersions(api, repository, packageName); err != nil {
@@ -40,6 +38,6 @@ func (p *packageLatestVersion) PackageLatestVersion(api aptly_model.API, reposit
 	}
 	sort.Sort(aptly_version.VersionByName(versions))
 	latestVersion := versions[len(versions)-1]
-	logger.Debugf("found latest version %v for package %s", latestVersion, packageName)
+	glog.V(2).Infof("found latest version %v for package %s", latestVersion, packageName)
 	return &latestVersion, nil
 }

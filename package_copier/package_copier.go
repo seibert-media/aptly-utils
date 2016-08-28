@@ -8,8 +8,8 @@ import (
 	aptly_model "github.com/bborbe/aptly_utils/model"
 	aptly_package_uploader "github.com/bborbe/aptly_utils/package_uploader"
 	http_requestbuilder "github.com/bborbe/http/requestbuilder"
-	"github.com/bborbe/log"
 	aptly_version "github.com/bborbe/version"
+	"github.com/golang/glog"
 )
 
 type ExecuteRequest func(req *http.Request) (resp *http.Response, err error)
@@ -23,8 +23,6 @@ type packageCopier struct {
 	httpRequestBuilderProvider http_requestbuilder.HTTPRequestBuilderProvider
 	executeRequest             ExecuteRequest
 }
-
-var logger = log.DefaultLogger
 
 func New(uploader aptly_package_uploader.PackageUploader, httpRequestBuilderProvider http_requestbuilder.HTTPRequestBuilderProvider, executeRequest ExecuteRequest) *packageCopier {
 	p := new(packageCopier)
@@ -42,9 +40,9 @@ func (c *packageCopier) CopyPackage(
 	packageName model.Package,
 	version aptly_version.Version,
 ) error {
-	logger.Debugf("CopyPackage - sourceRepo: %s targetRepo: %s, targetDistribution: %s, package: %s_%s", sourceRepo, targetRepo, targetDistribution, packageName, version)
+	glog.V(2).Infof("CopyPackage - sourceRepo: %s targetRepo: %s, targetDistribution: %s, package: %s_%s", sourceRepo, targetRepo, targetDistribution, packageName, version)
 	url := fmt.Sprintf("%s/%s/pool/main/%s/%s/%s_%s.deb", api.RepoURL, sourceRepo, packageName[0:1], packageName, packageName, version)
-	logger.Debugf("download package url: %s", url)
+	glog.V(2).Infof("download package url: %s", url)
 	requestbuilder := c.httpRequestBuilderProvider.NewHTTPRequestBuilder(url)
 	requestbuilder.AddBasicAuth(string(api.APIUsername), string(api.APIPassword))
 	req, err := requestbuilder.Build()
@@ -56,10 +54,10 @@ func (c *packageCopier) CopyPackage(
 		return err
 	}
 	defer resp.Body.Close()
-	logger.Debugf("download package returncode: %d", resp.StatusCode)
+	glog.V(2).Infof("download package returncode: %d", resp.StatusCode)
 	if resp.StatusCode/100 != 2 {
 		return fmt.Errorf("download package %s %s failed with status %d from url %s", packageName, version, resp.StatusCode, url)
 	}
-	logger.Debug("download completed, start upload")
+	glog.V(2).Info("download completed, start upload")
 	return c.uploader.UploadPackageByReader(api, targetRepo, targetDistribution, fmt.Sprintf("%s_%s.deb", packageName, version), resp.Body)
 }

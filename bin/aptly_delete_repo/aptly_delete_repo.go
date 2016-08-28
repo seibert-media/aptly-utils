@@ -15,11 +15,10 @@ import (
 	aptly_requestbuilder_executor "github.com/bborbe/aptly_utils/requestbuilder_executor"
 	http_client_builder "github.com/bborbe/http/client_builder"
 	http_requestbuilder "github.com/bborbe/http/requestbuilder"
-	"github.com/bborbe/log"
+	"github.com/golang/glog"
 )
 
 const (
-	parameterLoglevel        = "loglevel"
 	parameterAPIURL          = "url"
 	parameterAPIUser         = "username"
 	parameterAPIPassword     = "password"
@@ -30,8 +29,6 @@ const (
 )
 
 var (
-	logger             = log.DefaultLogger
-	logLevelPtr        = flag.String(parameterLoglevel, log.INFO_STRING, log.FLAG_USAGE)
 	apiURLPtr          = flag.String(parameterAPIURL, "", "url")
 	apiUserPtr         = flag.String(parameterAPIUser, "", "user")
 	apiPasswordPtr     = flag.String(parameterAPIPassword, "", "password")
@@ -42,11 +39,9 @@ var (
 )
 
 func main() {
-	defer logger.Close()
+	defer glog.Flush()
+	glog.CopyStandardLogTo("info")
 	flag.Parse()
-
-	logger.SetLevelThreshold(log.LogStringToLevel(*logLevelPtr))
-	logger.Debugf("set log level to %s", *logLevelPtr)
 
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
@@ -72,9 +67,7 @@ func main() {
 		*distributionPtr,
 	)
 	if err != nil {
-		logger.Fatal(err)
-		logger.Close()
-		os.Exit(1)
+		glog.Exit(err)
 	}
 }
 

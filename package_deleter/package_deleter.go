@@ -9,8 +9,8 @@ import (
 
 	aptly_model "github.com/bborbe/aptly_utils/model"
 	http_requestbuilder "github.com/bborbe/http/requestbuilder"
-	"github.com/bborbe/log"
 	aptly_version "github.com/bborbe/version"
+	"github.com/golang/glog"
 )
 
 type ExecuteRequest func(req *http.Request) (resp *http.Response, err error)
@@ -29,8 +29,6 @@ type packageDeleter struct {
 	newHTTPRequestBuilder NewHTTPRequestBuilder
 	publishRepo           PublishRepo
 }
-
-var logger = log.DefaultLogger
 
 func New(executeRequest ExecuteRequest, newHTTPRequestBuilder NewHTTPRequestBuilder, publishRepo PublishRepo) *packageDeleter {
 	p := new(packageDeleter)
@@ -61,7 +59,7 @@ func (p *packageDeleter) DeletePackagesByKey(api aptly_model.API, repository apt
 }
 
 func (p *packageDeleter) findKeys(api aptly_model.API, repository aptly_model.Repository, packageName aptly_model.Package, version aptly_version.Version) ([]aptly_model.Key, error) {
-	logger.Debugf("PackageVersions - repo: %s package: %s", repository, packageName)
+	glog.V(2).Infof("PackageVersions - repo: %s package: %s", repository, packageName)
 	url := fmt.Sprintf("%s/api/repos/%s/packages?format=details", api.APIUrl, repository)
 	requestbuilder := p.newHTTPRequestBuilder(url)
 	requestbuilder.AddBasicAuth(string(api.APIUsername), string(api.APIPassword))
@@ -92,7 +90,7 @@ func (p *packageDeleter) findKeys(api aptly_model.API, repository aptly_model.Re
 	for _, info := range jsonStruct {
 		if info["Package"] == string(packageName) && info["Version"] == string(version) {
 			key := info["Key"]
-			logger.Debugf("found key: %s", key)
+			glog.V(2).Infof("found key: %s", key)
 			keys = append(keys, aptly_model.Key(key))
 		}
 	}
@@ -100,7 +98,7 @@ func (p *packageDeleter) findKeys(api aptly_model.API, repository aptly_model.Re
 }
 
 func (p *packageDeleter) deletePackagesByKey(api aptly_model.API, repository aptly_model.Repository, keys []aptly_model.Key) error {
-	logger.Debugf("delete package with keys: %v", keys)
+	glog.V(2).Infof("delete package with keys: %v", keys)
 	url := fmt.Sprintf("%s/api/repos/%s/packages?format=details", api.APIUrl, repository)
 	requestbuilder := p.newHTTPRequestBuilder(url)
 	requestbuilder.AddBasicAuth(string(api.APIUsername), string(api.APIPassword))

@@ -2,11 +2,9 @@ package package_detail_latest_lister
 
 import (
 	aptly_model "github.com/bborbe/aptly_utils/model"
-	"github.com/bborbe/log"
 	aptly_version "github.com/bborbe/version"
+	"github.com/golang/glog"
 )
-
-var logger = log.DefaultLogger
 
 type ListPackageDetails func(api aptly_model.API, repository aptly_model.Repository) ([]aptly_model.PackageDetail, error)
 
@@ -25,7 +23,7 @@ func New(listPackageDetails ListPackageDetails) *packageDetailLatestLister {
 }
 
 func (p *packageDetailLatestLister) ListLatestPackageDetails(api aptly_model.API, repository aptly_model.Repository) ([]aptly_model.PackageDetail, error) {
-	logger.Debugf("ListPackageDetails")
+	glog.V(2).Infof("ListPackageDetails")
 	list, err := p.listPackageDetails(api, repository)
 	if err != nil {
 		return nil, err

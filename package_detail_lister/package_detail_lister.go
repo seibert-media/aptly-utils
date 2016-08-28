@@ -2,10 +2,8 @@ package package_detail_lister
 
 import (
 	aptly_model "github.com/bborbe/aptly_utils/model"
-	"github.com/bborbe/log"
+	"github.com/golang/glog"
 )
-
-var logger = log.DefaultLogger
 
 type ListPackages func(api aptly_model.API, repository aptly_model.Repository) ([]map[string]string, error)
 
@@ -24,7 +22,7 @@ func New(listPackages ListPackages) *packageDetailLister {
 }
 
 func (p *packageDetailLister) ListPackageDetails(api aptly_model.API, repository aptly_model.Repository) ([]aptly_model.PackageDetail, error) {
-	logger.Debugf("ListPackageDetails")
+	glog.V(2).Infof("ListPackageDetails")
 	infos, err := p.listPackages(api, repository)
 	if err != nil {
 		return nil, err

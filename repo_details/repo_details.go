@@ -8,7 +8,7 @@ import (
 
 	aptly_model "github.com/bborbe/aptly_utils/model"
 	http_requestbuilder "github.com/bborbe/http/requestbuilder"
-	"github.com/bborbe/log"
+	"github.com/golang/glog"
 )
 
 type ExecuteRequest func(req *http.Request) (resp *http.Response, err error)
@@ -24,8 +24,6 @@ type repoDetails struct {
 	newHTTPRequestBuilder NewHTTPRequestBuilder
 }
 
-var logger = log.DefaultLogger
-
 func New(executeRequest ExecuteRequest, newHTTPRequestBuilder NewHTTPRequestBuilder) *repoDetails {
 	p := new(repoDetails)
 	p.newHTTPRequestBuilder = newHTTPRequestBuilder
@@ -34,7 +32,7 @@ func New(executeRequest ExecuteRequest, newHTTPRequestBuilder NewHTTPRequestBuil
 }
 
 func (p *repoDetails) Repos(api aptly_model.API, repository aptly_model.Repository) (map[string]string, error) {
-	logger.Debugf("list repos")
+	glog.V(2).Infof("list repos")
 	url := fmt.Sprintf("%s/api/repos/%s", api.APIUrl, repository)
 	requestbuilder := p.newHTTPRequestBuilder(url)
 	requestbuilder.AddBasicAuth(string(api.APIUsername), string(api.APIPassword))

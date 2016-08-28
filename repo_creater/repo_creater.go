@@ -8,7 +8,7 @@ import (
 	aptly_model "github.com/bborbe/aptly_utils/model"
 	aptly_requestbuilder_executor "github.com/bborbe/aptly_utils/requestbuilder_executor"
 	http_requestbuilder "github.com/bborbe/http/requestbuilder"
-	"github.com/bborbe/log"
+	"github.com/golang/glog"
 )
 
 type PublishNewRepo func(api aptly_model.API, repository aptly_model.Repository, distribution aptly_model.Distribution, architectures []aptly_model.Architecture) error
@@ -22,8 +22,6 @@ type repoCreater struct {
 	httpRequestBuilderProvider http_requestbuilder.HTTPRequestBuilderProvider
 	publishNewRepo             PublishNewRepo
 }
-
-var logger = log.DefaultLogger
 
 func New(
 	buildRequestAndExecute aptly_requestbuilder_executor.RequestbuilderExecutor,
@@ -66,7 +64,7 @@ func validateArchitectures(architectures ...aptly_model.Architecture) error {
 }
 
 func (c *repoCreater) createRepo(api aptly_model.API, repository aptly_model.Repository) error {
-	logger.Debugf("createRepo")
+	glog.V(2).Infof("createRepo")
 	requestbuilder := c.httpRequestBuilderProvider.NewHTTPRequestBuilder(fmt.Sprintf("%s/api/repos", api.APIUrl))
 	requestbuilder.AddBasicAuth(string(api.APIUsername), string(api.APIPassword))
 	requestbuilder.SetMethod("POST")

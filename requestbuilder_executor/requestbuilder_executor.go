@@ -5,10 +5,8 @@ import (
 	"net/http"
 
 	http_requestbuilder "github.com/bborbe/http/requestbuilder"
-	"github.com/bborbe/log"
+	"github.com/golang/glog"
 )
-
-var logger = log.DefaultLogger
 
 type ExecuteRequest func(req *http.Request) (resp *http.Response, err error)
 
@@ -33,7 +31,7 @@ func (r *requestbuilderExecutor) BuildRequestAndExecute(requestbuilder http_requ
 	}
 	url := req.URL.String()
 	method := req.Method
-	logger.Debugf("build %s request to %s", method, url)
+	glog.V(2).Infof("build %s request to %s", method, url)
 	resp, err := r.executeRequest(req)
 	if err != nil {
 		return err

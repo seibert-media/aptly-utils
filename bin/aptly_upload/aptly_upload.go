@@ -4,7 +4,6 @@ import (
 	"flag"
 	"fmt"
 	"io/ioutil"
-	"os"
 	"runtime"
 	"strings"
 
@@ -14,12 +13,11 @@ import (
 	aptly_requestbuilder_executor "github.com/bborbe/aptly_utils/requestbuilder_executor"
 	http_client_builder "github.com/bborbe/http/client_builder"
 	http_requestbuilder "github.com/bborbe/http/requestbuilder"
-	"github.com/bborbe/log"
+	"github.com/golang/glog"
 )
 
 const (
 	parameterFile            = "file"
-	parameterLoglevel        = "loglevel"
 	parameterAPIURL          = "url"
 	parameterAPIUser         = "username"
 	parameterAPIPassword     = "password"
@@ -30,8 +28,6 @@ const (
 )
 
 var (
-	logger             = log.DefaultLogger
-	logLevelPtr        = flag.String(parameterLoglevel, log.INFO_STRING, log.FLAG_USAGE)
 	filePtr            = flag.String(parameterFile, "", "file")
 	apiURLPtr          = flag.String(parameterAPIURL, "", "url")
 	apiUserPtr         = flag.String(parameterAPIUser, "", "user")
@@ -43,12 +39,9 @@ var (
 )
 
 func main() {
-	defer logger.Close()
+	defer glog.Flush()
+	glog.CopyStandardLogTo("info")
 	flag.Parse()
-
-	logger.SetLevelThreshold(log.LogStringToLevel(*logLevelPtr))
-	logger.Debugf("set log level to %s", *logLevelPtr)
-
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
 	httpClient := http_client_builder.New().WithoutProxy().Build()
@@ -73,9 +66,7 @@ func main() {
 		*distributionPtr,
 	)
 	if err != nil {
-		logger.Fatal(err)
-		logger.Close()
-		os.Exit(1)
+		glog.Exit(err)
 	}
 }
 
@@ -106,6 +97,6 @@ func do(
 	if len(file) == 0 {
 		return fmt.Errorf("parameter %s missing", parameterFile)
 	}
-	logger.Debugf("upload file %s to repo %s dist %s on server %s", file, repo, distribution, apiURL)
+	glog.V(2).Infof("upload file %s to repo %s dist %s on server %s", file, repo, distribution, apiURL)
 	return package_uploader.UploadPackageByFile(aptly_model.NewAPI(repoURL, apiURL, apiUsername, apiPassword), aptly_model.Repository(repo), aptly_model.Distribution(distribution), file)
 }

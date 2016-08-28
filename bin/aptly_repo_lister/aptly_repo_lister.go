@@ -14,11 +14,10 @@ import (
 	aptly_repo_lister "github.com/bborbe/aptly_utils/repo_lister"
 	http_client_builder "github.com/bborbe/http/client_builder"
 	http_requestbuilder "github.com/bborbe/http/requestbuilder"
-	"github.com/bborbe/log"
+	"github.com/golang/glog"
 )
 
 const (
-	parameterLoglevel        = "loglevel"
 	parameterAPIURL          = "url"
 	parameterAPIUser         = "username"
 	parameterAPIPassword     = "password"
@@ -27,8 +26,6 @@ const (
 )
 
 var (
-	logger             = log.DefaultLogger
-	logLevelPtr        = flag.String(parameterLoglevel, log.INFO_STRING, log.FLAG_USAGE)
 	apiURLPtr          = flag.String(parameterAPIURL, "", "api url")
 	repoURLPtr         = flag.String(parameterRepoURL, "", "repo url")
 	apiUserPtr         = flag.String(parameterAPIUser, "", "user")
@@ -37,12 +34,9 @@ var (
 )
 
 func main() {
-	defer logger.Close()
+	defer glog.Flush()
+	glog.CopyStandardLogTo("info")
 	flag.Parse()
-
-	logger.SetLevelThreshold(log.LogStringToLevel(*logLevelPtr))
-	logger.Debugf("set log level to %s", *logLevelPtr)
-
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
 	httpClient := http_client_builder.New().WithoutProxy().Build()
@@ -61,11 +55,10 @@ func main() {
 		*apiURLPtr,
 		*apiUserPtr,
 		*apiPasswordPtr,
-		*apiPasswordFilePtr)
+		*apiPasswordFilePtr,
+	)
 	if err != nil {
-		logger.Fatal(err)
-		logger.Close()
-		os.Exit(1)
+		glog.Exit(err)
 	}
 }
 
@@ -94,7 +87,7 @@ func do(
 		return err
 	}
 	for _, repo := range repos {
-		logger.Debugf("repo: %v", repo)
+		glog.V(2).Infof("repo: %v", repo)
 		name := repo["Name"]
 		fmt.Fprintf(writer, "%s\n", name)
 	}
