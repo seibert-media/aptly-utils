@@ -47,16 +47,12 @@ go install $INSTALLS
 echo "Install completed, create debian package"
 
 create_debian_package \
--logtostderr \
--v=2 \
 -version=$VERSION \
 -config=src/$SOURCEDIRECTORY/create_debian_package_config.json || exit 1
 
 echo "Create debian package completed, start upload to aptly"
 
 aptly_upload \
--logtostderr \
--v=2 \
 -url=http://aptly-api.aptly.svc.cluster.local:3845 \
 -file=$DEB \
 -repo=unstable || exit 1
