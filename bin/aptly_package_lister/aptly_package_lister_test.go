@@ -4,7 +4,6 @@ import (
 	"testing"
 
 	"bytes"
-
 	aptly_package_lister "github.com/bborbe/aptly_utils/package_lister"
 	. "github.com/bborbe/assert"
 )

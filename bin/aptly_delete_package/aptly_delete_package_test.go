@@ -5,18 +5,13 @@ import (
 
 	aptly_package_deleter "github.com/bborbe/aptly_utils/package_deleter"
 
-	"bytes"
-
 	. "github.com/bborbe/assert"
 )
 
 func TestDo(t *testing.T) {
 	var err error
-	writer := bytes.NewBufferString("")
-
 	package_deleter := aptly_package_deleter.New(nil, nil, nil)
-
-	err = do(writer, package_deleter, "", "", "", "", "", "", "", "", "")
+	err = do(package_deleter, "", "", "", "", "", "", "", "", "")
 	err = AssertThat(err, NotNilValue())
 	if err != nil {
 		t.Fatal(err)

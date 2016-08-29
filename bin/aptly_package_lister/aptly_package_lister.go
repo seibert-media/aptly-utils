@@ -13,6 +13,8 @@ import (
 	http_client_builder "github.com/bborbe/http/client_builder"
 	http_requestbuilder "github.com/bborbe/http/requestbuilder"
 	"github.com/golang/glog"
+	"io"
+	"os"
 )
 
 const (
@@ -46,8 +48,9 @@ func main() {
 	if len(*repoURLPtr) == 0 {
 		*repoURLPtr = *apiURLPtr
 	}
-
+	writer := os.Stdout
 	err := do(
+		writer,
 		package_lister,
 		*repoURLPtr,
 		*apiURLPtr,
@@ -62,6 +65,7 @@ func main() {
 }
 
 func do(
+	writer io.Writer,
 	packageLister aptly_package_lister.PackageLister,
 	repoURL string,
 	apiURL string,

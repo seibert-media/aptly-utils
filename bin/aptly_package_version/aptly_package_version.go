@@ -16,6 +16,8 @@ import (
 	http_requestbuilder "github.com/bborbe/http/requestbuilder"
 	aptly_version "github.com/bborbe/version"
 	"github.com/golang/glog"
+	"io"
+	"os"
 )
 
 const (
@@ -53,8 +55,9 @@ func main() {
 	if len(*repoURLPtr) == 0 {
 		*repoURLPtr = *apiURLPtr
 	}
-
+	writer := os.Stdout
 	err := do(
+		writer,
 		packageVersion,
 		*repoURLPtr,
 		*apiURLPtr,
@@ -70,6 +73,7 @@ func main() {
 }
 
 func do(
+	writer io.Writer,
 	packageVersions aptly_package_versions.PackageVersions,
 	repoURL string,
 	apiURL string,
