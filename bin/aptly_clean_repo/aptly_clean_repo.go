@@ -3,9 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
-	"io"
 	"io/ioutil"
-	"os"
 	"runtime"
 
 	"strings"
@@ -60,9 +58,7 @@ func main() {
 		*repoURLPtr = *apiURLPtr
 	}
 
-	writer := os.Stdout
 	err := do(
-		writer,
 		repoCleaner,
 		*repoURLPtr,
 		*apiURLPtr,
@@ -78,7 +74,6 @@ func main() {
 }
 
 func do(
-	writer io.Writer,
 	repo_cleaner aptly_repo_cleaner.RepoCleaner,
 	repoURL string,
 	apiURL string,
@@ -88,6 +83,7 @@ func do(
 	repo string,
 	distribution string,
 ) error {
+	glog.Infof("repoURL: %v apiURL: %v apiUsername: %v apiPassword: %v apiPasswordfile: %v repo: %v distribution: %v", repoURL, apiURL, apiUsername, apiPassword, apiPasswordfile, repo, distribution)
 	if len(apiPasswordfile) > 0 {
 		content, err := ioutil.ReadFile(apiPasswordfile)
 		if err != nil {
@@ -105,6 +101,5 @@ func do(
 	if err != nil {
 		return err
 	}
-	fmt.Fprintf(writer, "clean repo finished\n")
 	return nil
 }

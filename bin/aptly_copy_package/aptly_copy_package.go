@@ -3,9 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
-	"io"
 	"io/ioutil"
-	"os"
 	"runtime"
 	"strings"
 
@@ -75,9 +73,7 @@ func main() {
 		*repoURLPtr = *apiURLPtr
 	}
 
-	writer := os.Stdout
 	err := do(
-		writer,
 		packageCopier,
 		packageLastestVersion,
 		packageDetailLatestLister,
@@ -98,7 +94,6 @@ func main() {
 }
 
 func do(
-	writer io.Writer,
 	packageCopier aptly_package_copier.PackageCopier,
 	packageLatestVersion aptly_package_latest_version.PackageLatestVersion,
 	packageDetailLatestLister aptly_model_latest_lister.PackageDetailLatestLister,
@@ -109,10 +104,11 @@ func do(
 	apiPasswordfile string,
 	sourceRepo string,
 	targetRepo string,
-	targetDistribution,
+	targetDistribution string,
 	name string,
 	version string,
 ) error {
+	glog.Infof("repoURL: %v apiURL: %v apiUsername: %v apiPassword: %v apiPasswordfile: %v sourceRepo: %v targetRepo: %v targetDistribution: %v name: %v version: %v", repoURL, apiURL, apiUsername, apiPassword, apiPasswordfile, sourceRepo, targetRepo, targetDistribution, name, version)
 	if len(apiPasswordfile) > 0 {
 		content, err := ioutil.ReadFile(apiPasswordfile)
 		if err != nil {

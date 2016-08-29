@@ -3,9 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
-	"io"
 	"io/ioutil"
-	"os"
 	"runtime"
 	"strings"
 
@@ -57,9 +55,7 @@ func main() {
 		*repoURLPtr = *apiURLPtr
 	}
 
-	writer := os.Stdout
 	err := do(
-		writer,
 		repo_creater,
 		*repoURLPtr,
 		*apiURLPtr,
@@ -76,7 +72,6 @@ func main() {
 }
 
 func do(
-	writer io.Writer,
 	repo_creater aptly_repo_creater.RepoCreater,
 	repoURL string,
 	apiURL string,
@@ -87,6 +82,7 @@ func do(
 	distribution string,
 	architectures []string,
 ) error {
+	glog.Infof("repoURL: %v apiURL: %v apiUsername: %v apiPassword: %v apiPasswordfile: %v repo: %v distribution: %v architectures: %v", repoURL, apiURL, apiUsername, apiPassword, apiPasswordfile, repo, distribution, architectures)
 	if len(apiPasswordfile) > 0 {
 		content, err := ioutil.ReadFile(apiPasswordfile)
 		if err != nil {

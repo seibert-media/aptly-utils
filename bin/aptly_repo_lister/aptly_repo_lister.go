@@ -71,6 +71,7 @@ func do(
 	apiPassword string,
 	apiPasswordfile string,
 ) error {
+	glog.Infof("repoURL: %v apiURL: %v apiUsername: %v apiPassword: %v apiPasswordfile: %v", repoURL, apiURL, apiUsername, apiPassword, apiPasswordfile)
 	if len(apiPasswordfile) > 0 {
 		content, err := ioutil.ReadFile(apiPasswordfile)
 		if err != nil {
