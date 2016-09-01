@@ -8,6 +8,9 @@ import (
 	"sort"
 	"strings"
 
+	"io"
+	"os"
+
 	aptly_model "github.com/bborbe/aptly_utils/model"
 	aptly_model_lister "github.com/bborbe/aptly_utils/package_detail_lister"
 	aptly_package_lister "github.com/bborbe/aptly_utils/package_lister"
@@ -16,8 +19,6 @@ import (
 	http_requestbuilder "github.com/bborbe/http/requestbuilder"
 	aptly_version "github.com/bborbe/version"
 	"github.com/golang/glog"
-	"io"
-	"os"
 )
 
 const (

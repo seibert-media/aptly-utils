@@ -6,6 +6,7 @@ import (
 	aptly_package_versions "github.com/bborbe/aptly_utils/package_versions"
 
 	"bytes"
+
 	. "github.com/bborbe/assert"
 )
 
