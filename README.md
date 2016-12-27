@@ -169,7 +169,7 @@ aptly_package_version \
 
 ## Continuous integration
 
-[Jenkins](https://www.benjamin-borbe.de/jenkins/job/Go-Aptly-Utils/)
+[Jenkins](https://jenkins.benjamin-borbe.de/job/Go-Aptly-Utils/)
 
 ## Copyright and license
 
