@@ -16,6 +16,7 @@ import (
 	http_requestbuilder "github.com/bborbe/http/requestbuilder"
 	aptly_version "github.com/bborbe/version"
 	"github.com/golang/glog"
+	"github.com/bborbe/io/util"
 )
 
 const (
@@ -91,9 +92,13 @@ func do(
 ) error {
 	glog.Infof("repoURL: %v apiURL: %v apiUsername: %v apiPassword: %v apiPasswordfile: %v repo: %v distribution: %v name: %v version: %v", repoURL, apiURL, apiUsername, apiPassword, apiPasswordfile, repo, distribution, name, version)
 	if len(apiPasswordfile) > 0 {
+		apiPasswordfile, err := util.NormalizePath(apiPasswordfile)
+		if err != nil {
+			return fmt.Errorf("normalize path %s failed: %v", apiPasswordfile, err)
+		}
 		content, err := ioutil.ReadFile(apiPasswordfile)
 		if err != nil {
-			return err
+			return fmt.Errorf("read password from file failed: %v", err)
 		}
 		apiPassword = strings.TrimSpace(string(content))
 	}
