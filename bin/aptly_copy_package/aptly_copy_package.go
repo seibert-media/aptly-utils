@@ -19,9 +19,9 @@ import (
 	aptly_requestbuilder_executor "github.com/bborbe/aptly_utils/requestbuilder_executor"
 	http_client_builder "github.com/bborbe/http/client_builder"
 	http_requestbuilder "github.com/bborbe/http/requestbuilder"
+	"github.com/bborbe/io/util"
 	aptly_version "github.com/bborbe/version"
 	"github.com/golang/glog"
-	"github.com/bborbe/io/util"
 )
 
 const (

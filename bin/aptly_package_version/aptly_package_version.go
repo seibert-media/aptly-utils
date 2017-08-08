@@ -17,9 +17,9 @@ import (
 	aptly_package_versions "github.com/bborbe/aptly_utils/package_versions"
 	http_client_builder "github.com/bborbe/http/client_builder"
 	http_requestbuilder "github.com/bborbe/http/requestbuilder"
+	"github.com/bborbe/io/util"
 	aptly_version "github.com/bborbe/version"
 	"github.com/golang/glog"
-	"github.com/bborbe/io/util"
 )
 
 const (

@@ -15,8 +15,8 @@ import (
 	aptly_package_lister "github.com/bborbe/aptly_utils/package_lister"
 	http_client_builder "github.com/bborbe/http/client_builder"
 	http_requestbuilder "github.com/bborbe/http/requestbuilder"
-	"github.com/golang/glog"
 	"github.com/bborbe/io/util"
+	"github.com/golang/glog"
 )
 
 const (
