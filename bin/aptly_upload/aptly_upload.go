@@ -82,7 +82,7 @@ func do(
 	repo string,
 	distribution string,
 ) error {
-	glog.Infof("repoURL: %v apiURL: %v apiUsername: %v apiPassword: %v apiPasswordfile: %v file: %v repo: %v distribution: %v", repoURL, apiURL, apiUsername, apiPassword, apiPasswordfile, file, repo, distribution)
+	glog.V(1).Infof("repoURL: %v apiURL: %v apiUsername: %v apiPassword: %v apiPasswordfile: %v file: %v repo: %v distribution: %v", repoURL, apiURL, apiUsername, apiPassword, apiPasswordfile, file, repo, distribution)
 	if len(apiPasswordfile) > 0 {
 		apiPasswordfile, err := util.NormalizePath(apiPasswordfile)
 		if err != nil {
