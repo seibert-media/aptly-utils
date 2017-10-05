@@ -1,7 +1,7 @@
 #!/bin/sh
 
 SOURCEDIRECTORY="github.com/bborbe/aptly_utils"
-VERSION="1.0.1-b${BUILD_NUMBER}"
+VERSION="2.0.1-b${BUILD_NUMBER}"
 NAME="aptly-utils"
 
 ################################################################################

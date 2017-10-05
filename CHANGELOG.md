@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## 2.0.1
+
+- Fix build.sh
+
 ## 2.0.0
 
 - Rename aptly_package_version to aptly_package_latest_version
