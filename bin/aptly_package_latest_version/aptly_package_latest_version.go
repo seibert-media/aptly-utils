@@ -14,7 +14,7 @@ import (
 	aptly_model "github.com/bborbe/aptly_utils/model"
 	aptly_model_lister "github.com/bborbe/aptly_utils/package_detail_lister"
 	aptly_package_lister "github.com/bborbe/aptly_utils/package_lister"
-	aptly_package_versions "github.com/bborbe/aptly_utils/package_versions"
+	aptly_package_latest_versions "github.com/bborbe/aptly_utils/package_versions"
 	http_client_builder "github.com/bborbe/http/client_builder"
 	http_requestbuilder "github.com/bborbe/http/requestbuilder"
 	"github.com/bborbe/io/util"
@@ -52,7 +52,7 @@ func main() {
 	httpRequestBuilderProvider := http_requestbuilder.NewHTTPRequestBuilderProvider()
 	packageLister := aptly_package_lister.New(httpClient.Do, httpRequestBuilderProvider.NewHTTPRequestBuilder)
 	packageDetailLister := aptly_model_lister.New(packageLister.ListPackages)
-	packageVersion := aptly_package_versions.New(packageDetailLister.ListPackageDetails)
+	packageVersion := aptly_package_latest_versions.New(packageDetailLister.ListPackageDetails)
 
 	if len(*repoURLPtr) == 0 {
 		*repoURLPtr = *apiURLPtr
@@ -76,7 +76,7 @@ func main() {
 
 func do(
 	writer io.Writer,
-	packageVersions aptly_package_versions.PackageVersions,
+	packageVersions aptly_package_latest_versions.PackageVersions,
 	repoURL string,
 	apiURL string,
 	apiUsername string,

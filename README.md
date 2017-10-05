@@ -16,7 +16,9 @@ Package provide some aptly utils
 
 `go get github.com/bborbe/aptly_utils/bin/aptly_package_lister`
 
-`go get github.com/bborbe/aptly_utils/bin/aptly_package_version`
+`go get github.com/bborbe/aptly_utils/bin/aptly_package_versions`
+
+`go get github.com/bborbe/aptly_utils/bin/aptly_package_latest_version`
 
 `go get github.com/bborbe/aptly_utils/bin/aptly_upload`
 
@@ -154,10 +156,23 @@ aptly_copy_package \
 -version=latest
 ```
 
-## Version of Package
+## Latest Version of Package
 
 ```
-aptly_package_version \
+aptly_package_latest_version \
+-logtostderr \
+-v=2 \
+-url=https://aptly.tools.seibert-media.net \
+-username=api \
+-passwordfile=$HOME/aptly_api_password \
+-repo=unstable \
+-name=booking
+```
+
+## Versions of Package
+
+```
+aptly_package_versions \
 -logtostderr \
 -v=2 \
 -url=https://aptly.tools.seibert-media.net \

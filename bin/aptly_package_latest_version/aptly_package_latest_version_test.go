@@ -3,7 +3,7 @@ package main
 import (
 	"testing"
 
-	aptly_package_versions "github.com/bborbe/aptly_utils/package_versions"
+	aptly_package_latest_versions "github.com/bborbe/aptly_utils/package_versions"
 
 	"bytes"
 
@@ -13,7 +13,7 @@ import (
 func TestDo(t *testing.T) {
 	var err error
 	writer := bytes.NewBufferString("")
-	package_versions := aptly_package_versions.New(nil)
+	package_versions := aptly_package_latest_versions.New(nil)
 	err = do(writer, package_versions, "", "", "", "", "", "", "")
 	err = AssertThat(err, NotNilValue())
 	if err != nil {
