@@ -28,7 +28,7 @@ Package provide some aptly utils
 aptly_repo_lister \
 -logtostderr \
 -v=2 \
--url=https://aptly.tools.seibert-media.net \
+-url=https://aptly.benjamin-borbe.de \
 -username=api \
 -passwordfile=$HOME/aptly_api_password
 ```
@@ -39,7 +39,7 @@ aptly_repo_lister \
 aptly_create_repo \
 -logtostderr \
 -v=2 \
--url=https://aptly.tools.seibert-media.net \
+-url=https://aptly.benjamin-borbe.de \
 -username=api \
 -passwordfile=$HOME/aptly_api_password \
 -repo=unstable \
@@ -52,7 +52,7 @@ aptly_create_repo \
 aptly_delete_repo \
 -logtostderr \
 -v=2 \
--url=https://aptly.tools.seibert-media.net \
+-url=https://aptly.benjamin-borbe.de \
 -username=api \
 -passwordfile=$HOME/aptly_api_password \
 -repo=unstable
@@ -64,7 +64,7 @@ aptly_delete_repo \
 aptly_clean_repo \
 -logtostderr \
 -v=2 \
--url=https://aptly.tools.seibert-media.net \
+-url=https://aptly.benjamin-borbe.de \
 -username=api \
 -passwordfile=$HOME/aptly_api_password \
 -repo=unstable
@@ -76,7 +76,7 @@ aptly_clean_repo \
 aptly_upload \
 -logtostderr \
 -v=2 \
--url=https://aptly.tools.seibert-media.net \
+-url=https://aptly.benjamin-borbe.de \
 -username=api \
 -passwordfile=$HOME/aptly_api_password \
 -file=booking_1.0.1-b47.deb \
@@ -89,7 +89,7 @@ aptly_upload \
 aptly_package_lister \
 -logtostderr \
 -v=2 \
--url=https://aptly.tools.seibert-media.net \
+-url=https://aptly.benjamin-borbe.de \
 -username=api \
 -passwordfile=$HOME/aptly_api_password \
 -repo=unstable
@@ -101,7 +101,7 @@ aptly_package_lister \
 aptly_delete_package \
 -logtostderr \
 -v=2 \
--url=https://aptly.tools.seibert-media.net \
+-url=https://aptly.benjamin-borbe.de \
 -username=api \
 -passwordfile=$HOME/aptly_api_password \
 -repo=unstable \
@@ -117,7 +117,7 @@ aptly_delete_package \
 aptly_copy_package \
 -logtostderr \
 -v=2 \
--url=https://aptly.tools.seibert-media.net \
+-url=https://aptly.benjamin-borbe.de \
 -username=api \
 -passwordfile=$HOME/aptly_api_password \
 -source=unstable \
@@ -132,7 +132,7 @@ aptly_copy_package \
 aptly_copy_package \
 -logtostderr \
 -v=2 \
--url=https://aptly.tools.seibert-media.net \
+-url=https://aptly.benjamin-borbe.de \
 -username=api \
 -passwordfile=$HOME/aptly_api_password \
 -source=unstable \
@@ -147,7 +147,7 @@ aptly_copy_package \
 aptly_copy_package \
 -logtostderr \
 -v=2 \
--url=https://aptly.tools.seibert-media.net \
+-url=https://aptly.benjamin-borbe.de \
 -username=api \
 -passwordfile=$HOME/aptly_api_password \
 -source=unstable \
@@ -162,7 +162,7 @@ aptly_copy_package \
 aptly_package_latest_version \
 -logtostderr \
 -v=2 \
--url=https://aptly.tools.seibert-media.net \
+-url=https://aptly.benjamin-borbe.de \
 -username=api \
 -passwordfile=$HOME/aptly_api_password \
 -repo=unstable \
@@ -175,7 +175,7 @@ aptly_package_latest_version \
 aptly_package_versions \
 -logtostderr \
 -v=2 \
--url=https://aptly.tools.seibert-media.net \
+-url=https://aptly.benjamin-borbe.de \
 -username=api \
 -passwordfile=$HOME/aptly_api_password \
 -repo=unstable \
