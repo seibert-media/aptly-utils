@@ -1,14 +1,14 @@
 install:
-	GOBIN=$(GOPATH)/bin GO15VENDOREXPERIMENT=1 go install bin/aptly_clean_repo/*.go
-	GOBIN=$(GOPATH)/bin GO15VENDOREXPERIMENT=1 go install bin/aptly_copy_package/*.go
-	GOBIN=$(GOPATH)/bin GO15VENDOREXPERIMENT=1 go install bin/aptly_create_repo/*.go
-	GOBIN=$(GOPATH)/bin GO15VENDOREXPERIMENT=1 go install bin/aptly_delete_package/*.go
-	GOBIN=$(GOPATH)/bin GO15VENDOREXPERIMENT=1 go install bin/aptly_delete_repo/*.go
-	GOBIN=$(GOPATH)/bin GO15VENDOREXPERIMENT=1 go install bin/aptly_package_lister/*.go
-	GOBIN=$(GOPATH)/bin GO15VENDOREXPERIMENT=1 go install bin/aptly_package_versions/*.go
-	GOBIN=$(GOPATH)/bin GO15VENDOREXPERIMENT=1 go install bin/aptly_package_latest_version/*.go
-	GOBIN=$(GOPATH)/bin GO15VENDOREXPERIMENT=1 go install bin/aptly_repo_lister/*.go
-	GOBIN=$(GOPATH)/bin GO15VENDOREXPERIMENT=1 go install bin/aptly_upload/*.go
+	GOBIN=$(GOPATH)/bin GO15VENDOREXPERIMENT=1 go install cmd/aptly_clean_repo/*.go
+	GOBIN=$(GOPATH)/bin GO15VENDOREXPERIMENT=1 go install cmd/aptly_copy_package/*.go
+	GOBIN=$(GOPATH)/bin GO15VENDOREXPERIMENT=1 go install cmd/aptly_create_repo/*.go
+	GOBIN=$(GOPATH)/bin GO15VENDOREXPERIMENT=1 go install cmd/aptly_delete_package/*.go
+	GOBIN=$(GOPATH)/bin GO15VENDOREXPERIMENT=1 go install cmd/aptly_delete_repo/*.go
+	GOBIN=$(GOPATH)/bin GO15VENDOREXPERIMENT=1 go install cmd/aptly_package_lister/*.go
+	GOBIN=$(GOPATH)/bin GO15VENDOREXPERIMENT=1 go install cmd/aptly_package_versions/*.go
+	GOBIN=$(GOPATH)/bin GO15VENDOREXPERIMENT=1 go install cmd/aptly_package_latest_version/*.go
+	GOBIN=$(GOPATH)/bin GO15VENDOREXPERIMENT=1 go install cmd/aptly_repo_lister/*.go
+	GOBIN=$(GOPATH)/bin GO15VENDOREXPERIMENT=1 go install cmd/aptly_upload/*.go
 test:
 	GO15VENDOREXPERIMENT=1 go test -cover `glide novendor`
 vet:
