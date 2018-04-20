@@ -3,7 +3,7 @@ package main
 import (
 	"testing"
 
-	aptly_repo_creater "github.com/bborbe/aptly_utils/repo_creater"
+	aptly_repo_creater "github.com/seibert-media/aptly-utils/repo_creater"
 	. "github.com/bborbe/assert"
 )
 

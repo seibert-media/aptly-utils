@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/bborbe/aptly_utils/model"
-	aptly_model "github.com/bborbe/aptly_utils/model"
-	aptly_package_uploader "github.com/bborbe/aptly_utils/package_uploader"
+	"github.com/seibert-media/aptly-utils/model"
+	aptly_model "github.com/seibert-media/aptly-utils/model"
+	aptly_package_uploader "github.com/seibert-media/aptly-utils/package_uploader"
 	http_requestbuilder "github.com/bborbe/http/requestbuilder"
 	aptly_version "github.com/bborbe/version"
 	"github.com/golang/glog"

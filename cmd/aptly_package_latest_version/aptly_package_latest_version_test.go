@@ -3,7 +3,7 @@ package main
 import (
 	"testing"
 
-	aptly_package_latest_versions "github.com/bborbe/aptly_utils/package_versions"
+	aptly_package_latest_versions "github.com/seibert-media/aptly-utils/package_versions"
 
 	"bytes"
 

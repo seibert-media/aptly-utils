@@ -3,7 +3,7 @@ package main
 import (
 	"testing"
 
-	aptly_repo_deleter "github.com/bborbe/aptly_utils/repo_deleter"
+	aptly_repo_deleter "github.com/seibert-media/aptly-utils/repo_deleter"
 
 	. "github.com/bborbe/assert"
 )

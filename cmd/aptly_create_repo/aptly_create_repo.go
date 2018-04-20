@@ -7,29 +7,25 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/bborbe/aptly_utils/model"
-	aptly_model "github.com/bborbe/aptly_utils/model"
-	aptly_package_deleter "github.com/bborbe/aptly_utils/package_deleter"
-	aptly_repo_publisher "github.com/bborbe/aptly_utils/repo_publisher"
-	aptly_requestbuilder_executor "github.com/bborbe/aptly_utils/requestbuilder_executor"
+	aptly_model "github.com/seibert-media/aptly-utils/model"
+	aptly_repo_creater "github.com/seibert-media/aptly-utils/repo_creater"
+	aptly_repo_publisher "github.com/seibert-media/aptly-utils/repo_publisher"
+	aptly_requestbuilder_executor "github.com/seibert-media/aptly-utils/requestbuilder_executor"
 	http_client_builder "github.com/bborbe/http/client_builder"
 	http_requestbuilder "github.com/bborbe/http/requestbuilder"
 	"github.com/bborbe/io/util"
-	aptly_version "github.com/bborbe/version"
 	"github.com/golang/glog"
 )
 
 const (
-	parameterLoglevel        = "loglevel"
 	parameterAPIURL          = "url"
 	parameterAPIUser         = "username"
 	parameterAPIPassword     = "password"
 	parameterAPIPasswordFile = "passwordfile"
-	parameterRepoURL         = "repo-url"
 	parameterRepo            = "repo"
-	parameterName            = "name"
-	parameterVersion         = "version"
 	parameterDistribution    = "distribution"
+	parameterArchitecture    = "architecture"
+	parameterRepoURL         = "repo-url"
 )
 
 var (
@@ -38,9 +34,8 @@ var (
 	apiPasswordPtr     = flag.String(parameterAPIPassword, "", "password")
 	apiPasswordFilePtr = flag.String(parameterAPIPasswordFile, "", "passwordfile")
 	repoPtr            = flag.String(parameterRepo, "", "repo")
-	namePtr            = flag.String(parameterName, "", "name")
-	versionPtr         = flag.String(parameterVersion, "", "version")
 	distributionPtr    = flag.String(parameterDistribution, string(aptly_model.DistribuionDefault), "distribution")
+	architecturePtr    = flag.String(parameterArchitecture, string(aptly_model.ArchitectureDefault), "architecture")
 	repoURLPtr         = flag.String(parameterRepoURL, "", "repo url")
 )
 
@@ -52,17 +47,17 @@ func main() {
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
 	httpClient := http_client_builder.New().WithoutProxy().Build()
-	httpRequestBuilderProvider := http_requestbuilder.NewHTTPRequestBuilderProvider()
 	requestbuilder_executor := aptly_requestbuilder_executor.New(httpClient.Do)
-	repo_publisher := aptly_repo_publisher.New(requestbuilder_executor, httpRequestBuilderProvider)
-	package_deleter := aptly_package_deleter.New(httpClient.Do, httpRequestBuilderProvider.NewHTTPRequestBuilder, repo_publisher.PublishRepo)
+	requestbuilder := http_requestbuilder.NewHTTPRequestBuilderProvider()
+	repo_publisher := aptly_repo_publisher.New(requestbuilder_executor, requestbuilder)
+	repo_creater := aptly_repo_creater.New(requestbuilder_executor, requestbuilder, repo_publisher.PublishNewRepo)
 
 	if len(*repoURLPtr) == 0 {
 		*repoURLPtr = *apiURLPtr
 	}
 
 	err := do(
-		package_deleter,
+		repo_creater,
 		*repoURLPtr,
 		*apiURLPtr,
 		*apiUserPtr,
@@ -70,8 +65,7 @@ func main() {
 		*apiPasswordFilePtr,
 		*repoPtr,
 		*distributionPtr,
-		*namePtr,
-		*versionPtr,
+		strings.Split(*architecturePtr, ","),
 	)
 	if err != nil {
 		glog.Exit(err)
@@ -79,7 +73,7 @@ func main() {
 }
 
 func do(
-	package_deleter aptly_package_deleter.PackageDeleter,
+	repo_creater aptly_repo_creater.RepoCreater,
 	repoURL string,
 	apiURL string,
 	apiUsername string,
@@ -87,10 +81,9 @@ func do(
 	apiPasswordfile string,
 	repo string,
 	distribution string,
-	name string,
-	version string,
+	architectures []string,
 ) error {
-	glog.Infof("repoURL: %v apiURL: %v apiUsername: %v apiPassword: %v apiPasswordfile: %v repo: %v distribution: %v name: %v version: %v", repoURL, apiURL, apiUsername, apiPassword, apiPasswordfile, repo, distribution, name, version)
+	glog.Infof("repoURL: %v apiURL: %v apiUsername: %v apiPassword: %v apiPasswordfile: %v repo: %v distribution: %v architectures: %v", repoURL, apiURL, apiUsername, apiPassword, apiPasswordfile, repo, distribution, architectures)
 	if len(apiPasswordfile) > 0 {
 		apiPasswordfile, err := util.NormalizePath(apiPasswordfile)
 		if err != nil {
@@ -108,11 +101,5 @@ func do(
 	if len(repo) == 0 {
 		return fmt.Errorf("parameter %s missing", parameterRepo)
 	}
-	if len(name) == 0 {
-		return fmt.Errorf("parameter %s missing", parameterName)
-	}
-	if len(version) == 0 {
-		return fmt.Errorf("parameter %s missing", parameterVersion)
-	}
-	return package_deleter.DeletePackageByNameAndVersion(aptly_model.NewAPI(repoURL, apiURL, apiUsername, apiPassword), aptly_model.Repository(repo), aptly_model.Distribution(distribution), model.Package(name), aptly_version.Version(version))
+	return repo_creater.CreateRepo(aptly_model.NewAPI(repoURL, apiURL, apiUsername, apiPassword), aptly_model.Repository(repo), aptly_model.Distribution(distribution), aptly_model.ParseArchitectures(architectures))
 }

@@ -10,8 +10,8 @@ import (
 
 	"io/ioutil"
 
-	aptly_model "github.com/bborbe/aptly_utils/model"
-	aptly_requestbuilder_executor "github.com/bborbe/aptly_utils/requestbuilder_executor"
+	aptly_model "github.com/seibert-media/aptly-utils/model"
+	aptly_requestbuilder_executor "github.com/seibert-media/aptly-utils/requestbuilder_executor"
 	http_requestbuilder "github.com/bborbe/http/requestbuilder"
 	"github.com/golang/glog"
 )

@@ -1,6 +1,6 @@
 #!/bin/sh
 
-SOURCEDIRECTORY="github.com/bborbe/aptly_utils"
+SOURCEDIRECTORY="github.com/seibert-media/aptly-utils"
 VERSION="2.0.1-b${BUILD_NUMBER}"
 NAME="aptly-utils"
 

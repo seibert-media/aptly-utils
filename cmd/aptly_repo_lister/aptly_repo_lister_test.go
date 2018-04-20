@@ -5,7 +5,7 @@ import (
 
 	"bytes"
 
-	aptly_repo_lister "github.com/bborbe/aptly_utils/repo_lister"
+	aptly_repo_lister "github.com/seibert-media/aptly-utils/repo_lister"
 	. "github.com/bborbe/assert"
 )
 

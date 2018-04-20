@@ -6,7 +6,7 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	aptly_model "github.com/bborbe/aptly_utils/model"
+	aptly_model "github.com/seibert-media/aptly-utils/model"
 	http_requestbuilder "github.com/bborbe/http/requestbuilder"
 	"github.com/golang/glog"
 )

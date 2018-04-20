@@ -3,7 +3,7 @@ package repo_creator
 import (
 	"testing"
 
-	"github.com/bborbe/aptly_utils/model"
+	"github.com/seibert-media/aptly-utils/model"
 	. "github.com/bborbe/assert"
 )
 

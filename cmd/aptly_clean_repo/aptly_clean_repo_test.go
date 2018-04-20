@@ -3,7 +3,7 @@ package main
 import (
 	"testing"
 
-	aptly_repo_cleaner "github.com/bborbe/aptly_utils/repo_cleaner"
+	aptly_repo_cleaner "github.com/seibert-media/aptly-utils/repo_cleaner"
 
 	. "github.com/bborbe/assert"
 )

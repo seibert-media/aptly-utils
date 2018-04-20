@@ -5,7 +5,7 @@ import (
 
 	"bytes"
 
-	aptly_package_lister "github.com/bborbe/aptly_utils/package_lister"
+	aptly_package_lister "github.com/seibert-media/aptly-utils/package_lister"
 	. "github.com/bborbe/assert"
 )
 

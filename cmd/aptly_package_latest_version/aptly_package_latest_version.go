@@ -5,18 +5,20 @@ import (
 	"fmt"
 	"io/ioutil"
 	"runtime"
-
+	"sort"
 	"strings"
 
-	aptly_model "github.com/bborbe/aptly_utils/model"
-	aptly_package_deleter "github.com/bborbe/aptly_utils/package_deleter"
-	aptly_package_lister "github.com/bborbe/aptly_utils/package_lister"
-	aptly_repo_cleaner "github.com/bborbe/aptly_utils/repo_cleaner"
-	aptly_repo_publisher "github.com/bborbe/aptly_utils/repo_publisher"
-	aptly_requestbuilder_executor "github.com/bborbe/aptly_utils/requestbuilder_executor"
+	"io"
+	"os"
+
+	aptly_model "github.com/seibert-media/aptly-utils/model"
+	aptly_model_lister "github.com/seibert-media/aptly-utils/package_detail_lister"
+	aptly_package_lister "github.com/seibert-media/aptly-utils/package_lister"
+	aptly_package_latest_versions "github.com/seibert-media/aptly-utils/package_versions"
 	http_client_builder "github.com/bborbe/http/client_builder"
 	http_requestbuilder "github.com/bborbe/http/requestbuilder"
 	"github.com/bborbe/io/util"
+	aptly_version "github.com/bborbe/version"
 	"github.com/golang/glog"
 )
 
@@ -25,9 +27,9 @@ const (
 	parameterAPIUser         = "username"
 	parameterAPIPassword     = "password"
 	parameterAPIPasswordFile = "passwordfile"
-	parameterRepo            = "repo"
-	parameterDistribution    = "distribution"
 	parameterRepoURL         = "repo-url"
+	parameterRepo            = "repo"
+	parameterName            = "name"
 )
 
 var (
@@ -35,39 +37,37 @@ var (
 	apiUserPtr         = flag.String(parameterAPIUser, "", "user")
 	apiPasswordPtr     = flag.String(parameterAPIPassword, "", "password")
 	apiPasswordFilePtr = flag.String(parameterAPIPasswordFile, "", "passwordfile")
-	repoURLPtr         = flag.String(parameterRepoURL, "", "repo url")
 	repoPtr            = flag.String(parameterRepo, "", "repo")
-	distributionPtr    = flag.String(parameterDistribution, string(aptly_model.DistribuionDefault), "distribution")
+	namePtr            = flag.String(parameterName, "", "name")
+	repoURLPtr         = flag.String(parameterRepoURL, "", "repo url")
 )
 
 func main() {
 	defer glog.Flush()
 	glog.CopyStandardLogTo("info")
 	flag.Parse()
-
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
 	httpClient := http_client_builder.New().WithoutProxy().Build()
 	httpRequestBuilderProvider := http_requestbuilder.NewHTTPRequestBuilderProvider()
 	packageLister := aptly_package_lister.New(httpClient.Do, httpRequestBuilderProvider.NewHTTPRequestBuilder)
-	requestbuilder_executor := aptly_requestbuilder_executor.New(httpClient.Do)
-	repoPublisher := aptly_repo_publisher.New(requestbuilder_executor, httpRequestBuilderProvider)
-	packageDeleter := aptly_package_deleter.New(httpClient.Do, httpRequestBuilderProvider.NewHTTPRequestBuilder, repoPublisher.PublishRepo)
-	repoCleaner := aptly_repo_cleaner.New(packageDeleter.DeletePackagesByKey, packageLister.ListPackages)
+	packageDetailLister := aptly_model_lister.New(packageLister.ListPackages)
+	packageVersion := aptly_package_latest_versions.New(packageDetailLister.ListPackageDetails)
 
 	if len(*repoURLPtr) == 0 {
 		*repoURLPtr = *apiURLPtr
 	}
-
+	writer := os.Stdout
 	err := do(
-		repoCleaner,
+		writer,
+		packageVersion,
 		*repoURLPtr,
 		*apiURLPtr,
 		*apiUserPtr,
 		*apiPasswordPtr,
 		*apiPasswordFilePtr,
 		*repoPtr,
-		*distributionPtr,
+		*namePtr,
 	)
 	if err != nil {
 		glog.Exit(err)
@@ -75,16 +75,17 @@ func main() {
 }
 
 func do(
-	repo_cleaner aptly_repo_cleaner.RepoCleaner,
+	writer io.Writer,
+	packageVersions aptly_package_latest_versions.PackageVersions,
 	repoURL string,
 	apiURL string,
 	apiUsername string,
 	apiPassword string,
 	apiPasswordfile string,
 	repo string,
-	distribution string,
+	name string,
 ) error {
-	glog.Infof("repoURL: %v apiURL: %v apiUsername: %v apiPassword: %v apiPasswordfile: %v repo: %v distribution: %v", repoURL, apiURL, apiUsername, apiPassword, apiPasswordfile, repo, distribution)
+	glog.Infof("repoURL: %v apiURL: %v apiUsername: %v apiPassword: %v apiPasswordfile: %v repo: %v name: %v", repoURL, apiURL, apiUsername, apiPassword, apiPasswordfile, repo, name)
 	if len(apiPasswordfile) > 0 {
 		apiPasswordfile, err := util.NormalizePath(apiPasswordfile)
 		if err != nil {
@@ -96,15 +97,26 @@ func do(
 		}
 		apiPassword = strings.TrimSpace(string(content))
 	}
+
 	if len(apiURL) == 0 {
 		return fmt.Errorf("parameter %s missing", parameterAPIURL)
 	}
 	if len(repo) == 0 {
 		return fmt.Errorf("parameter %s missing", parameterRepo)
 	}
-	err := repo_cleaner.CleanRepo(aptly_model.NewAPI(repoURL, apiURL, apiUsername, apiPassword), aptly_model.Repository(repo), aptly_model.Distribution(distribution))
-	if err != nil {
+	if len(name) == 0 {
+		return fmt.Errorf("parameter %s missing", parameterName)
+	}
+
+	var err error
+	var versions []aptly_version.Version
+	if versions, err = packageVersions.PackageVersions(aptly_model.NewAPI(repoURL, apiURL, apiUsername, apiPassword), aptly_model.Repository(repo), aptly_model.Package(name)); err != nil {
 		return err
 	}
+	if len(versions) == 0 {
+		return fmt.Errorf("package %s not found", name)
+	}
+	sort.Sort(aptly_version.VersionByName(versions))
+	fmt.Fprintf(writer, "%s\n", versions[len(versions)-1])
 	return nil
 }

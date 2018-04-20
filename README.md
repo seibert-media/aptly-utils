@@ -4,23 +4,23 @@ Package provide some aptly utils
 
 ## Install
 
-`go get github.com/bborbe/aptly_utils/bin/aptly_clean_repo`
+`go get github.com/seibert-media/aptly-utils/cmd/aptly_clean_repo`
 
-`go get github.com/bborbe/aptly_utils/bin/aptly_copy_package`
+`go get github.com/seibert-media/aptly-utils/cmd/aptly_copy_package`
 
-`go get github.com/bborbe/aptly_utils/bin/aptly_create_repo`
+`go get github.com/seibert-media/aptly-utils/cmd/aptly_create_repo`
 
-`go get github.com/bborbe/aptly_utils/bin/aptly_delete_package`
+`go get github.com/seibert-media/aptly-utils/cmd/aptly_delete_package`
 
-`go get github.com/bborbe/aptly_utils/bin/aptly_delete_repo`
+`go get github.com/seibert-media/aptly-utils/cmd/aptly_delete_repo`
 
-`go get github.com/bborbe/aptly_utils/bin/aptly_package_lister`
+`go get github.com/seibert-media/aptly-utils/cmd/aptly_package_lister`
 
-`go get github.com/bborbe/aptly_utils/bin/aptly_package_versions`
+`go get github.com/seibert-media/aptly-utils/cmd/aptly_package_versions`
 
-`go get github.com/bborbe/aptly_utils/bin/aptly_package_latest_version`
+`go get github.com/seibert-media/aptly-utils/cmd/aptly_package_latest_version`
 
-`go get github.com/bborbe/aptly_utils/bin/aptly_upload`
+`go get github.com/seibert-media/aptly-utils/cmd/aptly_upload`
 
 ## List repositories
 

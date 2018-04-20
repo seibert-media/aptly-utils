@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"sort"
 
-	"github.com/bborbe/aptly_utils/model"
-	aptly_model "github.com/bborbe/aptly_utils/model"
+	"github.com/seibert-media/aptly-utils/model"
+	aptly_model "github.com/seibert-media/aptly-utils/model"
 	aptly_version "github.com/bborbe/version"
 	"github.com/golang/glog"
 )

@@ -3,7 +3,7 @@ package main
 import (
 	"testing"
 
-	aptly_package_uploader "github.com/bborbe/aptly_utils/package_uploader"
+	aptly_package_uploader "github.com/seibert-media/aptly-utils/package_uploader"
 	. "github.com/bborbe/assert"
 )
 

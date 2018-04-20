@@ -1,7 +1,7 @@
 package package_detail_lister
 
 import (
-	aptly_model "github.com/bborbe/aptly_utils/model"
+	aptly_model "github.com/seibert-media/aptly-utils/model"
 	"github.com/golang/glog"
 )
 

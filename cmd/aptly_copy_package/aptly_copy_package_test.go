@@ -3,9 +3,9 @@ package main
 import (
 	"testing"
 
-	aptly_package_copier "github.com/bborbe/aptly_utils/package_copier"
-	aptly_model_lister "github.com/bborbe/aptly_utils/package_detail_latest_lister"
-	aptly_package_latest_version "github.com/bborbe/aptly_utils/package_latest_version"
+	aptly_package_copier "github.com/seibert-media/aptly-utils/package_copier"
+	aptly_model_lister "github.com/seibert-media/aptly-utils/package_detail_latest_lister"
+	aptly_package_latest_version "github.com/seibert-media/aptly-utils/package_latest_version"
 	. "github.com/bborbe/assert"
 )
 

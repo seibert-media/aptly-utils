@@ -5,7 +5,7 @@
 	"architecture": "amd64",
 	"maintainer": "Benjamin Borbe <bborbe@rocketnews.de>",
 	"description": "Aptly Utils",
-	"postinst": "src/github.com/bborbe/aptly_utils/postinst",
+	"postinst": "src/github.com/seibert-media/aptly-utils/postinst",
 	"files": [
 		{
 			"source": "bin/aptly_package_lister",
