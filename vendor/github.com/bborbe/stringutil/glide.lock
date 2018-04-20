@@ -1,0 +1,6 @@
+hash: f80760bf4530b86d35b4b47bee1e9a71a225313a6993f4f869c5d360de2d2327
+updated: 2016-08-29T00:13:24.937721418+02:00
+imports: []
+testImports:
+- name: github.com/bborbe/assert
+  version: 639eac9a24e3c01472758f3c79452b8517bc29f6

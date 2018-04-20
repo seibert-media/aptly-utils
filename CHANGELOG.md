@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## 2.0.2
+
+- Add Jenkinsfile
+- Use deps instead glide
+
 ## 2.0.1
 
 - Fix build.sh

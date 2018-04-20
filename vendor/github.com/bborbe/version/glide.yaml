@@ -1,0 +1,6 @@
+package: github.com/bborbe/version
+import:
+- package: github.com/golang/glog
+- package: github.com/bborbe/stringutil
+testImport:
+- package: github.com/bborbe/assert

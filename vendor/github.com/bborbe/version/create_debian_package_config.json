@@ -1,0 +1,32 @@
+{
+  "name": "version",
+  "section": "utils",
+  "priority": "optional",
+  "architecture": "amd64",
+  "maintainer": "Benjamin Borbe <bborbe@rocketnews.de>",
+  "description": "Version Generator",
+  "postinst": "src/github.com/bborbe/version/postinst",
+  "files": [
+		{
+			"source": "bin/version_eq",
+			"target": "/opt/version/bin/version_eq"
+		},
+		{
+			"source": "bin/version_lt",
+			"target": "/opt/version/bin/version_lt"
+		},
+		{
+			"source": "bin/version_le",
+			"target": "/opt/version/bin/version_le"
+		},
+		{
+			"source": "bin/version_gt",
+			"target": "/opt/version/bin/version_gt"
+		},
+		{
+			"source": "bin/version_ge",
+			"target": "/opt/version/bin/version_ge"
+		}
+  ]
+}
+
