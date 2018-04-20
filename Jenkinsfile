@@ -46,7 +46,7 @@ podTemplate(
 				stage('Golang Link') {
 					timeout(time: 5, unit: 'MINUTES') {
 						sh """
-						mkdir -p /go/src/github.com/bborbe
+						mkdir -p /go/src/github.com/seibert-media
 						ln -s `pwd` /go/src/github.com/seibert-media/aptly-utils
 						"""
 					}
