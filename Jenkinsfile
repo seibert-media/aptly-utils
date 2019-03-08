@@ -6,7 +6,7 @@ podTemplate(
 	containers: [
 		containerTemplate(
 			name: 'build-golang',
-			image: 'docker.io/bborbe/build-golang:1.0.0',
+			image: 'eu.gcr.io/smedia-kubernetes/build-golang:1.12.0-1.3.2',
 			ttyEnabled: true,
 			command: 'cat',
 			resourceRequestCpu: '500m',
@@ -37,7 +37,7 @@ podTemplate(
 							$class: 'GitSCM',
 							branches: scm.branches,
 							doGenerateSubmoduleConfigurations: scm.doGenerateSubmoduleConfigurations,
-							extensions: scm.extensions + [[$class: 'CloneOption', noTags: false, reference: '', shallow: true]],
+							extensions: scm.extensions + [[$class: 'CloneOption', noTags: false, reference: '', shallow: false]],
 							submoduleCfg: [],
 							userRemoteConfigs: scm.userRemoteConfigs
 						])
@@ -65,13 +65,13 @@ podTemplate(
 			if ('FAILURE'.equals(currentBuild.result)) {
 				emailext(
 					body: '${DEFAULT_CONTENT}',
-					mimeType: 'text/html',
+					mimeType: 'text/plain',
 					replyTo: '$DEFAULT_REPLYTO',
 					subject: '${DEFAULT_SUBJECT}',
-					to: emailextrecipients([
+					recipientProviders:[
 						[$class: 'CulpritsRecipientProvider'],
 						[$class: 'RequesterRecipientProvider']
-					])
+					]
 				)
 			}
 		}
